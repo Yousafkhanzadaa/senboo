@@ -1,0 +1,61 @@
+name: senboo
+description: Senboo is a social media app in which users can share there stories, quotes and many things in text form. User can't upload any pic, video etc.
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.12.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^1.0.2
+  shared_preferences: ^2.0.7
+  provider: ^6.0.0
+  font_awesome_flutter: ^9.1.0
+  firebase_core: ^1.6.0
+  firebase_auth: ^3.1.1
+  cloud_firestore: ^2.5.2
+  google_sign_in: ^5.1.0
+  uuid: ^3.0.4
+  timeago: ^3.1.0
+  google_mobile_ads: ^0.13.5
+  flutter_native_splash: ^1.2.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+
+
+
+# The following section is specific to Flutter.
+flutter:
+  # the material Icons class.
+  uses-material-design: true
+
+  # Images -------------------------------------
+  assets:
+    - assets/images/logo.png
+
+  # fonts ----------------------------------------
+  fonts:
+    - family: Lato
+      fonts:
+        - asset: assets/font/Lato/Lato-Regular.ttf
+        - asset: assets/font/Lato/Lato-Italic.ttf
+          style: italic
+        - asset: assets/font/Lato/Lato-Light.ttf
+          weight: 300
+        - asset: assets/font/Lato/Lato-LightItalic.ttf
+          weight: 300
+          style: italic
+        - asset: assets/font/Lato/Lato-Bold.ttf
+          weight: 700
+
