@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ydevs.senboo">
+    <user-permission android:name="android.permission.INTERNET"/>
    <application
         android:label="Senboo"
         android:icon="@mipmap/ic_launcher">
