@@ -33,7 +33,7 @@ class FirebaseAuthServices extends ChangeNotifier {
       await auth.signOut();
       GoogleSignIn().signOut();
     } catch (e) {
-      print(e);
+      // print(e);
       throw e;
     }
   }
