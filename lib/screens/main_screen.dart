@@ -324,7 +324,9 @@ class _MainScreenState extends State<MainScreen> {
       onPressed: () {
         Navigator.pop(context);
         showModalBottomSheet(
-            context: context, builder: (context) => ColorPalette());
+            backgroundColor: Colors.transparent,
+            context: context,
+            builder: (context) => ColorPalette());
       },
       style: ButtonStyle(
           backgroundColor:
