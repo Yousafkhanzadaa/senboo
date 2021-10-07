@@ -36,8 +36,8 @@ lib/generated_plugin_registrant.dart
 
 # Symbolication related
 app.*.symbols
-app/upload-keystore.jks
-key.properties
+/android/app/upload-keystore.jks
+/android/key.properties
 
 # Obfuscation related
 app.*.map.json
