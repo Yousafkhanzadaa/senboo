@@ -145,8 +145,8 @@ class _PostScreenState extends State<PostScreen> {
             ),
             CustomTextField(
               controller: _bodyTextController,
-              hint: "Optional body text",
-              label: "Body text (optional)",
+              hint: "Body text",
+              label: "Body text ",
               maxLines: 10,
             ),
           ],
@@ -165,16 +165,9 @@ class _PostScreenState extends State<PostScreen> {
         ),
         RichText(
           text: TextSpan(
-            text: "Categories",
+            text: "Select Categorie",
             style: Theme.of(context).textTheme.bodyText1,
-            children: <TextSpan>[
-              TextSpan(
-                text: '    (select only 2)',
-                style: Theme.of(context).textTheme.bodyText1!.copyWith(
-                      fontSize: 12,
-                    ),
-              ),
-            ],
+            children: <TextSpan>[],
           ),
         ),
         Container(

@@ -64,46 +64,49 @@ class _HomeScreenState extends State<HomeScreen> {
                   return _errorScreen();
                 }
                 if (snapshot.hasData) {
-                  return Container(
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      scrollDirection: Axis.vertical,
-                      itemCount: snapshot.data!.docs.length,
-                      itemBuilder: (context, index) {
-                        var data = snapshot.data!.docs;
-                        postData = PostData.setData(data[index]);
-                        return index % 3 == 0
-                            ? Column(
-                                children: [
-                                  PostCard(
-                                    userName: postData!.userName!,
-                                    profession: postData!.profession!,
-                                    title: postData!.title!,
-                                    body: postData!.body!,
-                                    date: postData!.date!.toDate(),
-                                    category: postData!.category!,
-                                    likes: postData!.likes!,
-                                    postId: postData!.postId!,
-                                    ownerId: postData!.ownerId!,
-                                  ),
-                                  SizedBox(height: 5),
-                                  Ads(),
-                                ],
-                              )
-                            : PostCard(
-                                userName: postData!.userName!,
-                                profession: postData!.profession!,
-                                title: postData!.title!,
-                                body: postData!.body!,
-                                date: postData!.date!.toDate(),
-                                category: postData!.category!,
-                                likes: postData!.likes!,
-                                postId: postData!.postId!,
-                                ownerId: postData!.ownerId!,
-                              );
-                      },
-                    ),
-                  );
+                  var postsList = snapshot.data!.docs;
+                  return postsList.isEmpty
+                      ? _noPosts()
+                      : Container(
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            scrollDirection: Axis.vertical,
+                            itemCount: snapshot.data!.docs.length,
+                            itemBuilder: (context, index) {
+                              var data = snapshot.data!.docs;
+                              postData = PostData.setData(data[index]);
+                              return index % 3 == 0
+                                  ? Column(
+                                      children: [
+                                        PostCard(
+                                          userName: postData!.userName!,
+                                          profession: postData!.profession!,
+                                          title: postData!.title!,
+                                          body: postData!.body!,
+                                          date: postData!.date!.toDate(),
+                                          category: postData!.category!,
+                                          likes: postData!.likes!,
+                                          postId: postData!.postId!,
+                                          ownerId: postData!.ownerId!,
+                                        ),
+                                        SizedBox(height: 5),
+                                        Ads(),
+                                      ],
+                                    )
+                                  : PostCard(
+                                      userName: postData!.userName!,
+                                      profession: postData!.profession!,
+                                      title: postData!.title!,
+                                      body: postData!.body!,
+                                      date: postData!.date!.toDate(),
+                                      category: postData!.category!,
+                                      likes: postData!.likes!,
+                                      postId: postData!.postId!,
+                                      ownerId: postData!.ownerId!,
+                                    );
+                            },
+                          ),
+                        );
                 }
                 return _loadingScreen();
               },
@@ -175,6 +178,34 @@ class _HomeScreenState extends State<HomeScreen> {
             _profileEditButton(),
           ],
         ),
+      ),
+    );
+  }
+
+  // Load Screen ---------------------------------------------
+  Widget _noPosts() {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.4,
+      alignment: Alignment.center,
+      margin: EdgeInsets.symmetric(
+        vertical: 10,
+        horizontal: 10,
+      ),
+      decoration: _cardDecoration(),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            "No Posts available for your interests. yet!",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Theme.of(context).primaryColor,
+              fontSize: 26,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
       ),
     );
   }

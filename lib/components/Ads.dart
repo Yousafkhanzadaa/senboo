@@ -13,7 +13,7 @@ class _AdsState extends State<Ads> {
   bool? isLoaded;
 
   // String get _adUnitTestID => "ca-app-pub-3940256099942544/6300978111";
-  String get _adUnitID => "ca-app-pub-8405854504560397/5741114678";
+  String get _adUnitID => "ca-app-pub-1612399077386662/6227262426";
   @override
   void initState() {
     super.initState();
