@@ -153,7 +153,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       height: MediaQuery.of(context).size.height * 0.40,
       width: MediaQuery.of(context).size.width,
       child: StreamBuilder<QuerySnapshot>(
-        stream: posts.where('ownerId', isEqualTo: currentUser!.uid).snapshots(),
+        stream: posts
+            .where('ownerId', isEqualTo: currentUser!.uid)
+            .orderBy("date", descending: true)
+            .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             List dataList = snapshot.data!.docs.toList();

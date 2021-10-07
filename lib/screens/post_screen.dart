@@ -32,14 +32,17 @@ class _PostScreenState extends State<PostScreen> {
   DateTime? dateTime;
 
   final List<String> _fieldButtonNames = [
-    'Finance & Economics',
+    "Quote",
+    "Art & Culture",
     "Business",
+    "Idea",
     "Science & Technology",
     "Health & Medicine",
+    "Story",
+    'Finance & Economics',
     "Lifestyle",
-    "Sport & Leisure",
     "Entertainment",
-    "Art & Culture",
+    "Top Five"
   ];
 
   @override
