@@ -40,7 +40,7 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
               child: CustomTextField(
                 controller: _searchController,
-                hint: 'Search by keywords or name',
+                hint: 'Search by keyword or name',
                 onChange: (value) {
                   setState(() {
                     _keyWords = value.toString().toLowerCase().split(" ");

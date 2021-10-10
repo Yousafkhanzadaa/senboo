@@ -168,7 +168,7 @@ class _PostScreenState extends State<PostScreen> {
         ),
         RichText(
           text: TextSpan(
-            text: "Select Categorie",
+            text: "Select category",
             style: Theme.of(context).textTheme.bodyText1,
             children: <TextSpan>[],
           ),
@@ -267,8 +267,7 @@ class _PostScreenState extends State<PostScreen> {
         if (_categories.isEmpty) {
           var snackBar = SnackBar(
               backgroundColor: Theme.of(context).primaryColor,
-              content:
-                  Text('please select category on top. scroll horizontal.'));
+              content: Text('please select category.\nscroll horizontal.'));
           ScaffoldMessenger.of(context).showSnackBar(snackBar);
         }
         if (_categories.isNotEmpty) {

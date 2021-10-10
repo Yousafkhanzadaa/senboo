@@ -22,21 +22,23 @@ class _AdsState extends State<Ads> {
       size: AdSize.banner,
       request: AdRequest(),
       listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          // print('Ad loaded: ${ad.adUnitId}');
-          setState(() {
-            isLoaded = true;
-          });
-        },
-        onAdFailedToLoad: (ad, error) {
-          print('Ad Failed to loaded: ${ad.adUnitId}, $error');
-        },
-        onAdOpened: (ad) => print(
-          'Ad Opened: ${ad.adUnitId}',
-        ),
-        onAdImpression: (ad) =>
-            print('every impression counts ${ad.responseInfo}'),
-      ),
+          onAdLoaded: (ad) {
+            // print('Ad loaded: ${ad.adUnitId}');
+            setState(() {
+              isLoaded = true;
+            });
+          },
+          onAdFailedToLoad: (ad, error) {
+            // print('Ad Failed to loaded: ${ad.adUnitId}, $error');
+          },
+          onAdOpened: (ad) => {
+                // print(
+                //       'Ad Opened: ${ad.adUnitId}',
+                //     ),
+              },
+          onAdImpression: (ad) {
+            // print('every impression counts ${ad.responseInfo}'),
+          }),
     );
     _myBanner!.load();
   }

@@ -78,7 +78,7 @@ class _MainScreenState extends State<MainScreen> {
         });
       }
     }).catchError((error) {
-      print(error);
+      // print(error);
     });
   }
 

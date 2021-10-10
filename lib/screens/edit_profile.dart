@@ -374,8 +374,8 @@ class _EditProfileState extends State<EditProfile> {
             }
             if (_interestedList.isEmpty) {
               var snackBar = SnackBar(
-                  content:
-                      Text('Please select your intrestes. scroll horizontal'));
+                  content: Text(
+                      'Please select your interestes.\nscroll horizontal'));
               ScaffoldMessenger.of(context).showSnackBar(snackBar);
             }
           },
@@ -432,7 +432,7 @@ class _EditProfileState extends State<EditProfile> {
             var snackBar = SnackBar(
                 backgroundColor: Theme.of(context).primaryColor,
                 content:
-                    Text('Please select your intrestes. scroll horizontal'));
+                    Text('Please select your interestes.\nscroll horizontal'));
             ScaffoldMessenger.of(context).showSnackBar(snackBar);
           }
         },

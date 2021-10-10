@@ -7,7 +7,6 @@ import 'package:senboo/components/post_card.dart';
 import 'package:senboo/model/get_user_data.dart';
 import 'package:senboo/providers/edit_list_controller.dart';
 import 'package:senboo/screens/edit_profile.dart';
-import 'package:senboo/screens/post_view_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -158,20 +157,20 @@ class _HomeScreenState extends State<HomeScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              "Please Enter Details.",
+              "Please first edit your profile.",
               style: TextStyle(
                 color: Theme.of(context).primaryColor,
                 fontSize: 26,
                 fontWeight: FontWeight.w700,
               ),
             ),
-            Text(
-              "No interests selected.",
-              style: TextStyle(
-                color: Theme.of(context).primaryColor,
-                fontSize: 18,
-              ),
-            ),
+            // Text(
+            //   "No interests selected.",
+            //   style: TextStyle(
+            //     color: Theme.of(context).primaryColor,
+            //     fontSize: 18,
+            //   ),
+            // ),
             SizedBox(
               height: 10,
             ),
@@ -197,7 +196,7 @@ class _HomeScreenState extends State<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            "No Posts available for your interests. yet!",
+            "No Posts available for your interests yet!",
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Theme.of(context).primaryColor,

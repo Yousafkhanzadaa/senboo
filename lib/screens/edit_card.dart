@@ -39,14 +39,17 @@ class _UpdatePostScreenState extends State<UpdatePostScreen> {
   DateTime? dateTime;
 
   final List<String> _fieldButtonNames = [
-    'Finance & Economics',
+    "Quote",
+    "Art & Culture",
     "Business",
+    "Idea",
     "Science & Technology",
     "Health & Medicine",
+    "Story",
+    'Finance & Economics',
     "Lifestyle",
-    "Sport & Leisure",
     "Entertainment",
-    "Art & Culture",
+    "Top Five"
   ];
 
   @override
@@ -182,16 +185,9 @@ class _UpdatePostScreenState extends State<UpdatePostScreen> {
         ),
         RichText(
           text: TextSpan(
-            text: "Categories",
+            text: "Select category",
             style: Theme.of(context).textTheme.bodyText1,
-            children: <TextSpan>[
-              TextSpan(
-                text: '    (select only 2)',
-                style: Theme.of(context).textTheme.bodyText1!.copyWith(
-                      fontSize: 12,
-                    ),
-              ),
-            ],
+            children: <TextSpan>[],
           ),
         ),
         Container(
