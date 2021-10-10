@@ -186,12 +186,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Container(
       height: MediaQuery.of(context).size.height * 0.40,
       width: MediaQuery.of(context).size.width,
-      child: StreamBuilder<QuerySnapshot>(
-        stream:
-            savedPosts.doc(currentUser!.uid).collection("saved").snapshots(),
+      child: StreamBuilder<DocumentSnapshot>(
+        stream: users.doc(currentUser!.uid).snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            List dataList = snapshot.data!.docs.toList();
+            List dataList = snapshot.data!.get("savedPosts");
             return dataList.isEmpty
                 ? _noPosts()
                 : ListView.builder(
@@ -199,9 +198,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     scrollDirection: Axis.horizontal,
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
-                      var data = snapshot.data!.docs;
-                      postData = PostData.setData(dataList[index]);
-                      return _cardView(postData!, data, index, 1, null);
+                      return _savedcardView(dataList[index], 1, null);
                     },
                   );
           }
@@ -209,6 +206,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
         },
       ),
     );
+  }
+
+  // cardView
+  Widget _savedcardView(
+    // PostData postData,
+    String postId,
+    int? reverse,
+    int? option,
+  ) {
+    return StreamBuilder<DocumentSnapshot>(
+        stream: posts.doc(postId).snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            postData = PostData.setData(snapshot.data);
+            return ProfilePostCard(
+              reverse: reverse,
+              profession: postData!.profession!,
+              ownerId: postData!.ownerId!,
+              userName: postData!.userName!,
+              body: postData!.body!,
+              title: postData!.title!,
+              date: postData!.date!.toDate(),
+              category: postData!.category!,
+              likes: postData!.likes!,
+              postId: postData!.postId!,
+              options: option,
+              deleteFunction: () {},
+              updateFunction: () {},
+            );
+          }
+          return Container();
+        });
   }
 
   // cardView

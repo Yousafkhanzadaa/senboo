@@ -45,6 +45,7 @@ class _PostViewScreenState extends State<PostViewScreen> {
       FirebaseFirestore.instance.collection("savedPosts");
   bool? liked;
   bool? _saved;
+  List? _savedList;
   int likesCounter = 0;
   List likeList = [];
   List saveList = [];
@@ -305,39 +306,25 @@ class _PostViewScreenState extends State<PostViewScreen> {
   // CommentButton goes here -------------------------------------------
   Widget _saveButton() {
     return StreamBuilder<DocumentSnapshot>(
-        stream: savedPosts
-            .doc(currentUser!.uid)
-            .collection("saved")
-            .doc(widget.postId)
-            .snapshots(),
+        stream: users.doc(currentUser!.uid).snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            _saved = snapshot.data!.exists;
+            _savedList = snapshot.data!['savedPosts'];
+            _saved = _savedList!.contains(widget.postId);
             return GestureDetector(
               onTap: () async {
                 // _handlePostSave(saved!);
 
-                FirestoreServices firestoreServices =
-                    Provider.of<FirestoreServices>(context, listen: false);
-
                 if (_saved!) {
-                  await savedPosts
+                  _savedList!.remove(widget.postId);
+                  await users
                       .doc(currentUser!.uid)
-                      .collection("saved")
-                      .doc(widget.postId)
-                      .delete();
+                      .update({"savedPosts": _savedList});
                 } else if (!_saved!) {
-                  await firestoreServices.savePost(
-                    userId: currentUser!.uid,
-                    postId: widget.postId,
-                    userName: widget.userName,
-                    body: widget.body,
-                    category: widget.category,
-                    date: widget.date,
-                    likes: likeList,
-                    profession: widget.profession,
-                    title: widget.title,
-                  );
+                  _savedList!.add(widget.postId);
+                  await users
+                      .doc(currentUser!.uid)
+                      .update({"savedPosts": _savedList});
                 }
               },
               child: Container(
