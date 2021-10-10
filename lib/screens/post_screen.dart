@@ -42,7 +42,7 @@ class _PostScreenState extends State<PostScreen> {
     'Finance & Economics',
     "Lifestyle",
     "Entertainment",
-    "Top Five"
+    "other"
   ];
 
   @override

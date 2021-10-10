@@ -33,7 +33,7 @@ class _EditProfileState extends State<EditProfile> {
     'Finance & Economics',
     "Lifestyle",
     "Entertainment",
-    "Top Five"
+    "other"
   ];
   List<dynamic> _interestedList = [];
   // User collection
