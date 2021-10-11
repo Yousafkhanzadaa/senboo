@@ -5,7 +5,6 @@ import 'package:senboo/components/profile_post_card.dart';
 import 'package:senboo/components/visitor_profile_card.dart';
 import 'package:senboo/model/get_user_data.dart';
 import 'package:senboo/providers/data_provider.dart';
-import 'package:senboo/screens/post_view_screen.dart';
 
 class VisitorProfileScreen extends StatefulWidget {
   VisitorProfileScreen({Key? key, required this.ownerId}) : super(key: key);
