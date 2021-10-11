@@ -100,8 +100,13 @@ class _ProfilePostCardState extends State<ProfilePostCard> {
             );
           }
           return Container(
-            child: CircularProgressIndicator(
-              color: Theme.of(context).primaryColor,
+            width: MediaQuery.of(context).size.width * 0.47,
+            margin: EdgeInsets.all(10),
+            decoration: _cardDecoration(),
+            child: Center(
+              child: CircularProgressIndicator(
+                color: Theme.of(context).primaryColor,
+              ),
             ),
           );
         });

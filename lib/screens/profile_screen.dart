@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -32,8 +34,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   PostData? postData;
   int totalPosts = 0;
   int totalLikes = 0;
+  List? _savedDataList;
 
-  List? savedPostsList;
+  // List? savedPostsList;
   bool waiting = true;
 
   @override
@@ -105,7 +108,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child:
                     ProfileCard(totalPosts: totalPosts, totalLikes: totalLikes),
               ),
-              _postHead("Posts", Icons.grid_4x4_outlined),
+              _postHead("Posts", Icons.read_more),
               _postCards(),
               SizedBox(
                 height: 20,
@@ -133,8 +136,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           Icon(
             icon,
-            size: 22,
+            size: 18,
             color: Color(0xFF3B3B3B),
+          ),
+          SizedBox(
+            width: 10,
           ),
           Text(
             title.toUpperCase(),
@@ -190,15 +196,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
         stream: users.doc(currentUser!.uid).snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            List dataList = snapshot.data!.get("savedPosts");
-            return dataList.isEmpty
+            _savedDataList = snapshot.data!.get("savedPosts");
+            return _savedDataList!.isEmpty
                 ? _noPosts()
                 : ListView.builder(
-                    itemCount: dataList.length,
+                    itemCount: _savedDataList!.length,
                     scrollDirection: Axis.horizontal,
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
-                      return _savedcardView(dataList[index], 1, null);
+                      return _savedcardView(_savedDataList![index], 1, null);
                     },
                   );
           }
@@ -219,24 +225,64 @@ class _ProfileScreenState extends State<ProfileScreen> {
         stream: posts.doc(postId).snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            postData = PostData.setData(snapshot.data);
-            return ProfilePostCard(
-              reverse: reverse,
-              profession: postData!.profession!,
-              ownerId: postData!.ownerId!,
-              userName: postData!.userName!,
-              body: postData!.body!,
-              title: postData!.title!,
-              date: postData!.date!.toDate(),
-              category: postData!.category!,
-              likes: postData!.likes!,
-              postId: postData!.postId!,
-              options: option,
-              deleteFunction: () {},
-              updateFunction: () {},
-            );
+            if (snapshot.data!.exists) {
+              postData = PostData.setData(snapshot.data);
+              return ProfilePostCard(
+                reverse: reverse,
+                profession: postData!.profession!,
+                ownerId: postData!.ownerId!,
+                userName: postData!.userName!,
+                body: postData!.body!,
+                title: postData!.title!,
+                date: postData!.date!.toDate(),
+                category: postData!.category!,
+                likes: postData!.likes!,
+                postId: postData!.postId!,
+                options: option,
+                deleteFunction: () {},
+                updateFunction: () {},
+              );
+            } else {
+              return Container(
+                width: MediaQuery.of(context).size.width * 0.47,
+                // height: 200,
+                // padding: EdgeInsets.symmetric(horizontal: 10, vertical: 40),
+                margin: EdgeInsets.all(10),
+                decoration: _cardDecoration(),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Original Post is Deleted.",
+                        style: TextStyle(
+                          color: Theme.of(context).primaryColor,
+                          fontSize: 14,
+                          // fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      _removePost(postId),
+                    ],
+                  ),
+                ),
+              );
+            }
           }
-          return Container();
+          return Container(
+            width: MediaQuery.of(context).size.width * 0.47,
+            // height: 200,
+            // padding: EdgeInsets.symmetric(horizontal: 10, vertical: 40),
+            margin: EdgeInsets.all(10),
+            decoration: _cardDecoration(),
+            child: Center(
+              child: CircularProgressIndicator(
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+          );
         });
   }
 
@@ -323,6 +369,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: CircularProgressIndicator(
           color: Theme.of(context).primaryColor,
         ),
+      ),
+    );
+  }
+
+  Widget _removePost(String postID) {
+    return ElevatedButton(
+      onPressed: () async {
+        _savedDataList!.remove(postID);
+        await users
+            .doc(currentUser!.uid)
+            .update({"savedPosts": _savedDataList});
+      },
+      style: ButtonStyle(
+          backgroundColor:
+              MaterialStateProperty.all(Theme.of(context).primaryColor),
+          shadowColor:
+              MaterialStateProperty.all(Theme.of(context).primaryColor),
+          padding: MaterialStateProperty.all(
+              EdgeInsets.symmetric(vertical: 10, horizontal: 25)),
+          shape: MaterialStateProperty.all(
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(35)))),
+      child: Text(
+        "Remove post".toUpperCase(),
+        style: Theme.of(context).textTheme.subtitle2!.copyWith(fontSize: 12),
       ),
     );
   }
