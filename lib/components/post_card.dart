@@ -57,11 +57,6 @@ class _PostCardState extends State<PostCard> {
     super.initState();
   }
 
-  Map commentData = {
-    "userName": "userName",
-    "profession": "profession",
-  };
-
   // gettting like
   void _handlePostLike() {
     bool _liked = likeList.contains(currentUser!.uid);
@@ -199,11 +194,11 @@ class _PostCardState extends State<PostCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            commentData['userName'],
+            widget.userName,
             style: Theme.of(context).textTheme.headline1,
           ),
           Text(
-            commentData['profession'],
+            widget.profession,
             style: Theme.of(context).textTheme.subtitle2,
           ),
         ],

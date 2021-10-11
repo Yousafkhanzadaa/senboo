@@ -88,7 +88,7 @@ class _VisitorProfileScreenState extends State<VisitorProfileScreen> {
                     ownerId: widget.ownerId,
                   ),
                 ),
-                _postHead("Posts", Icons.grid_4x4_outlined),
+                _postHead("Posts", Icons.read_more),
                 _postCards(),
                 SizedBox(
                   height: 20,
@@ -107,13 +107,19 @@ class _VisitorProfileScreenState extends State<VisitorProfileScreen> {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
       padding: EdgeInsets.all(10),
-      decoration: _cardDecoration(),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+      ),
       child: Row(
         children: [
           Icon(
             icon,
-            size: 22,
+            size: 18,
             color: Color(0xFF3B3B3B),
+          ),
+          SizedBox(
+            width: 10,
           ),
           Text(
             title.toUpperCase(),
