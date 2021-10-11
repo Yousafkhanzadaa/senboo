@@ -57,59 +57,41 @@ class _ProfilePostCardState extends State<ProfilePostCard> {
   };
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<DocumentSnapshot>(
-        stream: users.doc(widget.ownerId).snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            cardData['userName'] = snapshot.data!['userName'];
-            cardData['profession'] = snapshot.data!['profession'];
-            return GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PostViewScreen(
-                      userName: cardData['userName'],
-                      profession: cardData['profession'],
-                      title: widget.title,
-                      body: widget.body,
-                      date: widget.date,
-                      category: widget.category,
-                      postId: widget.postId,
-                      ownerId: widget.ownerId,
-                      reverse: widget.reverse,
-                    ),
-                  ),
-                );
-              },
-              child: Container(
-                width: MediaQuery.of(context).size.width * 0.47,
-                margin: EdgeInsets.symmetric(
-                  vertical: 10,
-                  horizontal: 10,
-                ),
-                decoration: _cardDecoration(),
-                child: Column(
-                  children: [
-                    _headingBox(),
-                    _bodyBox(),
-                    _actionBar(),
-                  ],
-                ),
-              ),
-            );
-          }
-          return Container(
-            width: MediaQuery.of(context).size.width * 0.47,
-            margin: EdgeInsets.all(10),
-            decoration: _cardDecoration(),
-            child: Center(
-              child: CircularProgressIndicator(
-                color: Theme.of(context).primaryColor,
-              ),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PostViewScreen(
+              userName: widget.userName,
+              profession: widget.profession,
+              title: widget.title,
+              body: widget.body,
+              date: widget.date,
+              category: widget.category,
+              postId: widget.postId,
+              ownerId: widget.ownerId,
+              reverse: widget.reverse,
             ),
-          );
-        });
+          ),
+        );
+      },
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.47,
+        margin: EdgeInsets.symmetric(
+          vertical: 10,
+          horizontal: 10,
+        ),
+        decoration: _cardDecoration(),
+        child: Column(
+          children: [
+            _headingBox(),
+            _bodyBox(),
+            _actionBar(),
+          ],
+        ),
+      ),
+    );
   }
 
   BoxDecoration _cardDecoration() {
@@ -203,7 +185,7 @@ class _ProfilePostCardState extends State<ProfilePostCard> {
 
   Widget _userNameHeading() {
     return Text(
-      cardData['userName'],
+      widget.userName,
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
       style: Theme.of(context)

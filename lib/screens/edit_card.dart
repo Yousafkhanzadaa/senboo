@@ -1,10 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:senboo/components/custom_text_field.dart';
 import 'package:senboo/components/interest_button.dart';
-import 'package:senboo/services/firestore_services.dart';
 
 class UpdatePostScreen extends StatefulWidget {
   UpdatePostScreen(
@@ -13,6 +11,7 @@ class UpdatePostScreen extends StatefulWidget {
       required this.category,
       required this.title,
       required this.userName,
+      required this.profession,
       required this.body})
       : super(key: key);
   final String postId;
@@ -20,6 +19,7 @@ class UpdatePostScreen extends StatefulWidget {
   final String title;
   final String body;
   final String userName;
+  final String profession;
 
   @override
   _UpdatePostScreenState createState() => _UpdatePostScreenState();
@@ -65,6 +65,29 @@ class _UpdatePostScreenState extends State<UpdatePostScreen> {
     super.dispose();
     _mainTitleController.dispose();
     _bodyTextController.dispose();
+  }
+
+  Future<void> updatePost({
+    required List category,
+    required String title,
+    required String body,
+    required List searchKeywords,
+    required String postId,
+    required String userName,
+    required String profession,
+  }) async {
+    try {
+      await posts.doc(postId).update({
+        "category": category,
+        "userName": userName,
+        "profession": profession,
+        "title": title,
+        "body": body,
+        "searchKeywords": searchKeywords,
+      });
+    } catch (e) {
+      throw e;
+    }
   }
 
   @override
@@ -276,8 +299,8 @@ class _UpdatePostScreenState extends State<UpdatePostScreen> {
   // save buttan goes here -0------------------------------------
   Widget _postEditButton() {
     dateTime = DateTime.now();
-    return Consumer<FirestoreServices>(
-      builder: (context, service, child) {
+    return Builder(
+      builder: (context) {
         List searchKeywords =
             _mainTitleController.text.toLowerCase().split(" ") +
                 widget.userName.toLowerCase().split(" ");
@@ -307,15 +330,15 @@ class _UpdatePostScreenState extends State<UpdatePostScreen> {
                   searchKeywords.remove("");
                 }
                 // userData = UserDataUpdate.setData(snapshot);
-                service
-                    .updatePost(
+                updatePost(
                   title: _mainTitleController.text,
                   body: _bodyTextController.text,
                   searchKeywords: searchKeywords,
                   category: _categories,
                   postId: widget.postId,
-                )
-                    .whenComplete(() {
+                  userName: widget.userName,
+                  profession: widget.profession,
+                ).whenComplete(() {
                   Navigator.pop(context);
                   setState(() {
                     _mainTitleController.text = "";

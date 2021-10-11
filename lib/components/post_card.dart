@@ -1,12 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:senboo/screens/comment_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:senboo/screens/post_view_screen.dart';
 import 'package:senboo/screens/visitor_screen.dart';
-import 'package:senboo/services/firestore_services.dart';
 
 class PostCard extends StatefulWidget {
   PostCard({
@@ -88,52 +86,41 @@ class _PostCardState extends State<PostCard> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<DocumentSnapshot>(
-        stream: users.doc(widget.ownerId).snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            if (snapshot.data!.exists) {
-              commentData['userName'] = snapshot.data!['userName'];
-              commentData['profession'] = snapshot.data!['profession'];
-            }
-            return GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PostViewScreen(
-                      userName: snapshot.data!['userName'],
-                      profession: snapshot.data!['profession'],
-                      title: widget.title,
-                      body: widget.body,
-                      date: widget.date,
-                      category: widget.category,
-                      postId: widget.postId,
-                      ownerId: widget.ownerId,
-                      reverse: 1,
-                    ),
-                  ),
-                );
-              },
-              child: Container(
-                width: MediaQuery.of(context).size.width * 0.97,
-                margin: EdgeInsets.symmetric(
-                  vertical: 10,
-                  horizontal: 10,
-                ),
-                decoration: _cardDecoration(),
-                child: Column(
-                  children: [
-                    _headingBox(),
-                    _bodyBox(),
-                    _actionBar(),
-                  ],
-                ),
-              ),
-            );
-          }
-          return _loadingScreen();
-        });
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PostViewScreen(
+              userName: widget.userName,
+              profession: widget.profession,
+              title: widget.title,
+              body: widget.body,
+              date: widget.date,
+              category: widget.category,
+              postId: widget.postId,
+              ownerId: widget.ownerId,
+              reverse: 1,
+            ),
+          ),
+        );
+      },
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.97,
+        margin: EdgeInsets.symmetric(
+          vertical: 10,
+          horizontal: 10,
+        ),
+        decoration: _cardDecoration(),
+        child: Column(
+          children: [
+            _headingBox(),
+            _bodyBox(),
+            _actionBar(),
+          ],
+        ),
+      ),
+    );
   }
 
   // Load Screen ---------------------------------------------

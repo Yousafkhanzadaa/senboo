@@ -338,6 +338,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     postId: data[index].id,
                     category: postData.category!,
                     title: postData.title!,
+                    profession: postData.profession!,
                     userName: postData.userName!,
                     body: postData.body!)));
         // showBottomSheet(

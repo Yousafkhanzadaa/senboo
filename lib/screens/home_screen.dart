@@ -37,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Provider.of<EditListController>(context, listen: false);
 
       setState(() {
-        editListController.setList = snapshot.get('interested');
+        editListController.setList = snapshot['interested'];
         gotList = true;
       });
     });

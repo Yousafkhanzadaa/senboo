@@ -7,7 +7,6 @@ import 'package:senboo/providers/data_provider.dart';
 import 'package:senboo/initial.dart';
 import 'package:senboo/providers/edit_list_controller.dart';
 import 'package:senboo/services/firebase_auth_services.dart';
-import 'package:senboo/services/firestore_services.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,9 +48,6 @@ class _SenbooState extends State<Senboo> {
             ),
             ChangeNotifierProvider<FirebaseAuthServices>(
               create: (_) => FirebaseAuthServices(),
-            ),
-            ChangeNotifierProvider<FirestoreServices>(
-              create: (_) => FirestoreServices(),
             ),
             ChangeNotifierProvider<DataProvider>(
               create: (_) => DataProvider(),

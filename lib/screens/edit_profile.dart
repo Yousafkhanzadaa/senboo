@@ -6,7 +6,6 @@ import 'package:senboo/components/custom_text_field.dart';
 import 'package:senboo/components/interest_button.dart';
 import 'package:senboo/model/user_data_update.dart';
 import 'package:senboo/providers/edit_list_controller.dart';
-import 'package:senboo/services/firestore_services.dart';
 
 class EditProfile extends StatefulWidget {
   EditProfile({Key? key}) : super(key: key);
@@ -64,6 +63,22 @@ class _EditProfileState extends State<EditProfile> {
         _interestedList = userData!.interested!;
         waiting = false;
       });
+    });
+  }
+
+  Future updateUserDetails({
+    String? userName,
+    String? profession,
+    String? bio,
+    List<String>? socialLinks,
+    List<dynamic>? interested,
+  }) async {
+    await users.doc(currentUser!.uid).update({
+      'userName': userName,
+      'profession': profession,
+      'bio': bio,
+      'socialLinks': socialLinks,
+      'interested': interested,
     });
   }
 
@@ -347,8 +362,8 @@ class _EditProfileState extends State<EditProfile> {
 
   // save buttan goes here -0------------------------------------
   Widget _saveEditButton() {
-    return Consumer2<FirestoreServices, EditListController>(
-      builder: (context, service, list, child) {
+    return Consumer<EditListController>(
+      builder: (context, list, child) {
         return ElevatedButton(
           onPressed: () async {
             FocusScopeNode currentFocus = FocusScope.of(context);
@@ -356,7 +371,7 @@ class _EditProfileState extends State<EditProfile> {
             if (_interestedList.isNotEmpty) {
               if (_formKey.currentState!.validate()) {
                 _showLoading();
-                await service.updateUserDetails(
+                await updateUserDetails(
                   userName: _nameController.text,
                   profession: _professionController.text,
                   bio: _bioController.text,
@@ -365,11 +380,12 @@ class _EditProfileState extends State<EditProfile> {
                     _twitterController.text,
                   ],
                   interested: _interestedList,
-                );
-                list.setList = _interestedList;
-                Navigator.pop(context);
+                ).whenComplete(() {
+                  list.setList = _interestedList;
+                  Navigator.pop(context);
 
-                Navigator.pop(context);
+                  Navigator.pop(context);
+                });
               }
             }
             if (_interestedList.isEmpty) {
@@ -400,8 +416,7 @@ class _EditProfileState extends State<EditProfile> {
   // Top Save button in Appbar -------------------------------------
   // CommentButton goes here -------------------------------------------
   Widget _topSaveButton() {
-    return Consumer2<FirestoreServices, EditListController>(
-        builder: (context, service, list, child) {
+    return Consumer<EditListController>(builder: (context, list, child) {
       return GestureDetector(
         onTap: () async {
           FocusScopeNode currentFocus = FocusScope.of(context);
@@ -410,8 +425,7 @@ class _EditProfileState extends State<EditProfile> {
             if (_formKey.currentState!.validate()) {
               _showLoading();
 
-              await service
-                  .updateUserDetails(
+              await updateUserDetails(
                 userName: _nameController.text,
                 profession: _professionController.text,
                 bio: _bioController.text,
@@ -420,8 +434,7 @@ class _EditProfileState extends State<EditProfile> {
                   _twitterController.text,
                 ],
                 interested: _interestedList,
-              )!
-                  .whenComplete(() {
+              ).whenComplete(() {
                 list.setList = _interestedList;
                 Navigator.pop(context);
                 Navigator.pop(context);
