@@ -59,7 +59,7 @@ class _MainScreenState extends State<MainScreen> {
           "userId": currentUser!.uid,
           "userName": currentUser!.displayName,
           "profession": "profession!",
-          "socialLinks": ["@instagram", "@twitter"],
+          "socialLinks": ["", ""],
           "date": dateTime,
           "photoUrl": currentUser!.photoURL,
           "userEmail": currentUser!.email,

@@ -25,6 +25,7 @@ class _CommentScreenState extends State<CommentScreen> {
       FirebaseFirestore.instance.collection('comments');
   // Post collection
   CollectionReference posts = FirebaseFirestore.instance.collection("posts");
+  CollectionReference users = FirebaseFirestore.instance.collection("users");
   CommentData? commentData;
 
   // Current User
@@ -52,13 +53,12 @@ class _CommentScreenState extends State<CommentScreen> {
         stream: posts.doc(widget.postId).snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            commentMap['userName'] = snapshot.data!['userName'];
-            commentMap['profession'] = snapshot.data!['profession'];
             commentMap['title'] = snapshot.data!['title'];
             commentMap['date'] = snapshot.data!['date'].toDate();
             return Container(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
               child: Column(
-                mainAxisSize: MainAxisSize.min,
                 children: [
                   _headingBox(),
                   _commentsList(),
@@ -153,6 +153,7 @@ class _CommentScreenState extends State<CommentScreen> {
                 : ListView.builder(
                     itemCount: postsList.length,
                     shrinkWrap: true,
+                    reverse: true,
                     itemBuilder: (context, index) {
                       var data = snapshot.data!.docs;
                       commentData = CommentData.setData(data[index]);
@@ -192,17 +193,19 @@ class _CommentScreenState extends State<CommentScreen> {
 
   Widget _writeComment() {
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      width: MediaQuery.of(context).size.width,
       child: Row(
         children: [
-          Container(
-            width: MediaQuery.of(context).size.width * 0.80,
+          Expanded(
             child: CustomTextField(
               controller: _commentTextContaller,
               hint: 'comment',
             ),
           ),
-          Spacer(),
+          SizedBox(
+            width: 4,
+          ),
           _sendButton()
         ],
       ),
@@ -213,29 +216,45 @@ class _CommentScreenState extends State<CommentScreen> {
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   Widget _sendButton() {
     dateTime = DateTime.now();
-    return GestureDetector(
-      onTap: () {
-        if (_commentTextContaller.text.isNotEmpty) {
-          addComment(
-            postId: widget.postId,
-            userName: commentMap['userName'],
-            profession: commentMap['profession'],
-            comment: _commentTextContaller.text,
-            date: dateTime!,
-          );
-          setState(() {
-            _commentTextContaller.clear();
-          });
-        }
-      },
-      child: Container(
-        padding: EdgeInsets.all(10),
-        decoration: _buttonDecorations(),
-        child: _buttonsIcon(
-          Icons.send_outlined,
-        ),
-      ),
-    );
+    return StreamBuilder<DocumentSnapshot>(
+        stream: users.doc(currentUser!.uid).snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            commentMap['userName'] = snapshot.data!.get("userName");
+            commentMap['profession'] = snapshot.data!.get("profession");
+            return GestureDetector(
+              onTap: () {
+                if (_commentTextContaller.text.isNotEmpty) {
+                  addComment(
+                    postId: widget.postId,
+                    userName: commentMap['userName'],
+                    profession: commentMap['profession'],
+                    comment: _commentTextContaller.text,
+                    date: dateTime!,
+                  );
+                  setState(() {
+                    _commentTextContaller.clear();
+                  });
+                }
+              },
+              child: Container(
+                padding: EdgeInsets.all(10),
+                decoration: _buttonDecorations(),
+                child: _buttonsIcon(
+                  Icons.send_outlined,
+                ),
+              ),
+            );
+          }
+          return Container(
+              padding: EdgeInsets.all(10),
+              decoration: _buttonDecorations(),
+              child: Center(
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                ),
+              ));
+        });
   }
 
   // Adding Comments ==================================================

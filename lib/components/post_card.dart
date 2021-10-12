@@ -57,6 +57,11 @@ class _PostCardState extends State<PostCard> {
     super.initState();
   }
 
+  Map userData = {
+    "userName": null,
+    "profession": null,
+  };
+
   // gettting like
   void _handlePostLike() {
     bool _liked = likeList.contains(currentUser!.uid);
@@ -81,41 +86,50 @@ class _PostCardState extends State<PostCard> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PostViewScreen(
-              userName: widget.userName,
-              profession: widget.profession,
-              title: widget.title,
-              body: widget.body,
-              date: widget.date,
-              category: widget.category,
-              postId: widget.postId,
-              ownerId: widget.ownerId,
-              reverse: 1,
-            ),
-          ),
-        );
-      },
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.97,
-        margin: EdgeInsets.symmetric(
-          vertical: 10,
-          horizontal: 10,
-        ),
-        decoration: _cardDecoration(),
-        child: Column(
-          children: [
-            _headingBox(),
-            _bodyBox(),
-            _actionBar(),
-          ],
-        ),
-      ),
-    );
+    return StreamBuilder<DocumentSnapshot>(
+        stream: users.doc(widget.ownerId).snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            userData["userName"] = snapshot.data!['userName'];
+            userData["profession"] = snapshot.data!['profession'];
+            return GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PostViewScreen(
+                      userName: userData["userName"] ?? widget.userName,
+                      profession: userData["profession"] ?? widget.profession,
+                      title: widget.title,
+                      body: widget.body,
+                      date: widget.date,
+                      category: widget.category,
+                      postId: widget.postId,
+                      ownerId: widget.ownerId,
+                      reverse: 1,
+                    ),
+                  ),
+                );
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.97,
+                margin: EdgeInsets.symmetric(
+                  vertical: 10,
+                  horizontal: 10,
+                ),
+                decoration: _cardDecoration(),
+                child: Column(
+                  children: [
+                    _headingBox(),
+                    _bodyBox(),
+                    _actionBar(),
+                  ],
+                ),
+              ),
+            );
+          }
+          return _loadingScreen();
+        });
   }
 
   // Load Screen ---------------------------------------------
@@ -194,11 +208,11 @@ class _PostCardState extends State<PostCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            widget.userName,
+            userData["userName"] ?? widget.userName,
             style: Theme.of(context).textTheme.headline1,
           ),
           Text(
-            widget.profession,
+            userData["profession"] ?? widget.profession,
             style: Theme.of(context).textTheme.subtitle2,
           ),
         ],

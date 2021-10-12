@@ -145,39 +145,69 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Load Screen ---------------------------------------------
   Widget _editPro() {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.4,
-      margin: EdgeInsets.symmetric(
-        vertical: 10,
-        horizontal: 10,
-      ),
-      decoration: _cardDecoration(),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "Please first edit your profile.",
-              style: TextStyle(
-                color: Theme.of(context).primaryColor,
-                fontSize: 26,
-                fontWeight: FontWeight.w700,
-              ),
+    return Column(
+      children: [
+        Container(
+          height: MediaQuery.of(context).size.height * 0.4,
+          margin: EdgeInsets.symmetric(
+            vertical: 10,
+            horizontal: 10,
+          ),
+          padding: EdgeInsets.symmetric(
+            vertical: 10,
+            horizontal: 10,
+          ),
+          decoration: _cardDecoration(),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Welcome",
+                  style: TextStyle(
+                    color: Theme.of(context).primaryColor,
+                    fontSize: 32,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  "We're glad you decide to join the Senboo family!",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Theme.of(context).primaryColor,
+                    fontSize: 22,
+                  ),
+                ),
+                SizedBox(
+                  height: 15,
+                ),
+                Text(
+                  "Please first edit your profile.",
+                  style: TextStyle(
+                    color: Theme.of(context).primaryColor,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                // Text(
+                //   "No interests selected.",
+                //   style: TextStyle(
+                //     color: Theme.of(context).primaryColor,
+                //     fontSize: 18,
+                //   ),
+                // ),
+                SizedBox(
+                  height: 10,
+                ),
+                _profileEditButton(),
+              ],
             ),
-            // Text(
-            //   "No interests selected.",
-            //   style: TextStyle(
-            //     color: Theme.of(context).primaryColor,
-            //     fontSize: 18,
-            //   ),
-            // ),
-            SizedBox(
-              height: 10,
-            ),
-            _profileEditButton(),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 

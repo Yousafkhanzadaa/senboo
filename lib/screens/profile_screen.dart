@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:senboo/components/likes_list.dart';
 import 'package:senboo/components/profile_card.dart';
 import 'package:senboo/components/profile_post_card.dart';
 // import 'package:senboo/components/update_post.dart';
@@ -38,6 +39,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   // List? savedPostsList;
   bool waiting = true;
+
+  Map userDataMap = {
+    "userName": null,
+    "profession": null,
+  };
 
   @override
   void initState() {
@@ -176,7 +182,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     itemBuilder: (context, index) {
                       var data = snapshot.data!.docs;
                       postData = PostData.setData(dataList[index]);
-                      return _cardView(postData!, data, index, null, 1);
+                      return _cardView(
+                          postData: postData!,
+                          data: data,
+                          index: index,
+                          option: 1,
+                          reverse: 1);
                     },
                   );
           }
@@ -288,12 +299,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   // cardView
   Widget _cardView(
-    PostData postData,
-    List<QueryDocumentSnapshot<Object?>> data,
-    int index,
-    int? reverse,
-    int? option,
-  ) {
+      {required PostData postData,
+      required List<QueryDocumentSnapshot<Object?>> data,
+      required int index,
+      int? reverse,
+      int? option}) {
     return ProfilePostCard(
       reverse: reverse,
       profession: postData.profession!,
@@ -351,6 +361,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         //         title: postData.title!,
         //         userName: postData.userName!,
         //         body: postData.body!));
+      },
+      likeFun: () {
+        showModalBottomSheet(
+            backgroundColor: Colors.transparent,
+            context: context,
+            builder: (context) => LikeList(likeList: postData.likes!));
       },
     );
   }

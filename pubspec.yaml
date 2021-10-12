@@ -43,6 +43,9 @@ flutter:
   # Images -------------------------------------
   assets:
     - assets/images/logo.png
+    - assets/images/dps/01.jpg
+    - assets/images/dps/02.jpg
+    - assets/images/dps/03.jpg
 
   # fonts ----------------------------------------
   fonts:

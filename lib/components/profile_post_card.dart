@@ -16,6 +16,7 @@ class ProfilePostCard extends StatefulWidget {
       this.options,
       this.updateFunction,
       this.deleteFunction,
+      this.likeFun,
       required this.body,
       required this.profession,
       required this.ownerId,
@@ -33,6 +34,7 @@ class ProfilePostCard extends StatefulWidget {
   final int? reverse;
   final Function? updateFunction;
   final Function? deleteFunction;
+  final Function? likeFun;
 
   final int? options;
 
@@ -52,45 +54,55 @@ class _ProfilePostCardState extends State<ProfilePostCard> {
       FirebaseFirestore.instance.collection('comments');
 
   Map cardData = {
-    "userName": "userName",
-    "profession": "profession",
+    "userName": null,
+    "profession": null,
   };
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PostViewScreen(
-              userName: widget.userName,
-              profession: widget.profession,
-              title: widget.title,
-              body: widget.body,
-              date: widget.date,
-              category: widget.category,
-              postId: widget.postId,
-              ownerId: widget.ownerId,
-              reverse: widget.reverse,
+    return StreamBuilder<DocumentSnapshot>(
+      stream: users.doc(widget.ownerId).snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return _loadingScreen();
+        }
+        cardData["userName"] = snapshot.data!['userName'];
+        cardData["profession"] = snapshot.data!['profession'];
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PostViewScreen(
+                  userName: cardData["userName"] ?? widget.userName,
+                  profession: cardData["profession"] ?? widget.profession,
+                  title: widget.title,
+                  body: widget.body,
+                  date: widget.date,
+                  category: widget.category,
+                  postId: widget.postId,
+                  ownerId: widget.ownerId,
+                  reverse: widget.reverse,
+                ),
+              ),
+            );
+          },
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.47,
+            margin: EdgeInsets.symmetric(
+              vertical: 10,
+              horizontal: 10,
+            ),
+            decoration: _cardDecoration(),
+            child: Column(
+              children: [
+                _headingBox(),
+                _bodyBox(),
+                _actionBar(),
+              ],
             ),
           ),
         );
       },
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.47,
-        margin: EdgeInsets.symmetric(
-          vertical: 10,
-          horizontal: 10,
-        ),
-        decoration: _cardDecoration(),
-        child: Column(
-          children: [
-            _headingBox(),
-            _bodyBox(),
-            _actionBar(),
-          ],
-        ),
-      ),
     );
   }
 
@@ -106,6 +118,22 @@ class _ProfilePostCardState extends State<ProfilePostCard> {
           spreadRadius: 1,
         ),
       ],
+    );
+  }
+
+  Widget _loadingScreen() {
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.47,
+      margin: EdgeInsets.symmetric(
+        vertical: 10,
+        horizontal: 10,
+      ),
+      decoration: _cardDecoration(),
+      child: Center(
+        child: CircularProgressIndicator(
+          color: Theme.of(context).primaryColor,
+        ),
+      ),
     );
   }
 
@@ -185,7 +213,7 @@ class _ProfilePostCardState extends State<ProfilePostCard> {
 
   Widget _userNameHeading() {
     return Text(
-      widget.userName,
+      cardData["userName"] ?? widget.userName,
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
       style: Theme.of(context)
@@ -251,21 +279,60 @@ class _ProfilePostCardState extends State<ProfilePostCard> {
   }
 
   Widget _likeIndication() {
-    return Row(
-      children: [
-        Icon(
-          Icons.favorite,
-          size: 18,
-          color: Theme.of(context).primaryColor,
+    return GestureDetector(
+      onTap: () {
+        widget.likeFun!();
+      },
+      child: Container(
+        // height: 20,
+        child: Row(
+          children: [
+            Icon(
+              Icons.favorite,
+              size: 22,
+              color: Theme.of(context).primaryColor,
+            ),
+            SizedBox(
+              width: 5,
+            ),
+            Container(
+              width: 35,
+              child: Stack(
+                children: [
+                  Positioned(child: _likedImages("assets/images/dps/02.jpg")),
+                  Positioned(
+                      left: 5, child: _likedImages("assets/images/dps/01.jpg")),
+                  Positioned(
+                      left: 10,
+                      child: _likedImages("assets/images/dps/03.jpg")),
+                ],
+              ),
+            ),
+            SizedBox(
+              width: 3,
+            ),
+            Text(
+              NumberFormat.compact().format(widget.likes.length).toString(),
+              style:
+                  Theme.of(context).textTheme.bodyText2!.copyWith(fontSize: 12),
+            )
+          ],
         ),
-        SizedBox(
-          width: 5,
-        ),
-        Text(
-          NumberFormat.compact().format(widget.likes.length).toString(),
-          style: Theme.of(context).textTheme.bodyText2,
-        )
-      ],
+      ),
+    );
+  }
+
+  Widget _likedImages(String link) {
+    return Container(
+      width: 22,
+      height: 22,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15),
+        image: DecorationImage(
+            image: AssetImage(link),
+            alignment: Alignment.center,
+            fit: BoxFit.cover),
+      ),
     );
   }
 }
