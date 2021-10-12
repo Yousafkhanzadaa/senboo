@@ -49,7 +49,8 @@ class _UpdatePostScreenState extends State<UpdatePostScreen> {
     'Finance & Economics',
     "Lifestyle",
     "Entertainment",
-    "other"
+    "Poetry",
+    "News",
   ];
 
   @override

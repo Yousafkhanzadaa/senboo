@@ -352,43 +352,43 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  _showLoading() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          child: Container(
-            decoration: _cardDecoration(),
-            height: MediaQuery.of(context).size.height * 0.35,
-            width: MediaQuery.of(context).size.width * 0.9,
-            child: Center(
-              child: CircularProgressIndicator(
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
+  // _showLoading() {
+  //   showDialog(
+  //     context: context,
+  //     barrierDismissible: false,
+  //     builder: (context) {
+  //       return Dialog(
+  //         backgroundColor: Colors.transparent,
+  //         child: Container(
+  //           decoration: _cardDecoration(),
+  //           height: MediaQuery.of(context).size.height * 0.35,
+  //           width: MediaQuery.of(context).size.width * 0.9,
+  //           child: Center(
+  //             child: CircularProgressIndicator(
+  //               color: Theme.of(context).primaryColor,
+  //             ),
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 
   // CardDecoration --------------------------------------
-  BoxDecoration _cardDecoration() {
-    return BoxDecoration(
-      color: Theme.of(context).cardColor,
-      borderRadius: BorderRadius.circular(25),
-      boxShadow: [
-        BoxShadow(
-          color: Theme.of(context).primaryColor.withOpacity(0.40),
-          blurRadius: 5,
-          offset: Offset(0, 0),
-          spreadRadius: 1,
-        ),
-      ],
-    );
-  }
+  // BoxDecoration _cardDecoration() {
+  //   return BoxDecoration(
+  //     color: Theme.of(context).cardColor,
+  //     borderRadius: BorderRadius.circular(25),
+  //     boxShadow: [
+  //       BoxShadow(
+  //         color: Theme.of(context).primaryColor.withOpacity(0.40),
+  //         blurRadius: 5,
+  //         offset: Offset(0, 0),
+  //         spreadRadius: 1,
+  //       ),
+  //     ],
+  //   );
+  // }
 
   // showing Pages ----------------------------------
   Widget _getBody() {

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:senboo/components/custom_text_field.dart';
 import 'package:senboo/components/search_card.dart';
 import 'package:senboo/model/get_user_data.dart';
-import 'package:senboo/screens/post_view_screen.dart';
 
 class SearchScreen extends StatefulWidget {
   SearchScreen({Key? key}) : super(key: key);

@@ -283,15 +283,15 @@ class _PostCardState extends State<PostCard> {
   }
 
   // bodyText is Here -----------------------------------------------------
-  Widget _bodyText() {
-    return Text(
-      widget.body,
-      maxLines: 6,
-      textAlign: TextAlign.start,
-      overflow: TextOverflow.ellipsis,
-      style: Theme.of(context).textTheme.bodyText1,
-    );
-  }
+  // Widget _bodyText() {
+  //   return Text(
+  //     widget.body,
+  //     maxLines: 6,
+  //     textAlign: TextAlign.start,
+  //     overflow: TextOverflow.ellipsis,
+  //     style: Theme.of(context).textTheme.bodyText1,
+  //   );
+  // }
 
   // Third Part
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

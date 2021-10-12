@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:senboo/model/user_data.dart';
-import 'package:senboo/screens/edit_profile.dart';
+// import 'package:senboo/screens/edit_profile.dart';
 import 'package:intl/intl.dart';
 
 class VisitorProfileCard extends StatefulWidget {
@@ -282,25 +282,25 @@ class _VisitorProfileCardState extends State<VisitorProfileCard> {
   //Profile Edit button are here----------------------------
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-  Widget _profileEditButton() {
-    return ElevatedButton(
-      onPressed: () {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => EditProfile()));
-      },
-      style: ButtonStyle(
-          backgroundColor:
-              MaterialStateProperty.all(Theme.of(context).primaryColor),
-          shadowColor:
-              MaterialStateProperty.all(Theme.of(context).primaryColor),
-          padding: MaterialStateProperty.all(
-              EdgeInsets.symmetric(vertical: 15, horizontal: 25)),
-          shape: MaterialStateProperty.all(
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(35)))),
-      child: Text(
-        "edit profile".toUpperCase(),
-        style: Theme.of(context).textTheme.subtitle2,
-      ),
-    );
-  }
+  // Widget _profileEditButton() {
+  //   return ElevatedButton(
+  //     onPressed: () {
+  //       Navigator.push(
+  //           context, MaterialPageRoute(builder: (context) => EditProfile()));
+  //     },
+  //     style: ButtonStyle(
+  //         backgroundColor:
+  //             MaterialStateProperty.all(Theme.of(context).primaryColor),
+  //         shadowColor:
+  //             MaterialStateProperty.all(Theme.of(context).primaryColor),
+  //         padding: MaterialStateProperty.all(
+  //             EdgeInsets.symmetric(vertical: 15, horizontal: 25)),
+  //         shape: MaterialStateProperty.all(
+  //             RoundedRectangleBorder(borderRadius: BorderRadius.circular(35)))),
+  //     child: Text(
+  //       "edit profile".toUpperCase(),
+  //       style: Theme.of(context).textTheme.subtitle2,
+  //     ),
+  //   );
+  // }
 }
