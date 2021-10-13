@@ -1,13 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:senboo/components/likes_list.dart';
 import 'package:senboo/components/profile_card.dart';
 import 'package:senboo/components/profile_post_card.dart';
-// import 'package:senboo/components/update_post.dart';
 import 'package:senboo/model/get_user_data.dart';
-import 'package:senboo/providers/data_provider.dart';
 import 'package:senboo/screens/edit_card.dart';
 // import 'package:senboo/screens/post_view_screen.dart';
 
@@ -31,8 +28,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   CollectionReference savedPosts =
       FirebaseFirestore.instance.collection("savedPosts");
   PostData? postData;
-  int totalPosts = 0;
-  int totalLikes = 0;
   List? _savedDataList;
 
   // List? savedPostsList;
@@ -46,20 +41,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-
-    DataProvider dataProvider =
-        Provider.of<DataProvider>(context, listen: false);
-    dataProvider.getTotalLikes(ownerId: currentUser!.uid);
   }
 
   deletePost(postId) async {
-    DataProvider dataProvider =
-        Provider.of<DataProvider>(context, listen: false);
+    // DataProvider dataProvider =
+    //     Provider.of<DataProvider>(context, listen: false);
     Navigator.pop(context);
     _showLoading();
     await comments.doc(postId).delete();
     await posts.doc(postId).delete();
-    dataProvider.getTotalLikes(ownerId: currentUser!.uid);
+    // dataProvider.getTotalLikes(ownerId: currentUser!.uid);
     Navigator.pop(context);
   }
 
@@ -88,9 +79,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    DataProvider dataProvider = Provider.of<DataProvider>(context);
-    totalLikes = dataProvider.getlikes;
-    totalPosts = dataProvider.getPosts;
     return Container(
       // height: MediaQuery.of(context).size.height,
       child: Stack(
@@ -109,8 +97,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               Container(
                 margin: EdgeInsets.only(bottom: 10),
-                child:
-                    ProfileCard(totalPosts: totalPosts, totalLikes: totalLikes),
+                child: ProfileCard(),
               ),
               _postHead("Posts", Icons.read_more),
               _postCards(),

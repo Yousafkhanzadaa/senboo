@@ -7,15 +7,8 @@ import 'package:senboo/model/user_data.dart';
 import 'package:intl/intl.dart';
 
 class VisitorProfileCard extends StatefulWidget {
-  VisitorProfileCard(
-      {Key? key,
-      required this.totalPosts,
-      required this.totalLikes,
-      required this.ownerId})
-      : super(key: key);
+  VisitorProfileCard({Key? key, required this.ownerId}) : super(key: key);
 
-  final int totalPosts;
-  final int totalLikes;
   final String ownerId;
 
   @override
@@ -25,10 +18,38 @@ class VisitorProfileCard extends StatefulWidget {
 class _VisitorProfileCardState extends State<VisitorProfileCard> {
   // User collection
   CollectionReference users = FirebaseFirestore.instance.collection("users");
+  CollectionReference posts = FirebaseFirestore.instance.collection("posts");
   // // Current User
   // User? currentUser = FirebaseAuth.instance.currentUser;
   // userData modal
   UserData? userData;
+  int totalPosts = 0;
+  int totalLikes = 0;
+  bool waiting = true;
+
+  @override
+  void initState() {
+    super.initState();
+    getTotalLikes(ownerId: widget.ownerId);
+  }
+
+  getTotalLikes({required String ownerId}) async {
+    await posts.where('ownerId', isEqualTo: ownerId).get().then((value) {
+      int likesCount = 0;
+      value.docs.forEach((val) {
+        // totalLikes += val.get()
+        List list = val.get("likes");
+        likesCount += list.length;
+      });
+      setState(() {
+        totalPosts = value.docs.length;
+        waiting = false;
+        totalLikes = likesCount;
+      });
+    });
+    // notifyListeners();
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -38,7 +59,7 @@ class _VisitorProfileCardState extends State<VisitorProfileCard> {
           return _errorScreen();
         }
 
-        if (snapshot.connectionState == ConnectionState.done) {
+        if (snapshot.connectionState == ConnectionState.done && !waiting) {
           userData = UserData.setData(snapshot);
           return Container(
             width: MediaQuery.of(context).size.width * 0.97,
@@ -138,7 +159,7 @@ class _VisitorProfileCardState extends State<VisitorProfileCard> {
       width: 70,
       decoration: BoxDecoration(
           border: Border.all(color: Theme.of(context).primaryColor, width: 2),
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(35),
           color: Colors.black26,
           image: DecorationImage(image: NetworkImage(photoUrl))),
     );
@@ -218,9 +239,9 @@ class _VisitorProfileCardState extends State<VisitorProfileCard> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _inds("Posts", widget.totalPosts),
+          _inds("Posts", totalPosts),
           SizedBox(width: MediaQuery.of(context).size.width * 0.25),
-          _inds("Likes", widget.totalLikes),
+          _inds("Likes", totalLikes),
         ],
       ),
     );

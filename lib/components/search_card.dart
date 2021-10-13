@@ -43,8 +43,9 @@ class _SearchCardState extends State<SearchCard> {
   CollectionReference users = FirebaseFirestore.instance.collection("users");
   final DateFormat formatter = DateFormat('yyyy-MM-dd');
   Map cardData = {
-    "userName": "userName",
-    "profession": "profession",
+    "userName": null,
+    "profession": null,
+    'photoUrl': null,
   };
   @override
   Widget build(BuildContext context) {
@@ -55,6 +56,7 @@ class _SearchCardState extends State<SearchCard> {
           if (snapshot.data!.exists) {
             cardData['profession'] = snapshot.data!['profession'];
             cardData['userName'] = snapshot.data!['userName'];
+            cardData['photoUrl'] = snapshot.data!['photoUrl'];
           }
           return GestureDetector(
             onTap: () {
@@ -69,6 +71,7 @@ class _SearchCardState extends State<SearchCard> {
                     date: widget.postData.date!.toDate(),
                     category: widget.postData.category!,
                     postId: widget.postData.postId!,
+                    photoUrl: cardData['photoUrl'],
                     ownerId: widget.postData.ownerId!,
                     reverse: 1,
                   ),

@@ -7,11 +7,7 @@ import 'package:senboo/screens/edit_profile.dart';
 import 'package:intl/intl.dart';
 
 class ProfileCard extends StatefulWidget {
-  ProfileCard({Key? key, required this.totalPosts, required this.totalLikes})
-      : super(key: key);
-
-  final int totalPosts;
-  final int totalLikes;
+  ProfileCard({Key? key}) : super(key: key);
 
   @override
   _ProfileCardState createState() => _ProfileCardState();
@@ -20,10 +16,42 @@ class ProfileCard extends StatefulWidget {
 class _ProfileCardState extends State<ProfileCard> {
   // User collection
   CollectionReference users = FirebaseFirestore.instance.collection("users");
+  CollectionReference posts = FirebaseFirestore.instance.collection("posts");
   // Current User
   User? currentUser = FirebaseAuth.instance.currentUser;
   // userData modal
   UserData? userData;
+  int totalPosts = 0;
+  int totalLikes = 0;
+  bool waiting = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    getTotalLikes(ownerId: currentUser!.uid);
+  }
+
+  getTotalLikes({required String ownerId}) async {
+    var a = posts.where('ownerId', isEqualTo: ownerId).snapshots();
+    a.listen((value) {
+      int likesCount = 0;
+      value.docs.forEach((val) {
+        // totalLikes += val.get()
+        List list = val.get("likes");
+        likesCount += list.length;
+      });
+      if (mounted) {
+        setState(() {
+          totalPosts = value.docs.length;
+          waiting = false;
+          totalLikes = likesCount;
+        });
+      }
+    });
+    // notifyListeners();
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
@@ -33,7 +61,7 @@ class _ProfileCardState extends State<ProfileCard> {
           return _errorScreen();
         }
 
-        if (snapshot.hasData) {
+        if (snapshot.hasData && !waiting) {
           userData = UserData.setData(snapshot);
           return Container(
             width: MediaQuery.of(context).size.width * 0.97,
@@ -135,8 +163,8 @@ class _ProfileCardState extends State<ProfileCard> {
       width: 70,
       decoration: BoxDecoration(
           border: Border.all(color: Theme.of(context).primaryColor, width: 2),
-          borderRadius: BorderRadius.circular(15),
-          color: Colors.black26,
+          borderRadius: BorderRadius.circular(35),
+          color: Colors.white,
           image: DecorationImage(image: NetworkImage(photoUrl))),
     );
   }
@@ -215,9 +243,9 @@ class _ProfileCardState extends State<ProfileCard> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _inds("Posts", widget.totalPosts),
+          _inds("Posts", totalPosts),
           SizedBox(width: MediaQuery.of(context).size.width * 0.25),
-          _inds("Likes", widget.totalLikes),
+          _inds("Likes", totalLikes),
         ],
       ),
     );

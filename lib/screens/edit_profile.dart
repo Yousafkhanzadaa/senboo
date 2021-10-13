@@ -21,19 +21,21 @@ class _EditProfileState extends State<EditProfile> {
   final TextEditingController _bioController = TextEditingController();
   final TextEditingController _instaController = TextEditingController();
   final TextEditingController _twitterController = TextEditingController();
-  List<String> _fieldButtonNames = [
+  final List<String> _fieldButtonNames = [
     "Quote",
-    "Art & Culture",
-    "Business",
+    "Motivation",
     "Idea",
-    "Science & Technology",
-    "Health & Medicine",
-    "Story",
-    'Finance & Economics',
-    "Lifestyle",
-    "Entertainment",
     "Poetry",
+    "Story",
+    "philosophy",
+    "Science & Technology",
     "News",
+    "Lifestyle",
+    "Finance & Economics",
+    "Business",
+    "Health & Medicine",
+    "Art & Culture",
+    "Entertainment",
   ];
   List<dynamic> _interestedList = [];
   // User collection

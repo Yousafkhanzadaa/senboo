@@ -130,8 +130,10 @@ class _CommentScreenState extends State<CommentScreen> {
     return Text(
       commentMap['title'],
       maxLines: 5,
-      style:
-          Theme.of(context).textTheme.bodyText1!.copyWith(color: Colors.white),
+      style: Theme.of(context)
+          .textTheme
+          .bodyText1!
+          .copyWith(color: Colors.white, fontSize: 18),
     );
   }
 
@@ -168,9 +170,42 @@ class _CommentScreenState extends State<CommentScreen> {
                   );
           }
 
-          return _cardNotFount();
+          return _loadingScreen();
         },
       ),
+    );
+  }
+
+  // loading card
+  Widget _loadingScreen() {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.3,
+      margin: EdgeInsets.symmetric(
+        vertical: 10,
+        horizontal: 10,
+      ),
+      decoration: _cardDecoration(),
+      child: Center(
+        child: CircularProgressIndicator(
+          color: Theme.of(context).primaryColor,
+        ),
+      ),
+    );
+  }
+
+  // CardDecoration --------------------------------------
+  BoxDecoration _cardDecoration() {
+    return BoxDecoration(
+      color: Theme.of(context).cardColor,
+      borderRadius: BorderRadius.circular(25),
+      boxShadow: [
+        BoxShadow(
+          color: Theme.of(context).primaryColor.withOpacity(0.40),
+          blurRadius: 5,
+          offset: Offset(0, 0),
+          spreadRadius: 1,
+        ),
+      ],
     );
   }
 

@@ -26,6 +26,7 @@ class _ColorPaletteState extends State<ColorPalette> {
     '0xFFEFC050',
     '0xFF5B5EA6',
     '0xFF9B2335',
+    '0xFF000000',
   ];
 
   @override

@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +18,7 @@ class PostViewScreen extends StatefulWidget {
       required this.category,
       required this.postId,
       required this.ownerId,
+      required this.photoUrl,
       this.reverse})
       : super(key: key);
   final String userName;
@@ -26,6 +29,7 @@ class PostViewScreen extends StatefulWidget {
   final List category;
   final String postId;
   final String ownerId;
+  final String photoUrl;
   final int? reverse;
 
   @override
@@ -112,30 +116,61 @@ class _PostViewScreenState extends State<PostViewScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _timerText(),
-          SizedBox(
-            height: 5,
-          ),
-          GestureDetector(
-            onTap: () {
-              if (widget.reverse != null) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        VisitorProfileScreen(ownerId: widget.ownerId),
-                  ),
-                );
-              }
-            },
-            child: _userNameHeading(),
-          ),
-          SizedBox(
-            height: 15,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _profilePic(widget.photoUrl),
+              SizedBox(
+                width: 5,
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        if (widget.reverse != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  VisitorProfileScreen(ownerId: widget.ownerId),
+                            ),
+                          );
+                        }
+                      },
+                      child: _userNameHeading(),
+                    ),
+                    SizedBox(
+                      height: 15,
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
           _categoryText(),
+          _timerText(),
         ],
       ),
+    );
+  }
+
+  // Profile pic.-------------------------------
+  Widget _profilePic(String photoUrl) {
+    return Container(
+      height: 50,
+      width: 50,
+      decoration: BoxDecoration(
+          // border: Border.all(color: Theme.of(context).primaryColor, width: 2),
+          borderRadius: BorderRadius.circular(15),
+          // color: Colors.white,
+          gradient: RadialGradient(colors: [
+            Colors.grey,
+            Colors.transparent,
+            // Colors.transparent,
+          ], radius: 1),
+          image: DecorationImage(image: NetworkImage(photoUrl))),
     );
   }
 
@@ -146,10 +181,14 @@ class _PostViewScreenState extends State<PostViewScreen> {
       children: [
         Text(
           widget.userName,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: Theme.of(context).textTheme.headline1,
         ),
         Text(
           widget.profession,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: Theme.of(context).textTheme.subtitle2,
         )
       ],
@@ -181,6 +220,8 @@ class _PostViewScreenState extends State<PostViewScreen> {
   Widget _categoryText() {
     return Text(
       "${widget.category.toString()}".toUpperCase(),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
       style: Theme.of(context).textTheme.subtitle2,
     );
   }

@@ -1,10 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:senboo/components/profile_post_card.dart';
 import 'package:senboo/components/visitor_profile_card.dart';
 import 'package:senboo/model/get_user_data.dart';
-import 'package:senboo/providers/data_provider.dart';
 
 class VisitorProfileScreen extends StatefulWidget {
   VisitorProfileScreen({Key? key, required this.ownerId}) : super(key: key);
@@ -23,33 +21,27 @@ class _VisitorProfileScreenState extends State<VisitorProfileScreen> {
   int totalPosts = 0;
   int totalLikes = 0;
 
-  List? savedPostsList;
+  // List? savedPostsList;
   bool waiting = true;
 
   @override
   void initState() {
     super.initState();
 
-    DataProvider dataProvider =
-        Provider.of<DataProvider>(context, listen: false);
-    getUserDetails();
-    dataProvider.getTotalLikes(ownerId: widget.ownerId);
+    // getUserDetails();
   }
 
-  Future getUserDetails() async {
-    await users.doc(widget.ownerId).get().then((snapshot) {
-      setState(() {
-        savedPostsList = snapshot.get('savedPosts');
-        waiting = false;
-      });
-    });
-  }
+  // Future getUserDetails() async {
+  //   await users.doc(widget.ownerId).get().then((snapshot) {
+  //     setState(() {
+  //       savedPostsList = snapshot.get('savedPosts');
+  //       waiting = false;
+  //     });
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
-    DataProvider dataProvider = Provider.of<DataProvider>(context);
-    totalLikes = dataProvider.getlikes;
-    totalPosts = dataProvider.getPosts;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -82,8 +74,6 @@ class _VisitorProfileScreenState extends State<VisitorProfileScreen> {
                 Container(
                   margin: EdgeInsets.only(bottom: 10),
                   child: VisitorProfileCard(
-                    totalPosts: totalPosts,
-                    totalLikes: totalLikes,
                     ownerId: widget.ownerId,
                   ),
                 ),

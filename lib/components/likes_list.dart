@@ -39,7 +39,6 @@ class _LikeListState extends State<LikeList> {
     return FutureBuilder(
       future: users.doc(ownerId).get(),
       builder: (context, snapshot) {
-        print("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww");
         if (snapshot.connectionState == ConnectionState.done) {
           userData = UserData.setData(snapshot);
           return _likeCard(
@@ -86,7 +85,7 @@ class _LikeListState extends State<LikeList> {
               height: 40,
               decoration: BoxDecoration(
                 image: DecorationImage(image: NetworkImage(imgUrl)),
-                borderRadius: BorderRadius.circular(15),
+                borderRadius: BorderRadius.circular(35),
               ),
             ),
             SizedBox(
@@ -118,7 +117,7 @@ class _LikeListState extends State<LikeList> {
   BoxDecoration _cardDecoration() {
     return BoxDecoration(
       color: Theme.of(context).cardColor,
-      borderRadius: BorderRadius.circular(25),
+      borderRadius: BorderRadius.circular(22),
       boxShadow: [
         BoxShadow(
           color: Theme.of(context).primaryColor.withOpacity(0.40),

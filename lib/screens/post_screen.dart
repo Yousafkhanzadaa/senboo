@@ -33,17 +33,19 @@ class _PostScreenState extends State<PostScreen> {
 
   final List<String> _fieldButtonNames = [
     "Quote",
-    "Art & Culture",
-    "Business",
+    "Motivation",
     "Idea",
-    "Science & Technology",
-    "Health & Medicine",
-    "Story",
-    'Finance & Economics',
-    "Lifestyle",
-    "Entertainment",
     "Poetry",
+    "Story",
+    "philosophy",
+    "Science & Technology",
     "News",
+    "Lifestyle",
+    "Finance & Economics",
+    "Business",
+    "Health & Medicine",
+    "Art & Culture",
+    "Entertainment",
   ];
 
   @override
@@ -194,13 +196,13 @@ class _PostScreenState extends State<PostScreen> {
                       if (_categories.contains(_fieldButtonNames[index])) {
                         _categories.remove(_fieldButtonNames[index]);
                       } else {
-                        if (_categories.length < 2) {
+                        if (_categories.length < 3) {
                           _categories.add(_fieldButtonNames[index]);
                         } else {
                           var snackBar = SnackBar(
                               backgroundColor: Theme.of(context).primaryColor,
                               content:
-                                  Text('You can select only two categories'));
+                                  Text('You can select only three categories'));
                           ScaffoldMessenger.of(context).showSnackBar(snackBar);
                         }
                       }
@@ -297,12 +299,12 @@ class _PostScreenState extends State<PostScreen> {
                 date: dateTime!,
               );
             }).whenComplete(() {
-              Navigator.pop(context);
               setState(() {
                 _mainTitleController.text = "";
                 _bodyTextController.text = "";
                 _categories.clear();
               });
+              Navigator.pop(context);
             });
           }
         }

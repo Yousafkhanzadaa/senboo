@@ -56,6 +56,7 @@ class _ProfilePostCardState extends State<ProfilePostCard> {
   Map cardData = {
     "userName": null,
     "profession": null,
+    "photoUrl": null,
   };
   @override
   Widget build(BuildContext context) {
@@ -67,6 +68,7 @@ class _ProfilePostCardState extends State<ProfilePostCard> {
         }
         cardData["userName"] = snapshot.data!['userName'];
         cardData["profession"] = snapshot.data!['profession'];
+        cardData['photoUrl'] = snapshot.data!['photoUrl'];
         return GestureDetector(
           onTap: () {
             Navigator.push(
@@ -81,6 +83,7 @@ class _ProfilePostCardState extends State<ProfilePostCard> {
                   category: widget.category,
                   postId: widget.postId,
                   ownerId: widget.ownerId,
+                  photoUrl: cardData['photoUrl'],
                   reverse: widget.reverse,
                 ),
               ),

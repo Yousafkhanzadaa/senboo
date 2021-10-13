@@ -60,6 +60,7 @@ class _PostCardState extends State<PostCard> {
   Map userData = {
     "userName": null,
     "profession": null,
+    "photoUrl": null,
   };
 
   // gettting like
@@ -92,6 +93,7 @@ class _PostCardState extends State<PostCard> {
           if (snapshot.hasData) {
             userData["userName"] = snapshot.data!['userName'];
             userData["profession"] = snapshot.data!['profession'];
+            userData["photoUrl"] = snapshot.data!['photoUrl'];
             return GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -106,6 +108,7 @@ class _PostCardState extends State<PostCard> {
                       category: widget.category,
                       postId: widget.postId,
                       ownerId: widget.ownerId,
+                      photoUrl: userData['photoUrl'],
                       reverse: 1,
                     ),
                   ),
@@ -165,6 +168,25 @@ class _PostCardState extends State<PostCard> {
     );
   }
 
+  // Profile pic.-------------------------------
+  Widget _profilePic(String photoUrl) {
+    return Container(
+      height: 50,
+      width: 50,
+      decoration: BoxDecoration(
+          // border: Border.all(color: Theme.of(context).primaryColor, width: 2),
+
+          borderRadius: BorderRadius.circular(15),
+          // color: Colors.white,
+          gradient: RadialGradient(colors: [
+            Colors.grey,
+            Colors.transparent,
+            // Colors.transparent,
+          ], radius: 1),
+          image: DecorationImage(image: NetworkImage(photoUrl))),
+    );
+  }
+
   // First Part
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   // Upper HeadingBox -------------------------------------------
@@ -182,12 +204,28 @@ class _PostCardState extends State<PostCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _timerText(),
-          _userNameHeading(),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _profilePic(userData['photoUrl']),
+              SizedBox(
+                width: 5,
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _userNameHeading(),
+                  ],
+                ),
+              ),
+            ],
+          ),
           SizedBox(
             height: 10,
           ),
           _categoryText(),
+          _timerText(),
         ],
       ),
     );
@@ -209,10 +247,14 @@ class _PostCardState extends State<PostCard> {
         children: [
           Text(
             userData["userName"] ?? widget.userName,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.headline1,
           ),
           Text(
             userData["profession"] ?? widget.profession,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.subtitle2,
           ),
         ],
@@ -244,6 +286,8 @@ class _PostCardState extends State<PostCard> {
   Widget _categoryText() {
     return Text(
       "${widget.category.toString()}".toUpperCase(),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
       style: Theme.of(context).textTheme.subtitle2,
     );
   }
