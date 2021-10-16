@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import 'package:senboo/components/custom_text_field.dart';
 import 'package:senboo/components/interest_button.dart';
 import 'package:senboo/model/user_data_update.dart';
-import 'package:senboo/providers/edit_list_controller.dart';
 
 class EditProfile extends StatefulWidget {
   EditProfile({Key? key}) : super(key: key);
@@ -36,10 +35,13 @@ class _EditProfileState extends State<EditProfile> {
     "Health & Medicine",
     "Art & Culture",
     "Entertainment",
+    "Urdu",
   ];
   List<dynamic> _interestedList = [];
   // User collection
   CollectionReference users = FirebaseFirestore.instance.collection("users");
+  // Post collection
+  CollectionReference posts = FirebaseFirestore.instance.collection("posts");
   // Current User
   User? currentUser = FirebaseAuth.instance.currentUser;
   // userData modal
@@ -85,6 +87,21 @@ class _EditProfileState extends State<EditProfile> {
     });
   }
 
+  Future updatePostsData({
+    String? userName,
+    String? profession,
+  }) async {
+    posts.where("ownerId", isEqualTo: currentUser!.uid).get().then((value) {
+      value.docs.forEach((DocumentSnapshot element) async {
+        var postId = element.get('postId');
+        await posts.doc(postId).update({
+          'userName': userName,
+          'profession': profession,
+        });
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -122,7 +139,10 @@ class _EditProfileState extends State<EditProfile> {
                         SizedBox(
                           height: 20,
                         ),
-                        _saveEditButton(),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width,
+                          child: _saveEditButton(),
+                        ),
                       ],
                     ),
                   ),
@@ -284,7 +304,7 @@ class _EditProfileState extends State<EditProfile> {
           height: 10,
         ),
         Text(
-          "Interests",
+          "Fields of Interest",
           style: Theme.of(context).textTheme.bodyText1,
         ),
         Container(
@@ -308,7 +328,15 @@ class _EditProfileState extends State<EditProfile> {
                       if (_interestedList.contains(_fieldButtonNames[index])) {
                         _interestedList.remove(_fieldButtonNames[index]);
                       } else {
-                        _interestedList.add(_fieldButtonNames[index]);
+                        if (_interestedList.length < 10) {
+                          _interestedList.add(_fieldButtonNames[index]);
+                        } else {
+                          var snackBar = SnackBar(
+                              backgroundColor: Theme.of(context).primaryColor,
+                              content: Text(
+                                  'You can select only ten fields of interests.'));
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        }
                       }
                     });
                   },
@@ -365,113 +393,113 @@ class _EditProfileState extends State<EditProfile> {
 
   // save buttan goes here -0------------------------------------
   Widget _saveEditButton() {
-    return Consumer<EditListController>(
-      builder: (context, list, child) {
-        return ElevatedButton(
-          onPressed: () async {
-            FocusScopeNode currentFocus = FocusScope.of(context);
-            currentFocus.unfocus();
-            if (_interestedList.isNotEmpty) {
-              if (_formKey.currentState!.validate()) {
-                _showLoading();
-                await updateUserDetails(
-                  userName: _nameController.text,
-                  profession: _professionController.text,
-                  bio: _bioController.text,
-                  socialLinks: [
-                    _instaController.text,
-                    _twitterController.text,
-                  ],
-                  interested: _interestedList,
-                ).whenComplete(() {
-                  list.setList = _interestedList;
-                  Navigator.pop(context);
+    return ElevatedButton(
+      onPressed: () async {
+        FocusScopeNode currentFocus = FocusScope.of(context);
+        currentFocus.unfocus();
+        if (_interestedList.isNotEmpty) {
+          if (_formKey.currentState!.validate()) {
+            _showLoading();
+            await updatePostsData(
+              userName: _nameController.text,
+              profession: _professionController.text,
+            );
+            await updateUserDetails(
+              userName: _nameController.text,
+              profession: _professionController.text,
+              bio: _bioController.text,
+              socialLinks: [
+                _instaController.text,
+                _twitterController.text,
+              ],
+              interested: _interestedList,
+            ).whenComplete(() {
+              Navigator.pop(context);
 
-                  Navigator.pop(context);
-                });
-              }
-            }
-            if (_interestedList.isEmpty) {
-              var snackBar = SnackBar(
-                  content: Text(
-                      'Please select your interestes.\nscroll horizontal'));
-              ScaffoldMessenger.of(context).showSnackBar(snackBar);
-            }
-          },
-          style: ButtonStyle(
-              backgroundColor:
-                  MaterialStateProperty.all(Theme.of(context).primaryColor),
-              shadowColor:
-                  MaterialStateProperty.all(Theme.of(context).primaryColor),
-              padding: MaterialStateProperty.all(
-                  EdgeInsets.symmetric(vertical: 15, horizontal: 65)),
-              shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(35)))),
-          child: Text(
-            "save".toUpperCase(),
-            style: Theme.of(context).textTheme.subtitle2,
-          ),
-        );
+              Navigator.pop(context);
+            });
+          }
+        }
+        if (_interestedList.isEmpty) {
+          var snackBar = SnackBar(
+              backgroundColor: Theme.of(context).primaryColor,
+              content: Text(
+                  'Please select your fields of interests.\nscroll horizontal'));
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        }
       },
+      style: ButtonStyle(
+          backgroundColor:
+              MaterialStateProperty.all(Theme.of(context).primaryColor),
+          shadowColor:
+              MaterialStateProperty.all(Theme.of(context).primaryColor),
+          padding: MaterialStateProperty.all(
+              EdgeInsets.symmetric(vertical: 15, horizontal: 65)),
+          shape: MaterialStateProperty.all(
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(35)))),
+      child: Text(
+        "save".toUpperCase(),
+        style: Theme.of(context).textTheme.subtitle2,
+      ),
     );
   }
 
   // Top Save button in Appbar -------------------------------------
   // CommentButton goes here -------------------------------------------
   Widget _topSaveButton() {
-    return Consumer<EditListController>(builder: (context, list, child) {
-      return GestureDetector(
-        onTap: () async {
-          FocusScopeNode currentFocus = FocusScope.of(context);
-          currentFocus.unfocus();
-          if (_interestedList.isNotEmpty) {
-            if (_formKey.currentState!.validate()) {
-              _showLoading();
-
-              await updateUserDetails(
-                userName: _nameController.text,
-                profession: _professionController.text,
-                bio: _bioController.text,
-                socialLinks: [
-                  _instaController.text,
-                  _twitterController.text,
-                ],
-                interested: _interestedList,
-              ).whenComplete(() {
-                list.setList = _interestedList;
-                Navigator.pop(context);
-                Navigator.pop(context);
-              });
-            }
-          }
-          if (_interestedList.isEmpty) {
-            var snackBar = SnackBar(
-                backgroundColor: Theme.of(context).primaryColor,
-                content:
-                    Text('Please select your interestes.\nscroll horizontal'));
-            ScaffoldMessenger.of(context).showSnackBar(snackBar);
-          }
-        },
-        child: Container(
-            margin: EdgeInsets.only(top: 5, bottom: 5, right: 10),
-            padding: EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
-              borderRadius: BorderRadius.circular(25),
-              boxShadow: [
-                BoxShadow(
-                  color: Theme.of(context).primaryColor.withOpacity(0.40),
-                  blurRadius: 5,
-                  offset: Offset(0, 0),
-                  spreadRadius: 1,
-                ),
+    return GestureDetector(
+      onTap: () async {
+        FocusScopeNode currentFocus = FocusScope.of(context);
+        currentFocus.unfocus();
+        if (_interestedList.isNotEmpty) {
+          if (_formKey.currentState!.validate()) {
+            _showLoading();
+            await updatePostsData(
+              userName: _nameController.text,
+              profession: _professionController.text,
+            );
+            await updateUserDetails(
+              userName: _nameController.text,
+              profession: _professionController.text,
+              bio: _bioController.text,
+              socialLinks: [
+                _instaController.text,
+                _twitterController.text,
               ],
-            ),
-            child: _buttonsIcon(
-              Icons.done,
-            )),
-      );
-    });
+              interested: _interestedList,
+            ).whenComplete(() {
+              Navigator.pop(context);
+              Navigator.pop(context);
+            });
+          }
+        }
+        if (_interestedList.isEmpty) {
+          var snackBar = SnackBar(
+              backgroundColor: Theme.of(context).primaryColor,
+              content: Text(
+                  'Please select your fields of interests.\nscroll horizontal'));
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        }
+      },
+      child: Container(
+          margin: EdgeInsets.only(top: 5, bottom: 5, right: 10),
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(25),
+            boxShadow: [
+              BoxShadow(
+                color: Theme.of(context).primaryColor.withOpacity(0.40),
+                blurRadius: 5,
+                offset: Offset(0, 0),
+                spreadRadius: 1,
+              ),
+            ],
+          ),
+          child: _buttonsIcon(
+            Icons.done,
+          )),
+    );
   }
 
   // button icons ------------------------------------------

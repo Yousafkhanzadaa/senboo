@@ -33,11 +33,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // List? savedPostsList;
   bool waiting = true;
 
-  Map userDataMap = {
-    "userName": null,
-    "profession": null,
-  };
-
   @override
   void initState() {
     super.initState();
@@ -234,6 +229,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 category: postData!.category!,
                 likes: postData!.likes!,
                 postId: postData!.postId!,
+                photoUrl: postData!.photoUrl!,
                 options: option,
                 deleteFunction: () {},
                 updateFunction: () {},
@@ -300,6 +296,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       category: postData.category!,
       likes: postData.likes!,
       postId: postData.postId!,
+      photoUrl: postData.photoUrl!,
       options: option,
       deleteFunction: () {
         showDialog(
@@ -336,16 +333,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     profession: postData.profession!,
                     userName: postData.userName!,
                     body: postData.body!)));
-        // showBottomSheet(
-        //     context: context,
-        //     backgroundColor: Colors.transparent,
-        //     elevation: 2,
-        //     builder: (context) => UpdatePostScreen(
-        //         postId: data[index].id,
-        //         category: postData.category!,
-        //         title: postData.title!,
-        //         userName: postData.userName!,
-        //         body: postData.body!));
       },
       likeFun: () {
         showModalBottomSheet(
@@ -401,15 +388,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   // Load Screen ---------------------------------------------
   Widget _noPosts() {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.4,
-      margin: EdgeInsets.symmetric(
-        vertical: 10,
-        horizontal: 10,
-      ),
-      decoration: _cardDecoration(),
-      child: Center(
-        child: Text(
+    return Column(
+      children: [
+        Container(
+            height: MediaQuery.of(context).size.height * 0.2,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                  image: AssetImage("assets/images/svgs/inbox.png")),
+            )),
+        Text(
           "No Posts",
           style: TextStyle(
             color: Theme.of(context).primaryColor,
@@ -417,7 +404,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             fontWeight: FontWeight.w700,
           ),
         ),
-      ),
+      ],
     );
   }
 

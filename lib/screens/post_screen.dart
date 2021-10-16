@@ -46,6 +46,7 @@ class _PostScreenState extends State<PostScreen> {
     "Health & Medicine",
     "Art & Culture",
     "Entertainment",
+    "Urdu",
   ];
 
   @override
@@ -97,7 +98,10 @@ class _PostScreenState extends State<PostScreen> {
             SizedBox(
               height: 20,
             ),
-            _postEditButton(),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.80,
+              child: _postEditButton(),
+            ),
           ],
         ),
       ),
@@ -135,12 +139,12 @@ class _PostScreenState extends State<PostScreen> {
               controller: _mainTitleController,
               hint: "Title",
               label: "Main Title",
-              maxLines: 5,
+              maxLines: 4,
               validator: (value) {
-                if (value!.length > 140) {
-                  return "Title is too long";
-                }
-                if (value.isEmpty) {
+                // if (value!.length > 140) {
+                //   return "Title is too long";
+                // }
+                if (value!.isEmpty) {
                   return "Field must not be empty";
                 }
                 return null;
@@ -151,8 +155,8 @@ class _PostScreenState extends State<PostScreen> {
             ),
             CustomTextField(
               controller: _bodyTextController,
-              hint: "Body text",
-              label: "Body text ",
+              hint: "Body text (optional)",
+              label: "Body text (optional)",
               maxLines: 10,
             ),
           ],
@@ -171,7 +175,7 @@ class _PostScreenState extends State<PostScreen> {
         ),
         RichText(
           text: TextSpan(
-            text: "Select category",
+            text: "Select Post Category",
             style: Theme.of(context).textTheme.bodyText1,
             children: <TextSpan>[],
           ),
@@ -270,7 +274,8 @@ class _PostScreenState extends State<PostScreen> {
         if (_categories.isEmpty) {
           var snackBar = SnackBar(
               backgroundColor: Theme.of(context).primaryColor,
-              content: Text('please select category.\nscroll horizontal.'));
+              content:
+                  Text('please select post category.\nscroll horizontal.'));
           ScaffoldMessenger.of(context).showSnackBar(snackBar);
         }
         if (_categories.isNotEmpty) {
@@ -292,6 +297,7 @@ class _PostScreenState extends State<PostScreen> {
               addPost(
                 userName: userData!.userName!,
                 profession: userData!.profession!,
+                photoUrl: userData!.photoUrl!,
                 category: _categories,
                 title: _mainTitleController.text,
                 body: _bodyTextController.text,
@@ -332,6 +338,7 @@ class _PostScreenState extends State<PostScreen> {
     required List<String> category,
     required String title,
     required String body,
+    required String photoUrl,
     required List searchKeywords,
     required DateTime date,
   }) async {
@@ -347,6 +354,7 @@ class _PostScreenState extends State<PostScreen> {
         "body": body,
         "searchKeywords": searchKeywords,
         "postId": uidV4,
+        "photoUrl": photoUrl,
         "likes": [],
       });
     } catch (e) {

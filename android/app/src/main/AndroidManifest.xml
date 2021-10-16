@@ -1,8 +1,18 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ydevs.senboo">
+    <!-- 
+        Permission for storage
+     -->
+     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+     <!-- 
+         Permission for internet
+      -->
     <uses-permission android:name="android.permission.INTERNET" />
    <application
         android:label="Senboo"
+        android:requestLegacyExternalStorage="true"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

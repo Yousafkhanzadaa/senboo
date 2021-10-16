@@ -53,6 +53,7 @@ class _UpdatePostScreenState extends State<UpdatePostScreen> {
     "Health & Medicine",
     "Art & Culture",
     "Entertainment",
+    "Urdu",
   ];
 
   @override
@@ -76,14 +77,10 @@ class _UpdatePostScreenState extends State<UpdatePostScreen> {
     required String body,
     required List searchKeywords,
     required String postId,
-    required String userName,
-    required String profession,
   }) async {
     try {
       await posts.doc(postId).update({
         "category": category,
-        "userName": userName,
-        "profession": profession,
         "title": title,
         "body": body,
         "searchKeywords": searchKeywords,
@@ -319,7 +316,7 @@ class _UpdatePostScreenState extends State<UpdatePostScreen> {
               var snackBar = SnackBar(
                   backgroundColor: Theme.of(context).primaryColor,
                   content: Text(
-                      'please select category on top. scroll horizontal.'));
+                      'please select your post category on top. scroll horizontal.'));
               ScaffoldMessenger.of(context).showSnackBar(snackBar);
             }
             if (_categories.isNotEmpty) {
@@ -339,8 +336,6 @@ class _UpdatePostScreenState extends State<UpdatePostScreen> {
                   searchKeywords: searchKeywords,
                   category: _categories,
                   postId: widget.postId,
-                  userName: widget.userName,
-                  profession: widget.profession,
                 ).whenComplete(() {
                   Navigator.pop(context);
                   setState(() {

@@ -28,6 +28,13 @@ dependencies:
   google_mobile_ads: ^0.13.5
   flutter_native_splash: ^1.2.4
 
+  # Capture image and save or share
+  screenshot: ^1.2.3
+  # image_gallery_saver: ^1.7.1
+  # permission_handler: ^8.2.5
+  share_plus: ^3.0.4
+  path_provider: ^2.0.5
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -46,6 +53,9 @@ flutter:
     - assets/images/dps/01.jpg
     - assets/images/dps/02.jpg
     - assets/images/dps/03.jpg
+    - assets/images/svgs/inbox.png
+    - assets/images/svgs/search.png
+    - assets/images/svgs/comments.png
 
   # fonts ----------------------------------------
   fonts:

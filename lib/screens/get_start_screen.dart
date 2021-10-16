@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:senboo/services/firebase_auth_services.dart';
@@ -47,7 +48,16 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
             ),
             _appName(),
             SizedBox(height: 60),
-            Expanded(child: _quote()),
+            Expanded(
+                child: Column(
+              children: [
+                _quote(),
+                SizedBox(
+                  height: 25,
+                ),
+                _write(),
+              ],
+            )),
             // _termsContitions(),
             _getStartedButton(),
             SizedBox(
@@ -62,8 +72,8 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
   // Logo conainer --------------------------------------------
   Widget _logoContainer() {
     return Container(
-      height: 80,
-      width: 80,
+      height: 100,
+      width: 100,
       child: Image(
         image: AssetImage("assets/images/logo.png"),
       ),
@@ -92,9 +102,22 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
   // Quote --------------------------------------------
   Widget _quote() {
     return Text(
-      " The world is a canvas for your imagination. You are the painter. There are NO RULES",
+      '"The world is a canvas for your imagination. You are the painter.\nThere are NO RULES!"',
       textAlign: TextAlign.center,
       style: Theme.of(context).textTheme.bodyText1!.copyWith(fontSize: 19),
+    );
+  }
+
+  // Quote --------------------------------------------
+  Widget _write() {
+    return Text(
+      "Write and share with world!",
+      textAlign: TextAlign.center,
+      style: Theme.of(context).textTheme.bodyText1!.copyWith(
+            fontSize: 19,
+            color: Theme.of(context).primaryColor,
+            fontWeight: FontWeight.w700,
+          ),
     );
   }
 

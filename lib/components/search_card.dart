@@ -15,9 +15,9 @@ class SearchCard extends StatefulWidget {
     required this.date,
     required this.category,
     required this.postId,
+    required this.photoUrl,
     required this.likes,
     required this.ownerId,
-    required this.postData,
   }) : super(key: key);
   final String userName;
   final String profession;
@@ -26,9 +26,9 @@ class SearchCard extends StatefulWidget {
   final DateTime date;
   final List category;
   final String postId;
+  final String photoUrl;
   final List likes;
   final String ownerId;
-  final PostData postData;
 
   @override
   _SearchCardState createState() => _SearchCardState();
@@ -42,61 +42,44 @@ class _SearchCardState extends State<SearchCard> {
   // User collection
   CollectionReference users = FirebaseFirestore.instance.collection("users");
   final DateFormat formatter = DateFormat('yyyy-MM-dd');
-  Map cardData = {
-    "userName": null,
-    "profession": null,
-    'photoUrl': null,
-  };
+
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<DocumentSnapshot>(
-      stream: users.doc(widget.ownerId).snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          if (snapshot.data!.exists) {
-            cardData['profession'] = snapshot.data!['profession'];
-            cardData['userName'] = snapshot.data!['userName'];
-            cardData['photoUrl'] = snapshot.data!['photoUrl'];
-          }
-          return GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => PostViewScreen(
-                    userName: widget.postData.userName!,
-                    profession: widget.postData.profession!,
-                    title: widget.postData.title!,
-                    body: widget.postData.body!,
-                    date: widget.postData.date!.toDate(),
-                    category: widget.postData.category!,
-                    postId: widget.postData.postId!,
-                    photoUrl: cardData['photoUrl'],
-                    ownerId: widget.postData.ownerId!,
-                    reverse: 1,
-                  ),
-                ),
-              );
-            },
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              margin: EdgeInsets.symmetric(
-                vertical: 10,
-                horizontal: 10,
-              ),
-              decoration: _cardDecoration(),
-              child: Column(
-                children: [
-                  _headingBox(),
-                  _bodyBox(),
-                  _actionBar(),
-                ],
-              ),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PostViewScreen(
+              userName: widget.userName,
+              profession: widget.profession,
+              title: widget.title,
+              body: widget.body,
+              date: widget.date,
+              category: widget.category,
+              postId: widget.postId,
+              photoUrl: widget.photoUrl,
+              ownerId: widget.ownerId,
+              reverse: 1,
             ),
-          );
-        }
-        return _loadingScreen();
+          ),
+        );
       },
+      child: Container(
+        width: MediaQuery.of(context).size.width,
+        margin: EdgeInsets.symmetric(
+          vertical: 10,
+          horizontal: 10,
+        ),
+        decoration: _cardDecoration(),
+        child: Column(
+          children: [
+            _headingBox(),
+            _bodyBox(),
+            _actionBar(),
+          ],
+        ),
+      ),
     );
   }
 
@@ -108,9 +91,8 @@ class _SearchCardState extends State<SearchCard> {
       boxShadow: [
         BoxShadow(
           color: Theme.of(context).primaryColor.withOpacity(0.40),
-          blurRadius: 5,
+          blurRadius: 3,
           offset: Offset(0, 0),
-          spreadRadius: 1,
         ),
       ],
     );
@@ -135,11 +117,11 @@ class _SearchCardState extends State<SearchCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _timerText(),
-          SizedBox(height: 5),
+          // _timerText(),
+          // SizedBox(height: 5),
           _userNameHeading(),
           SizedBox(
-            height: 10,
+            height: 5,
           ),
           _categoryText(),
         ],
@@ -147,21 +129,21 @@ class _SearchCardState extends State<SearchCard> {
     );
   }
 
-  Widget _loadingScreen() {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.4,
-      margin: EdgeInsets.symmetric(
-        vertical: 10,
-        horizontal: 10,
-      ),
-      decoration: _cardDecoration(),
-      child: Center(
-        child: CircularProgressIndicator(
-          color: Theme.of(context).primaryColor,
-        ),
-      ),
-    );
-  }
+  // Widget _loadingScreen() {
+  //   return Container(
+  //     height: MediaQuery.of(context).size.height * 0.4,
+  //     margin: EdgeInsets.symmetric(
+  //       vertical: 10,
+  //       horizontal: 10,
+  //     ),
+  //     decoration: _cardDecoration(),
+  //     child: Center(
+  //       child: CircularProgressIndicator(
+  //         color: Theme.of(context).primaryColor,
+  //       ),
+  //     ),
+  //   );
+  // }
 
   // UserName and Profession Text here ------------------------------------
   Widget _userNameHeading() {
@@ -169,11 +151,11 @@ class _SearchCardState extends State<SearchCard> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          cardData['userName'],
-          style: Theme.of(context).textTheme.headline2,
+          widget.userName,
+          style: Theme.of(context).textTheme.headline2!.copyWith(fontSize: 18),
         ),
         Text(
-          cardData['profession'],
+          widget.profession,
           style: Theme.of(context).textTheme.subtitle2,
         )
       ],
@@ -181,26 +163,26 @@ class _SearchCardState extends State<SearchCard> {
   }
 
   // Timer Text under UserName here -----------------------------------------
-  Widget _timerText() {
-    return Row(
-      children: [
-        Icon(
-          Icons.watch_later_outlined,
-          size: 16,
-          color: Colors.white,
-        ),
-        Text(
-          formatter.format(widget.date),
-          style: Theme.of(context).textTheme.subtitle2,
-        ),
-      ],
-    );
-  }
+  // Widget _timerText() {
+  //   return Row(
+  //     children: [
+  //       Icon(
+  //         Icons.watch_later_outlined,
+  //         size: 16,
+  //         color: Colors.white,
+  //       ),
+  //       Text(
+  //         formatter.format(widget.date),
+  //         style: Theme.of(context).textTheme.subtitle2,
+  //       ),
+  //     ],
+  //   );
+  // }
 
   // Category Text under TimerText here ----------------------------------
   Widget _categoryText() {
     return Text(
-      "${widget.category.toString()}".toUpperCase(),
+      "${widget.category.join(", ").toUpperCase()}",
       style: Theme.of(context).textTheme.subtitle2,
     );
   }
@@ -222,7 +204,7 @@ class _SearchCardState extends State<SearchCard> {
   Widget _textTitle() {
     return Text(
       widget.title,
-      style: Theme.of(context).textTheme.subtitle1,
+      style: Theme.of(context).textTheme.subtitle1!.copyWith(fontSize: 16),
     );
   }
 

@@ -1,11 +1,15 @@
-import 'dart:ffi';
+import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:screenshot/screenshot.dart';
 import 'package:senboo/screens/comment_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:senboo/screens/visitor_screen.dart';
+import 'package:share_plus/share_plus.dart';
 
 class PostViewScreen extends StatefulWidget {
   PostViewScreen(
@@ -45,6 +49,11 @@ class _PostViewScreenState extends State<PostViewScreen> {
       FirebaseFirestore.instance.collection("users"); // saved posts
   CollectionReference savedPosts =
       FirebaseFirestore.instance.collection("savedPosts");
+  //comments
+
+  CollectionReference comments =
+      FirebaseFirestore.instance.collection('comments');
+  ScreenshotController screenshotController = ScreenshotController();
   bool? liked;
   bool? _saved;
   List? _savedList;
@@ -82,22 +91,25 @@ class _PostViewScreenState extends State<PostViewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: kToolbarHeight * 0,
-        elevation: 0,
-        backgroundColor: Theme.of(context).primaryColor,
-      ),
-      body: Container(
-        // decoration: _cardDecoration(),
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        child: Column(
-          children: [
-            _headingBox(),
-            _bodyBox(),
-            _actionBar(),
-          ],
+    return Screenshot(
+      controller: screenshotController,
+      child: Scaffold(
+        appBar: AppBar(
+          toolbarHeight: kToolbarHeight * 0,
+          elevation: 0,
+          backgroundColor: Theme.of(context).primaryColor,
+        ),
+        body: Container(
+          // decoration: _cardDecoration(),
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          child: Column(
+            children: [
+              _headingBox(),
+              _bodyBox(),
+              _actionBar(),
+            ],
+          ),
         ),
       ),
     );
@@ -163,13 +175,8 @@ class _PostViewScreenState extends State<PostViewScreen> {
       width: 50,
       decoration: BoxDecoration(
           // border: Border.all(color: Theme.of(context).primaryColor, width: 2),
-          borderRadius: BorderRadius.circular(15),
-          // color: Colors.white,
-          gradient: RadialGradient(colors: [
-            Colors.grey,
-            Colors.transparent,
-            // Colors.transparent,
-          ], radius: 1),
+          borderRadius: BorderRadius.circular(35),
+          color: Colors.white.withOpacity(0.5),
           image: DecorationImage(image: NetworkImage(photoUrl))),
     );
   }
@@ -219,7 +226,7 @@ class _PostViewScreenState extends State<PostViewScreen> {
   // Category Text under TimerText here ----------------------------------
   Widget _categoryText() {
     return Text(
-      "${widget.category.toString()}".toUpperCase(),
+      "${widget.category.join(", ").toUpperCase()}",
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
       style: Theme.of(context).textTheme.subtitle2,
@@ -282,6 +289,8 @@ class _PostViewScreenState extends State<PostViewScreen> {
           Spacer(),
           _saveButton(),
           SizedBox(width: 10),
+          _screenshot(),
+          SizedBox(width: 10),
           _backButton(),
         ],
       ),
@@ -300,7 +309,7 @@ class _PostViewScreenState extends State<PostViewScreen> {
           return GestureDetector(
             onTap: _handlePostLike,
             child: Container(
-              padding: EdgeInsets.all(10),
+              padding: EdgeInsets.all(5),
               decoration: _buttonDecorations(),
               child: Column(
                 children: [
@@ -322,23 +331,50 @@ class _PostViewScreenState extends State<PostViewScreen> {
 
   // CommentButton goes here -------------------------------------------
   Widget _commentButton() {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => CommentScreen(
-              postId: widget.postId,
+    return StreamBuilder<QuerySnapshot>(
+      stream:
+          comments.doc(widget.postId).collection("postComments").snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          List commentList = snapshot.data!.docs.toList();
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CommentScreen(
+                    postId: widget.postId,
+                  ),
+                ),
+              );
+            },
+            child: Container(
+              padding: EdgeInsets.all(5),
+              decoration: _buttonDecorations(),
+              child: Column(
+                children: [
+                  _buttonsIcon(
+                    Icons.chat_bubble_outline,
+                  ),
+                  Text(
+                    NumberFormat.compact()
+                        .format(commentList.length)
+                        .toString(),
+                    style: Theme.of(context).textTheme.bodyText2,
+                  )
+                ],
+              ),
             ),
-          ),
-        );
-      },
-      child: Container(
-          padding: EdgeInsets.all(10),
+          );
+        }
+        return Container(
+          padding: EdgeInsets.all(5),
           decoration: _buttonDecorations(),
           child: _buttonsIcon(
             Icons.chat_bubble_outline,
-          )),
+          ),
+        );
+      },
     );
   }
 
@@ -367,7 +403,7 @@ class _PostViewScreenState extends State<PostViewScreen> {
                 }
               },
               child: Container(
-                padding: EdgeInsets.all(10),
+                padding: EdgeInsets.all(5),
                 decoration: _buttonDecorations(),
                 child: _buttonsIcon(_saved!
                     ? Icons.bookmark_added
@@ -376,7 +412,7 @@ class _PostViewScreenState extends State<PostViewScreen> {
             );
           }
           return Container(
-              padding: EdgeInsets.all(10),
+              padding: EdgeInsets.all(5),
               decoration: _buttonDecorations(),
               child: _buttonsIcon(
                 Icons.bookmark_outline,
@@ -391,10 +427,37 @@ class _PostViewScreenState extends State<PostViewScreen> {
         Navigator.pop(context);
       },
       child: Container(
-          padding: EdgeInsets.all(10),
+          padding: EdgeInsets.all(5),
           decoration: _buttonDecorations(),
           child: _buttonsIcon(Icons.arrow_back)),
     );
+  }
+
+  Widget _screenshot() {
+    return GestureDetector(
+      onTap: () async {
+        final image = await screenshotController.capture();
+        if (image == null) return;
+
+        await _shareScreenshot(image);
+      },
+      child: Container(
+        padding: EdgeInsets.all(5),
+        decoration: _buttonDecorations(),
+        child: _buttonsIcon(
+          Icons.share,
+        ),
+      ),
+    );
+  }
+
+  _shareScreenshot(Uint8List bytes) async {
+    final directory = await getApplicationDocumentsDirectory();
+    final image = File('${directory.path}/screenshot.png');
+    image.writeAsBytesSync(bytes);
+
+    var text = "Shared form Senboo";
+    await Share.shareFiles([image.path], text: text);
   }
 
   // All Button Decoration -------------------------------
@@ -402,7 +465,15 @@ class _PostViewScreenState extends State<PostViewScreen> {
     return BoxDecoration(
       color: Theme.of(context).cardColor,
       borderRadius: BorderRadius.circular(10),
-      border: Border.all(color: Theme.of(context).primaryColor, width: 1),
+      // border: Border.all(color: Theme.of(context).primaryColor, width: 1),
+      boxShadow: [
+        BoxShadow(
+          color: Theme.of(context).primaryColor.withOpacity(0.20),
+          blurRadius: 3,
+          offset: Offset(0, 0),
+          spreadRadius: 1,
+        ),
+      ],
     );
   }
 

@@ -47,10 +47,10 @@ class _CommentCardState extends State<CommentCard> {
       borderRadius: BorderRadius.circular(25),
       boxShadow: [
         BoxShadow(
-          color: Theme.of(context).primaryColor.withOpacity(0.40),
-          blurRadius: 5,
+          color: Theme.of(context).primaryColor.withOpacity(0.30),
+          blurRadius: 4,
           offset: Offset(0, 0),
-          spreadRadius: 1,
+          // spreadRadius: 1,
         ),
       ],
     );
@@ -73,6 +73,9 @@ class _CommentCardState extends State<CommentCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _timeAgo(),
+          SizedBox(
+            height: 5,
+          ),
           _userNameHeading(),
         ],
       ),
@@ -94,7 +97,8 @@ class _CommentCardState extends State<CommentCard> {
         children: [
           Text(
             widget.userName,
-            style: Theme.of(context).textTheme.headline2,
+            style:
+                Theme.of(context).textTheme.headline2!.copyWith(fontSize: 18),
           ),
           Text(
             widget.profession,
@@ -126,7 +130,7 @@ class _CommentCardState extends State<CommentCard> {
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   Widget _commentbox() {
     return Container(
-      padding: EdgeInsets.only(top: 10, bottom: 20, left: 10, right: 10),
+      padding: EdgeInsets.only(top: 10, bottom: 30, left: 10, right: 10),
       alignment: Alignment.topLeft,
       child: _textTitle(),
     );

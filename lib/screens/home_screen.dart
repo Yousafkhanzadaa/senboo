@@ -1,12 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:senboo/components/Ads.dart';
+import 'package:senboo/components/interest_button.dart';
 import 'package:senboo/components/post_card.dart';
 import 'package:senboo/model/get_user_data.dart';
-import 'package:senboo/providers/edit_list_controller.dart';
-import 'package:senboo/screens/edit_profile.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -22,6 +20,27 @@ class _HomeScreenState extends State<HomeScreen> {
   CollectionReference users = FirebaseFirestore.instance.collection("users");
   PostData? postData;
   bool gotList = false;
+  int limit = 100;
+
+  final List<String> _fieldButtonNames = [
+    "Quote",
+    "Motivation",
+    "Idea",
+    "Poetry",
+    "Story",
+    "philosophy",
+    "Science & Technology",
+    "News",
+    "Lifestyle",
+    "Finance & Economics",
+    "Business",
+    "Health & Medicine",
+    "Art & Culture",
+    "Entertainment",
+    "Urdu",
+  ];
+  List<dynamic> _interestedList = [];
+  List<dynamic> _newInterestedList = [];
   // List interestList = [];
 
   @override
@@ -33,30 +52,43 @@ class _HomeScreenState extends State<HomeScreen> {
 
   getInterested() {
     users.doc(currentUser!.uid).get().then((snapshot) {
-      EditListController editListController =
-          Provider.of<EditListController>(context, listen: false);
+      // EditListController editListController =
+      //     Provider.of<EditListController>(context, listen: false);
 
       setState(() {
-        editListController.setList = snapshot['interested'];
+        _interestedList = snapshot['interested'];
         gotList = true;
       });
     });
   }
 
+  Widget showAd(bool show) {
+    if (show) {
+      return Ads();
+    } else {
+      return Container();
+    }
+  }
+
+  Future<void> _refresh() async {
+    setState(() {
+      limit += 1;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    EditListController editListController =
-        Provider.of<EditListController>(context);
     if (gotList) {
-      return editListController.getList.isEmpty
+      return _interestedList.isEmpty
           ? _editPro()
           : StreamBuilder<QuerySnapshot>(
               stream: posts
                   .where(
                     "category",
-                    arrayContainsAny: editListController.getList,
+                    arrayContainsAny: _interestedList,
                   )
                   .orderBy('date', descending: true)
+                  .limit(limit)
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
@@ -66,43 +98,47 @@ class _HomeScreenState extends State<HomeScreen> {
                   var postsList = snapshot.data!.docs;
                   return postsList.isEmpty
                       ? _noPosts()
-                      : Container(
+                      : RefreshIndicator(
+                          onRefresh: _refresh,
+                          color: Theme.of(context).primaryColor,
                           child: ListView.builder(
                             shrinkWrap: true,
-                            scrollDirection: Axis.vertical,
+                            // scrollDirection: Axis.vertical,
+                            physics: ScrollPhysics(),
+                            addRepaintBoundaries: false,
                             itemCount: snapshot.data!.docs.length,
                             itemBuilder: (context, index) {
                               var data = snapshot.data!.docs;
                               postData = PostData.setData(data[index]);
-                              return index % 3 == 0
-                                  ? Column(
-                                      children: [
-                                        PostCard(
-                                          userName: postData!.userName!,
-                                          profession: postData!.profession!,
-                                          title: postData!.title!,
-                                          body: postData!.body!,
-                                          date: postData!.date!.toDate(),
-                                          category: postData!.category!,
-                                          likes: postData!.likes!,
-                                          postId: postData!.postId!,
-                                          ownerId: postData!.ownerId!,
-                                        ),
-                                        SizedBox(height: 5),
-                                        Ads(),
-                                      ],
-                                    )
-                                  : PostCard(
-                                      userName: postData!.userName!,
-                                      profession: postData!.profession!,
-                                      title: postData!.title!,
-                                      body: postData!.body!,
-                                      date: postData!.date!.toDate(),
-                                      category: postData!.category!,
-                                      likes: postData!.likes!,
-                                      postId: postData!.postId!,
-                                      ownerId: postData!.ownerId!,
-                                    );
+
+                              return Column(
+                                children: [
+                                  PostCard(
+                                    userName: postData!.userName!,
+                                    profession: postData!.profession!,
+                                    title: postData!.title!,
+                                    body: postData!.body!,
+                                    date: postData!.date!.toDate(),
+                                    category: postData!.category!,
+                                    likes: postData!.likes!,
+                                    postId: postData!.postId!,
+                                    ownerId: postData!.ownerId!,
+                                    photoUrl: postData!.photoUrl!,
+                                  ),
+                                  showAd(index % 3 == 0),
+                                ],
+                              );
+                              // : PostCard(
+                              //     userName: postData!.userName!,
+                              //     profession: postData!.profession!,
+                              //     title: postData!.title!,
+                              //     body: postData!.body!,
+                              //     date: postData!.date!.toDate(),
+                              //     category: postData!.category!,
+                              //     likes: postData!.likes!,
+                              //     postId: postData!.postId!,
+                              //     ownerId: postData!.ownerId!,
+                              //   );
                             },
                           ),
                         );
@@ -148,13 +184,14 @@ class _HomeScreenState extends State<HomeScreen> {
     return Column(
       children: [
         Container(
-          height: MediaQuery.of(context).size.height * 0.4,
+          // height: MediaQuery.of(context).size.height * 0.4,
+
           margin: EdgeInsets.symmetric(
             vertical: 10,
             horizontal: 10,
           ),
           padding: EdgeInsets.symmetric(
-            vertical: 10,
+            vertical: 20,
             horizontal: 10,
           ),
           decoration: _cardDecoration(),
@@ -178,31 +215,32 @@ class _HomeScreenState extends State<HomeScreen> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Theme.of(context).primaryColor,
-                    fontSize: 22,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 SizedBox(
                   height: 15,
                 ),
                 Text(
-                  "Please first edit your profile.",
+                  "Please first select your fields of interests and then save.",
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Theme.of(context).primaryColor,
                     fontSize: 18,
-                    fontWeight: FontWeight.w700,
                   ),
                 ),
-                // Text(
-                //   "No interests selected.",
-                //   style: TextStyle(
-                //     color: Theme.of(context).primaryColor,
-                //     fontSize: 18,
-                //   ),
-                // ),
                 SizedBox(
                   height: 10,
                 ),
-                _profileEditButton(),
+                _intrestButtonsField(),
+                SizedBox(
+                  height: 10,
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.70,
+                  child: _saveInterestsButton(),
+                ),
               ],
             ),
           ),
@@ -211,22 +249,23 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Load Screen ---------------------------------------------
+// mo posts found
   Widget _noPosts() {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.4,
-      alignment: Alignment.center,
-      margin: EdgeInsets.symmetric(
-        vertical: 10,
-        horizontal: 10,
-      ),
-      decoration: _cardDecoration(),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            "No Posts available for your interests yet!",
+    return Column(
+      children: [
+        Container(
+            height: MediaQuery.of(context).size.height * 0.3,
+            margin: EdgeInsets.symmetric(
+              vertical: 10,
+              horizontal: 10,
+            ),
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                  image: AssetImage("assets/images/svgs/inbox.png")),
+            )),
+        Center(
+          child: Text(
+            "No posts available for your fields of interests yet!",
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Theme.of(context).primaryColor,
@@ -234,17 +273,28 @@ class _HomeScreenState extends State<HomeScreen> {
               fontWeight: FontWeight.w700,
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  Widget _profileEditButton() {
+  Widget _saveInterestsButton() {
     return ElevatedButton(
-      onPressed: () {
-        Navigator.push(
-                context, MaterialPageRoute(builder: (context) => EditProfile()))
-            .then((value) => setState(() {}));
+      onPressed: () async {
+        if (_newInterestedList.isNotEmpty) {
+          await users.doc(currentUser!.uid).update({
+            "interested": _newInterestedList,
+          }).then((value) {
+            setState(() {
+              _interestedList = _newInterestedList;
+            });
+          });
+        } else {
+          var snackBar = SnackBar(
+              backgroundColor: Theme.of(context).primaryColor,
+              content: Text('Please select fields of interests'));
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        }
       },
       style: ButtonStyle(
           backgroundColor:
@@ -256,7 +306,7 @@ class _HomeScreenState extends State<HomeScreen> {
           shape: MaterialStateProperty.all(
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(35)))),
       child: Text(
-        "edit profile".toUpperCase(),
+        "save".toUpperCase(),
         style: Theme.of(context).textTheme.subtitle2,
       ),
     );
@@ -270,11 +320,56 @@ class _HomeScreenState extends State<HomeScreen> {
       boxShadow: [
         BoxShadow(
           color: Theme.of(context).primaryColor.withOpacity(0.40),
-          blurRadius: 5,
+          blurRadius: 3,
           offset: Offset(0, 0),
-          spreadRadius: 1,
+          // spreadRadius: 1,
         ),
       ],
+    );
+  }
+
+  // intrust Fields -----------------------------------------
+  Widget _intrestButtonsField() {
+    return Container(
+      // margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      // width: MediaQuery.of(context).size.width,
+      height: 60,
+      padding: EdgeInsets.symmetric(vertical: 10),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: _fieldButtonNames.length,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5),
+            child: InterestButton(
+              name: _fieldButtonNames[index],
+              onPressed: () {
+                FocusScopeNode currentFocus = FocusScope.of(context);
+                currentFocus.unfocus();
+
+                setState(() {
+                  if (_newInterestedList.contains(_fieldButtonNames[index])) {
+                    _newInterestedList.remove(_fieldButtonNames[index]);
+                  } else {
+                    if (_newInterestedList.length < 10) {
+                      _newInterestedList.add(_fieldButtonNames[index]);
+                    } else {
+                      var snackBar = SnackBar(
+                          backgroundColor: Theme.of(context).primaryColor,
+                          content: Text(
+                              'You can select only ten fields of interests'));
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    }
+                  }
+                });
+              },
+              interested: _newInterestedList.contains(_fieldButtonNames[index])
+                  ? true
+                  : false,
+            ),
+          );
+        },
+      ),
     );
   }
 }

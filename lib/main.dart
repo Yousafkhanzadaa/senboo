@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:senboo/providers/color_provider.dart';
 import 'package:senboo/initial.dart';
-import 'package:senboo/providers/edit_list_controller.dart';
 import 'package:senboo/services/firebase_auth_services.dart';
 
 void main() {
@@ -47,9 +46,6 @@ class _SenbooState extends State<Senboo> {
             ),
             ChangeNotifierProvider<FirebaseAuthServices>(
               create: (_) => FirebaseAuthServices(),
-            ),
-            ChangeNotifierProvider<EditListController>(
-              create: (_) => EditListController(),
             ),
           ], child: InitialService());
         }

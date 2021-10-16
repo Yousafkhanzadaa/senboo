@@ -12,7 +12,7 @@ class _AdsState extends State<Ads> {
   BannerAd? _myBanner;
   bool? isLoaded;
 
-  // String get _adUnitTestID => "ca-app-pub-3940256099942544/6300978111";
+  // String get _TestadUnitTestID => "ca-app-pub-3940256099942544/6300978111";
   String get _adUnitID => "ca-app-pub-1612399077386662/6227262426";
   @override
   void initState() {
@@ -24,9 +24,9 @@ class _AdsState extends State<Ads> {
       listener: BannerAdListener(
           onAdLoaded: (ad) {
             // print('Ad loaded: ${ad.adUnitId}');
-            setState(() {
-              isLoaded = true;
-            });
+            // setState(() {
+            isLoaded = true;
+            // });
           },
           onAdFailedToLoad: (ad, error) {
             // print('Ad Failed to loaded: ${ad.adUnitId}, $error');

@@ -13,6 +13,7 @@ class ProfilePostCard extends StatefulWidget {
       required this.category,
       required this.likes,
       required this.postId,
+      required this.photoUrl,
       this.options,
       this.updateFunction,
       this.deleteFunction,
@@ -25,6 +26,7 @@ class ProfilePostCard extends StatefulWidget {
   final String userName;
   final String title;
   final String postId;
+  final String photoUrl;
   final DateTime date;
   final List category;
   final List likes;
@@ -53,59 +55,43 @@ class _ProfilePostCardState extends State<ProfilePostCard> {
   CollectionReference comments =
       FirebaseFirestore.instance.collection('comments');
 
-  Map cardData = {
-    "userName": null,
-    "profession": null,
-    "photoUrl": null,
-  };
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<DocumentSnapshot>(
-      stream: users.doc(widget.ownerId).snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return _loadingScreen();
-        }
-        cardData["userName"] = snapshot.data!['userName'];
-        cardData["profession"] = snapshot.data!['profession'];
-        cardData['photoUrl'] = snapshot.data!['photoUrl'];
-        return GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => PostViewScreen(
-                  userName: cardData["userName"] ?? widget.userName,
-                  profession: cardData["profession"] ?? widget.profession,
-                  title: widget.title,
-                  body: widget.body,
-                  date: widget.date,
-                  category: widget.category,
-                  postId: widget.postId,
-                  ownerId: widget.ownerId,
-                  photoUrl: cardData['photoUrl'],
-                  reverse: widget.reverse,
-                ),
-              ),
-            );
-          },
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.47,
-            margin: EdgeInsets.symmetric(
-              vertical: 10,
-              horizontal: 10,
-            ),
-            decoration: _cardDecoration(),
-            child: Column(
-              children: [
-                _headingBox(),
-                _bodyBox(),
-                _actionBar(),
-              ],
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PostViewScreen(
+              userName: widget.userName,
+              profession: widget.profession,
+              title: widget.title,
+              body: widget.body,
+              date: widget.date,
+              category: widget.category,
+              postId: widget.postId,
+              ownerId: widget.ownerId,
+              photoUrl: widget.photoUrl,
+              reverse: widget.reverse,
             ),
           ),
         );
       },
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.47,
+        margin: EdgeInsets.symmetric(
+          vertical: 10,
+          horizontal: 10,
+        ),
+        decoration: _cardDecoration(),
+        child: Column(
+          children: [
+            _headingBox(),
+            _bodyBox(),
+            _actionBar(),
+          ],
+        ),
+      ),
     );
   }
 
@@ -116,29 +102,29 @@ class _ProfilePostCardState extends State<ProfilePostCard> {
       boxShadow: [
         BoxShadow(
           color: Theme.of(context).primaryColor.withOpacity(0.40),
-          blurRadius: 5,
+          blurRadius: 3,
           offset: Offset(0, 0),
-          spreadRadius: 1,
+          // spreadRadius: 1,
         ),
       ],
     );
   }
 
-  Widget _loadingScreen() {
-    return Container(
-      width: MediaQuery.of(context).size.width * 0.47,
-      margin: EdgeInsets.symmetric(
-        vertical: 10,
-        horizontal: 10,
-      ),
-      decoration: _cardDecoration(),
-      child: Center(
-        child: CircularProgressIndicator(
-          color: Theme.of(context).primaryColor,
-        ),
-      ),
-    );
-  }
+  // Widget _loadingScreen() {
+  //   return Container(
+  //     width: MediaQuery.of(context).size.width * 0.47,
+  //     margin: EdgeInsets.symmetric(
+  //       vertical: 10,
+  //       horizontal: 10,
+  //     ),
+  //     decoration: _cardDecoration(),
+  //     child: Center(
+  //       child: CircularProgressIndicator(
+  //         color: Theme.of(context).primaryColor,
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget popUpButton() => Container(
         width: 30,
@@ -216,7 +202,7 @@ class _ProfilePostCardState extends State<ProfilePostCard> {
 
   Widget _userNameHeading() {
     return Text(
-      cardData["userName"] ?? widget.userName,
+      widget.userName,
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
       style: Theme.of(context)
@@ -230,14 +216,6 @@ class _ProfilePostCardState extends State<ProfilePostCard> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        // Icon(
-        //   Icons.watch_later_outlined,
-        //   size: 16,
-        //   color: Colors.white,
-        // ),
-        // SizedBox(
-        //   width: 5,
-        // ),
         Text(
           formatter.format(widget.date),
           style: Theme.of(context).textTheme.subtitle2,
@@ -298,19 +276,9 @@ class _ProfilePostCardState extends State<ProfilePostCard> {
             SizedBox(
               width: 5,
             ),
-            Container(
-              width: 35,
-              child: Stack(
-                children: [
-                  Positioned(child: _likedImages("assets/images/dps/02.jpg")),
-                  Positioned(
-                      left: 5, child: _likedImages("assets/images/dps/01.jpg")),
-                  Positioned(
-                      left: 10,
-                      child: _likedImages("assets/images/dps/03.jpg")),
-                ],
-              ),
-            ),
+            widget.likes.length == 0
+                ? Container()
+                : _showLikedImages(widget.likes.length),
             SizedBox(
               width: 3,
             ),
@@ -323,6 +291,43 @@ class _ProfilePostCardState extends State<ProfilePostCard> {
         ),
       ),
     );
+  }
+
+  _showLikedImages(int count) {
+    if (count >= 3) {
+      return Container(
+        width: 35,
+        child: Stack(
+          children: [
+            Positioned(child: _likedImages("assets/images/dps/02.jpg")),
+            Positioned(
+                left: 5, child: _likedImages("assets/images/dps/01.jpg")),
+            Positioned(
+                left: 10, child: _likedImages("assets/images/dps/03.jpg")),
+          ],
+        ),
+      );
+    } else if (count == 2) {
+      return Container(
+        width: 25,
+        child: Stack(
+          children: [
+            Positioned(child: _likedImages("assets/images/dps/02.jpg")),
+            Positioned(
+                left: 5, child: _likedImages("assets/images/dps/01.jpg")),
+          ],
+        ),
+      );
+    } else {
+      return Container(
+        width: 20,
+        child: Stack(
+          children: [
+            Positioned(child: _likedImages("assets/images/dps/02.jpg")),
+          ],
+        ),
+      );
+    }
   }
 
   Widget _likedImages(String link) {

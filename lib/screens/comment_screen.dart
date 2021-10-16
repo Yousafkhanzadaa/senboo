@@ -96,32 +96,9 @@ class _CommentScreenState extends State<CommentScreen> {
         children: [
           _textTitle(),
           SizedBox(height: 5),
-          _timerText(),
+          // _timerText(),
         ],
       ),
-    );
-  }
-
-  // Timer Text under UserName here -----------------------------------------
-  Widget _timerText() {
-    return Row(
-      children: [
-        // Icon(
-        //   Icons.watch_later_outlined,
-        //   size: 16,
-        //   color: Colors.white,
-        // ),
-        // SizedBox(
-        //   width: 5,
-        // ),
-        Text(
-          formatter.format(commentMap['date']),
-          style: Theme.of(context)
-              .textTheme
-              .bodyText2!
-              .copyWith(color: Colors.white),
-        ),
-      ],
     );
   }
 
@@ -130,10 +107,11 @@ class _CommentScreenState extends State<CommentScreen> {
     return Text(
       commentMap['title'],
       maxLines: 5,
+      overflow: TextOverflow.ellipsis,
       style: Theme.of(context)
           .textTheme
           .bodyText1!
-          .copyWith(color: Colors.white, fontSize: 18),
+          .copyWith(color: Colors.white, fontSize: 16),
     );
   }
 
@@ -155,7 +133,6 @@ class _CommentScreenState extends State<CommentScreen> {
                 : ListView.builder(
                     itemCount: postsList.length,
                     shrinkWrap: true,
-                    reverse: true,
                     itemBuilder: (context, index) {
                       var data = snapshot.data!.docs;
                       commentData = CommentData.setData(data[index]);
@@ -210,16 +187,33 @@ class _CommentScreenState extends State<CommentScreen> {
   }
 
   // comment not found
+
   Widget _cardNotFount() {
-    return Center(
-      child: Text(
-        "No comments",
-        style: TextStyle(
-          color: Theme.of(context).primaryColor,
-          fontSize: 32,
-          fontWeight: FontWeight.w700,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+            height: MediaQuery.of(context).size.height * 0.2,
+            margin: EdgeInsets.symmetric(
+              vertical: 10,
+              horizontal: 10,
+            ),
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                  image: AssetImage("assets/images/svgs/comments.png")),
+            )),
+        Center(
+          child: Text(
+            "No comments",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Theme.of(context).primaryColor,
+              fontSize: 26,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 

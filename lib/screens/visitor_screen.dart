@@ -22,23 +22,12 @@ class _VisitorProfileScreenState extends State<VisitorProfileScreen> {
   int totalLikes = 0;
 
   // List? savedPostsList;
-  bool waiting = true;
+  // bool waiting = true;
 
   @override
   void initState() {
     super.initState();
-
-    // getUserDetails();
   }
-
-  // Future getUserDetails() async {
-  //   await users.doc(widget.ownerId).get().then((snapshot) {
-  //     setState(() {
-  //       savedPostsList = snapshot.get('savedPosts');
-  //       waiting = false;
-  //     });
-  //   });
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -126,31 +115,28 @@ class _VisitorProfileScreenState extends State<VisitorProfileScreen> {
     return Container(
       height: MediaQuery.of(context).size.height * 0.40,
       width: MediaQuery.of(context).size.width,
-      child: waiting
-          ? _loadingScreen()
-          : StreamBuilder<QuerySnapshot>(
-              stream:
-                  posts.where('ownerId', isEqualTo: widget.ownerId).snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  List dataList = snapshot.data!.docs.toList();
+      child: StreamBuilder<QuerySnapshot>(
+        stream: posts.where('ownerId', isEqualTo: widget.ownerId).snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            List dataList = snapshot.data!.docs.toList();
 
-                  return dataList.isEmpty
-                      ? _noPosts()
-                      : ListView.builder(
-                          itemCount: dataList.length,
-                          scrollDirection: Axis.horizontal,
-                          shrinkWrap: true,
-                          itemBuilder: (context, index) {
-                            var data = snapshot.data!.docs;
-                            postData = PostData.setData(dataList[index]);
-                            return _cardView(postData!, data, index);
-                          },
-                        );
-                }
-                return _loadingScreen();
-              },
-            ),
+            return dataList.isEmpty
+                ? _noPosts()
+                : ListView.builder(
+                    itemCount: dataList.length,
+                    scrollDirection: Axis.horizontal,
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) {
+                      var data = snapshot.data!.docs;
+                      postData = PostData.setData(dataList[index]);
+                      return _cardView(postData!, data, index);
+                    },
+                  );
+          }
+          return _loadingScreen();
+        },
+      ),
     );
   }
 
@@ -168,6 +154,8 @@ class _VisitorProfileScreenState extends State<VisitorProfileScreen> {
       category: postData.category!,
       likes: postData.likes!,
       postId: postData.postId!,
+      photoUrl: postData.photoUrl!,
+      likeFun: () {},
     );
   }
 

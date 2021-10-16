@@ -143,9 +143,9 @@ class _VisitorProfileCardState extends State<VisitorProfileCard> {
       boxShadow: [
         BoxShadow(
           color: Theme.of(context).primaryColor.withOpacity(0.40),
-          blurRadius: 5,
+          blurRadius: 3,
           offset: Offset(0, 0),
-          spreadRadius: 1,
+          // spreadRadius: 1,
         ),
       ],
     );
@@ -176,10 +176,9 @@ class _VisitorProfileCardState extends State<VisitorProfileCard> {
           Text(
             userName,
             textAlign: TextAlign.center,
-            style: Theme.of(context)
-                .textTheme
-                .subtitle1!
-                .copyWith(fontWeight: FontWeight.w700),
+            style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
           ),
           SizedBox(height: 10),
           Text(
@@ -273,7 +272,7 @@ class _VisitorProfileCardState extends State<VisitorProfileCard> {
 
   Widget _bio({required String bio}) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10),
+      padding: EdgeInsets.symmetric(horizontal: 35),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

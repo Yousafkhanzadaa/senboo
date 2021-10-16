@@ -1,10 +1,17 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:screenshot/screenshot.dart';
 import 'package:senboo/screens/comment_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:senboo/screens/post_view_screen.dart';
 import 'package:senboo/screens/visitor_screen.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:uuid/uuid.dart';
 
 class PostCard extends StatefulWidget {
   PostCard({
@@ -17,6 +24,7 @@ class PostCard extends StatefulWidget {
     required this.category,
     required this.likes,
     required this.postId,
+    required this.photoUrl,
     required this.ownerId,
   }) : super(key: key);
   final String userName;
@@ -27,6 +35,7 @@ class PostCard extends StatefulWidget {
   final List category;
   final List likes;
   final String postId;
+  final String photoUrl;
   final String ownerId;
 
   @override
@@ -40,10 +49,16 @@ class _PostCardState extends State<PostCard> {
   CollectionReference posts = FirebaseFirestore.instance.collection("posts");
   // User collection
   CollectionReference users = FirebaseFirestore.instance.collection("users");
+  //comments
+  CollectionReference comments =
+      FirebaseFirestore.instance.collection('comments');
   // saved posts
   CollectionReference savedPosts =
       FirebaseFirestore.instance.collection("savedPosts");
+
+  ScreenshotController screenshotController = ScreenshotController();
   bool? liked;
+  Uuid uid = Uuid();
   // bool? saved;
   int likesCounter = 0;
   List likeList = [];
@@ -56,12 +71,6 @@ class _PostCardState extends State<PostCard> {
   void initState() {
     super.initState();
   }
-
-  Map userData = {
-    "userName": null,
-    "profession": null,
-    "photoUrl": null,
-  };
 
   // gettting like
   void _handlePostLike() {
@@ -87,70 +96,65 @@ class _PostCardState extends State<PostCard> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<DocumentSnapshot>(
-        stream: users.doc(widget.ownerId).snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            userData["userName"] = snapshot.data!['userName'];
-            userData["profession"] = snapshot.data!['profession'];
-            userData["photoUrl"] = snapshot.data!['photoUrl'];
-            return GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PostViewScreen(
-                      userName: userData["userName"] ?? widget.userName,
-                      profession: userData["profession"] ?? widget.profession,
-                      title: widget.title,
-                      body: widget.body,
-                      date: widget.date,
-                      category: widget.category,
-                      postId: widget.postId,
-                      ownerId: widget.ownerId,
-                      photoUrl: userData['photoUrl'],
-                      reverse: 1,
-                    ),
-                  ),
-                );
-              },
-              child: Container(
-                width: MediaQuery.of(context).size.width * 0.97,
-                margin: EdgeInsets.symmetric(
-                  vertical: 10,
-                  horizontal: 10,
-                ),
-                decoration: _cardDecoration(),
-                child: Column(
-                  children: [
-                    _headingBox(),
-                    _bodyBox(),
-                    _actionBar(),
-                  ],
-                ),
-              ),
-            );
-          }
-          return _loadingScreen();
-        });
-  }
-
-  // Load Screen ---------------------------------------------
-  Widget _loadingScreen() {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.4,
       margin: EdgeInsets.symmetric(
         vertical: 10,
         horizontal: 10,
       ),
-      decoration: _cardDecoration(),
-      child: Center(
-        child: CircularProgressIndicator(
-          color: Theme.of(context).primaryColor,
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PostViewScreen(
+                userName: widget.userName,
+                profession: widget.profession,
+                title: widget.title,
+                body: widget.body,
+                date: widget.date,
+                category: widget.category,
+                postId: widget.postId,
+                ownerId: widget.ownerId,
+                photoUrl: widget.photoUrl,
+                reverse: 1,
+              ),
+            ),
+          );
+        },
+        child: Screenshot(
+          controller: screenshotController,
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.97,
+            decoration: _cardDecoration(),
+            child: Column(
+              children: [
+                _headingBox(),
+                _bodyBox(),
+                _actionBar(),
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
+
+  // // Load Screen ---------------------------------------------
+  // Widget _loadingScreen() {
+  //   return Container(
+  //     height: MediaQuery.of(context).size.height * 0.4,
+  //     margin: EdgeInsets.symmetric(
+  //       vertical: 10,
+  //       horizontal: 10,
+  //     ),
+  //     decoration: _cardDecoration(),
+  //     child: Center(
+  //       child: CircularProgressIndicator(
+  //         color: Theme.of(context).primaryColor,
+  //       ),
+  //     ),
+  //   );
+  // }
 
   // CardDecoration --------------------------------------
   BoxDecoration _cardDecoration() {
@@ -160,9 +164,9 @@ class _PostCardState extends State<PostCard> {
       boxShadow: [
         BoxShadow(
           color: Theme.of(context).primaryColor.withOpacity(0.40),
-          blurRadius: 5,
+          blurRadius: 3,
           offset: Offset(0, 0),
-          spreadRadius: 1,
+          // spreadRadius: 1,
         ),
       ],
     );
@@ -176,13 +180,8 @@ class _PostCardState extends State<PostCard> {
       decoration: BoxDecoration(
           // border: Border.all(color: Theme.of(context).primaryColor, width: 2),
 
-          borderRadius: BorderRadius.circular(15),
-          // color: Colors.white,
-          gradient: RadialGradient(colors: [
-            Colors.grey,
-            Colors.transparent,
-            // Colors.transparent,
-          ], radius: 1),
+          borderRadius: BorderRadius.circular(35),
+          color: Colors.white.withOpacity(0.5),
           image: DecorationImage(image: NetworkImage(photoUrl))),
     );
   }
@@ -204,23 +203,7 @@ class _PostCardState extends State<PostCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _profilePic(userData['photoUrl']),
-              SizedBox(
-                width: 5,
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _userNameHeading(),
-                  ],
-                ),
-              ),
-            ],
-          ),
+          _userNameHeading(),
           SizedBox(
             height: 10,
           ),
@@ -242,20 +225,35 @@ class _PostCardState extends State<PostCard> {
           ),
         );
       },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Text(
-            userData["userName"] ?? widget.userName,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.headline1,
+          _profilePic(widget.photoUrl),
+          SizedBox(
+            width: 5,
           ),
-          Text(
-            userData["profession"] ?? widget.profession,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.subtitle2,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.userName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context)
+                      .textTheme
+                      .headline1!
+                      .copyWith(fontSize: 20),
+                ),
+                Text(
+                  widget.profession,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.subtitle2,
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -266,14 +264,6 @@ class _PostCardState extends State<PostCard> {
   Widget _timerText() {
     return Row(
       children: [
-        // Icon(
-        //   Icons.watch_later_outlined,
-        //   size: 16,
-        //   color: Colors.white,
-        // ),
-        // SizedBox(
-        //   width: 5,
-        // ),
         Text(
           formatter.format(widget.date),
           style: Theme.of(context).textTheme.subtitle2,
@@ -285,7 +275,7 @@ class _PostCardState extends State<PostCard> {
   // Category Text under TimerText here ----------------------------------
   Widget _categoryText() {
     return Text(
-      "${widget.category.toString()}".toUpperCase(),
+      "${widget.category.join(", ").toUpperCase()}",
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
       style: Theme.of(context).textTheme.subtitle2,
@@ -352,6 +342,10 @@ class _PostCardState extends State<PostCard> {
           _commentButton(),
           Spacer(),
           _saveButton(),
+          SizedBox(
+            width: 10,
+          ),
+          _screenshot(),
         ],
       ),
     );
@@ -370,7 +364,7 @@ class _PostCardState extends State<PostCard> {
           return GestureDetector(
             onTap: _handlePostLike,
             child: Container(
-              padding: EdgeInsets.all(10),
+              padding: EdgeInsets.all(5),
               decoration: _buttonDecorations(),
               child: Column(
                 children: [
@@ -390,33 +384,89 @@ class _PostCardState extends State<PostCard> {
     );
   }
 
-  // CommentButton goes here -------------------------------------------
   Widget _commentButton() {
-    return StreamBuilder<DocumentSnapshot>(
-      stream: users.doc(widget.ownerId).snapshots(),
+    return StreamBuilder<QuerySnapshot>(
+      stream:
+          comments.doc(widget.postId).collection("postComments").snapshots(),
       builder: (context, snapshot) {
-        return GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => CommentScreen(
-                  postId: widget.postId,
+        if (snapshot.hasData) {
+          List commentList = snapshot.data!.docs.toList();
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CommentScreen(
+                    postId: widget.postId,
+                  ),
                 ),
+              );
+            },
+            child: Container(
+              padding: EdgeInsets.all(5),
+              decoration: _buttonDecorations(),
+              child: Column(
+                children: [
+                  _buttonsIcon(
+                    Icons.chat_bubble_outline,
+                  ),
+                  Text(
+                    NumberFormat.compact()
+                        .format(commentList.length)
+                        .toString(),
+                    style: Theme.of(context).textTheme.bodyText2,
+                  )
+                ],
               ),
-            );
-          },
-          child: Container(
-            padding: EdgeInsets.all(10),
-            decoration: _buttonDecorations(),
-            child: _buttonsIcon(
-              Icons.chat_bubble_outline,
             ),
+          );
+        }
+        return Container(
+          padding: EdgeInsets.all(5),
+          decoration: _buttonDecorations(),
+          child: _buttonsIcon(
+            Icons.chat_bubble_outline,
           ),
         );
       },
     );
   }
+
+  Widget _screenshot() {
+    return GestureDetector(
+      onTap: () async {
+        final image = await screenshotController.capture();
+        if (image == null) return;
+
+        await _shareScreenshot(image);
+      },
+      child: Container(
+        padding: EdgeInsets.all(5),
+        decoration: _buttonDecorations(),
+        child: _buttonsIcon(
+          Icons.share,
+        ),
+      ),
+    );
+  }
+
+  _shareScreenshot(Uint8List bytes) async {
+    final directory = await getApplicationDocumentsDirectory();
+    final image = File('${directory.path}/screenshot.png');
+    image.writeAsBytesSync(bytes);
+
+    var text = "Shared form Senboo";
+    await Share.shareFiles([image.path], text: text);
+  }
+
+  // _saveScreenshot(Uint8List bytes) async {
+  //   await [Permission.storage].request();
+
+  //   var imageName = uid.v4();
+  //   final result = await ImageGallerySaver.saveImage(bytes, name: imageName);
+
+  //   return result['filePath'];
+  // }
 
   // CommentButton goes here -------------------------------------------
   Widget _saveButton() {
@@ -448,7 +498,7 @@ class _PostCardState extends State<PostCard> {
                 }
               },
               child: Container(
-                padding: EdgeInsets.all(10),
+                padding: EdgeInsets.all(5),
                 decoration: _buttonDecorations(),
                 child: _buttonsIcon(_saved!
                     ? Icons.bookmark_added
@@ -457,7 +507,7 @@ class _PostCardState extends State<PostCard> {
             );
           }
           return Container(
-              padding: EdgeInsets.all(10),
+              padding: EdgeInsets.all(5),
               decoration: _buttonDecorations(),
               child: _buttonsIcon(
                 Icons.bookmark_outline,
@@ -471,15 +521,15 @@ class _PostCardState extends State<PostCard> {
       color: Theme.of(context).cardColor,
       borderRadius: BorderRadius.circular(10),
 
-      border: Border.all(color: Theme.of(context).primaryColor, width: 1),
-      // boxShadow: [
-      //   BoxShadow(
-      //     color: Theme.of(context).primaryColor.withOpacity(0.40),
-      //     blurRadius: 5,
-      //     offset: Offset(0, 0),
-      //     spreadRadius: 1,
-      //   ),
-      // ],
+      // border: Border.all(color: Theme.of(context).primaryColor, width: 1),
+      boxShadow: [
+        BoxShadow(
+          color: Theme.of(context).primaryColor.withOpacity(0.40),
+          blurRadius: 3,
+          offset: Offset(0, 0),
+          // spreadRadius: 1,
+        ),
+      ],
     );
   }
 
@@ -487,7 +537,7 @@ class _PostCardState extends State<PostCard> {
   Widget _buttonsIcon(IconData icon) {
     return Icon(
       icon,
-      size: 26,
+      size: 24,
       color: Theme.of(context).primaryColor,
     );
   }

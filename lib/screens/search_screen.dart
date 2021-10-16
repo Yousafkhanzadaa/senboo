@@ -41,9 +41,11 @@ class _SearchScreenState extends State<SearchScreen> {
                 controller: _searchController,
                 hint: 'Search by keyword or name',
                 onChange: (value) {
-                  setState(() {
-                    _keyWords = value.toString().toLowerCase().split(" ");
-                  });
+                  if (value!.split(" ").length <= 10) {
+                    setState(() {
+                      _keyWords = value.toString().toLowerCase().split(" ");
+                    });
+                  }
                 },
               ),
             ),
@@ -56,21 +58,20 @@ class _SearchScreenState extends State<SearchScreen> {
                     currentFocus.unfocus();
                   }
                 },
-                child: _keyWords.isEmpty
-                    ? Center(
-                        child: _blankField(),
-                      )
-                    : StreamBuilder<QuerySnapshot>(
-                        stream: posts
+                child: _searchController.text == ""
+                    ? _blankField()
+                    : FutureBuilder<QuerySnapshot>(
+                        future: posts
                             .where("searchKeywords",
                                 arrayContainsAny: _keyWords)
                             .limit(100)
-                            .snapshots(),
+                            .get(),
                         builder: (context, snapshot) {
-                          if (snapshot.hasData) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.done) {
                             List searchList = snapshot.data!.docs.toList();
                             return searchList.isEmpty &&
-                                    _searchController.text.isNotEmpty
+                                    _searchController.text != ""
                                 ? _cardNotFount()
                                 : ListView.builder(
                                     itemCount: searchList.length,
@@ -104,32 +105,68 @@ class _SearchScreenState extends State<SearchScreen> {
       category: postData.category!,
       likes: postData.likes!,
       postId: postData.postId!,
+      photoUrl: postData.photoUrl!,
       ownerId: postData.ownerId!,
-      postData: postData,
     );
   }
 
   // search not found
   Widget _cardNotFount() {
-    return Text(
-      "No Result",
-      style: TextStyle(
-        color: Theme.of(context).primaryColor,
-        fontSize: 32,
-        fontWeight: FontWeight.w700,
-      ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+            height: MediaQuery.of(context).size.height * 0.2,
+            margin: EdgeInsets.symmetric(
+              vertical: 10,
+              horizontal: 10,
+            ),
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                  image: AssetImage("assets/images/svgs/inbox.png")),
+            )),
+        Center(
+          child: Text(
+            "No posts found",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Theme.of(context).primaryColor,
+              fontSize: 26,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
   // field is empty
   Widget _blankField() {
-    return Text(
-      "Search",
-      style: TextStyle(
-        color: Theme.of(context).primaryColor,
-        fontSize: 32,
-        fontWeight: FontWeight.w700,
-      ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+            height: MediaQuery.of(context).size.height * 0.2,
+            margin: EdgeInsets.symmetric(
+              vertical: 10,
+              horizontal: 10,
+            ),
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                  image: AssetImage("assets/images/svgs/search.png")),
+            )),
+        Center(
+          child: Text(
+            "Search",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Theme.of(context).primaryColor,
+              fontSize: 26,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
