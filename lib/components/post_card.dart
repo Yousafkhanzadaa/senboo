@@ -305,14 +305,18 @@ class _PostCardState extends State<PostCard> {
 
   // TextTitle is here ---------------------------------------------------
   Widget _textTitle() {
-    return Text(
-      widget.title,
-      textAlign: TextAlign.start,
-      maxLines: 7,
-      style: Theme.of(context)
-          .textTheme
-          .subtitle1!
-          .copyWith(fontWeight: FontWeight.w700),
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      child: Text(
+        widget.title,
+        textAlign:
+            widget.category.contains("Urdu") ? TextAlign.end : TextAlign.start,
+        maxLines: 7,
+        style: Theme.of(context)
+            .textTheme
+            .subtitle1!
+            .copyWith(fontWeight: FontWeight.w700),
+      ),
     );
   }
 
@@ -421,11 +425,23 @@ class _PostCardState extends State<PostCard> {
             ),
           );
         }
-        return Container(
-          padding: EdgeInsets.all(5),
-          decoration: _buttonDecorations(),
-          child: _buttonsIcon(
-            Icons.chat_bubble_outline,
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CommentScreen(
+                  postId: widget.postId,
+                ),
+              ),
+            );
+          },
+          child: Container(
+            padding: EdgeInsets.all(5),
+            decoration: _buttonDecorations(),
+            child: _buttonsIcon(
+              Icons.chat_bubble_outline,
+            ),
           ),
         );
       },

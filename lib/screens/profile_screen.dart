@@ -49,29 +49,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Navigator.pop(context);
   }
 
-  // show loading
-  _showLoading() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          child: Container(
-            decoration: _cardDecoration(),
-            height: MediaQuery.of(context).size.height * 0.35,
-            width: MediaQuery.of(context).size.width * 0.9,
-            child: Center(
-              child: CircularProgressIndicator(
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -115,8 +92,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       margin: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(25),
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
         children: [
@@ -171,7 +148,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     },
                   );
           }
-          return _loadingScreen();
+          return _searching();
         },
       ),
     );
@@ -199,7 +176,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     },
                   );
           }
-          return _loadingScreen();
+          return _searching();
         },
       ),
     );
@@ -343,25 +320,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // Load Screen ---------------------------------------------
-
-  // Load Screen ---------------------------------------------
-  Widget _loadingScreen() {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.4,
-      margin: EdgeInsets.symmetric(
-        vertical: 10,
-        horizontal: 10,
-      ),
-      decoration: _cardDecoration(),
-      child: Center(
-        child: CircularProgressIndicator(
-          color: Theme.of(context).primaryColor,
-        ),
-      ),
-    );
-  }
-
   Widget _removePost(String postID) {
     return ElevatedButton(
       onPressed: () async {
@@ -388,23 +346,94 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   // Load Screen ---------------------------------------------
   Widget _noPosts() {
+    return Container(
+      decoration: _cardDecoration(),
+      margin: EdgeInsets.all(10),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+              height: MediaQuery.of(context).size.height * 0.20,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage("assets/images/svgs/inbox.png")),
+              )),
+          SizedBox(
+            height: 10,
+          ),
+          Text(
+            "No Posts",
+            style: TextStyle(
+              color: Theme.of(context).primaryColor,
+              fontSize: 26,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Load Screen ---------------------------------------------
+  Widget _searching() {
     return Column(
       children: [
         Container(
-            height: MediaQuery.of(context).size.height * 0.2,
+            height: MediaQuery.of(context).size.height * 0.20,
             decoration: BoxDecoration(
               image: DecorationImage(
-                  image: AssetImage("assets/images/svgs/inbox.png")),
+                  image: AssetImage("assets/images/svgs/post.png")),
             )),
-        Text(
-          "No Posts",
-          style: TextStyle(
-            color: Theme.of(context).primaryColor,
-            fontSize: 26,
-            fontWeight: FontWeight.w700,
-          ),
+        SizedBox(
+          height: 5,
         ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 9.0, horizontal: 60),
+          child: LinearProgressIndicator(
+            color: Theme.of(context).primaryColor,
+            minHeight: 2,
+          ),
+        )
       ],
+    );
+  }
+
+  _showLoading() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            width: MediaQuery.of(context).size.width * 70,
+            height: 200,
+            decoration: _cardDecoration(),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                    height: 100,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                          image: AssetImage("assets/images/svgs/loading.png")),
+                    )),
+                SizedBox(
+                  height: 5,
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 9.0, horizontal: 60),
+                  child: LinearProgressIndicator(
+                    color: Theme.of(context).primaryColor,
+                    minHeight: 2,
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -418,7 +447,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           color: Theme.of(context).primaryColor.withOpacity(0.40),
           blurRadius: 5,
           offset: Offset(0, 0),
-          spreadRadius: 1,
+          // spreadRadius: 1,
         ),
       ],
     );

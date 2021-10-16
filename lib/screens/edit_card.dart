@@ -174,10 +174,10 @@ class _UpdatePostScreenState extends State<UpdatePostScreen> {
               label: "Main Title",
               maxLines: 5,
               validator: (value) {
-                if (value!.length > 140) {
-                  return "Title is too long";
-                }
-                if (value.isEmpty) {
+                // if (value!.length > 140) {
+                //   return "Title is too long";
+                // }
+                if (value!.isEmpty) {
                   return "Field must not be empty";
                 }
                 return null;
@@ -257,7 +257,6 @@ class _UpdatePostScreenState extends State<UpdatePostScreen> {
     );
   }
 
-  // show loading
   _showLoading() {
     showDialog(
       context: context,
@@ -266,13 +265,30 @@ class _UpdatePostScreenState extends State<UpdatePostScreen> {
         return Dialog(
           backgroundColor: Colors.transparent,
           child: Container(
+            width: MediaQuery.of(context).size.width * 70,
+            height: 200,
             decoration: _cardDecoration(),
-            height: MediaQuery.of(context).size.height * 0.35,
-            width: MediaQuery.of(context).size.width * 0.9,
-            child: Center(
-              child: CircularProgressIndicator(
-                color: Theme.of(context).primaryColor,
-              ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                    height: 100,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                          image: AssetImage("assets/images/svgs/loading.png")),
+                    )),
+                SizedBox(
+                  height: 5,
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 9.0, horizontal: 60),
+                  child: LinearProgressIndicator(
+                    color: Theme.of(context).primaryColor,
+                    minHeight: 2,
+                  ),
+                )
+              ],
             ),
           ),
         );

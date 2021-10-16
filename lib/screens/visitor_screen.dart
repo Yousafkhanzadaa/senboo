@@ -134,7 +134,7 @@ class _VisitorProfileScreenState extends State<VisitorProfileScreen> {
                     },
                   );
           }
-          return _loadingScreen();
+          return _searching();
         },
       ),
     );
@@ -160,41 +160,56 @@ class _VisitorProfileScreenState extends State<VisitorProfileScreen> {
   }
 
   // Load Screen ---------------------------------------------
-  Widget _loadingScreen() {
+  Widget _noPosts() {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.4,
-      margin: EdgeInsets.symmetric(
-        vertical: 10,
-        horizontal: 10,
-      ),
       decoration: _cardDecoration(),
-      child: Center(
-        child: CircularProgressIndicator(
-          color: Theme.of(context).primaryColor,
-        ),
+      margin: EdgeInsets.all(10),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+              height: MediaQuery.of(context).size.height * 0.20,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage("assets/images/svgs/inbox.png")),
+              )),
+          SizedBox(
+            height: 10,
+          ),
+          Text(
+            "No Posts",
+            style: TextStyle(
+              color: Theme.of(context).primaryColor,
+              fontSize: 26,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
       ),
     );
   }
 
   // Load Screen ---------------------------------------------
-  Widget _noPosts() {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.4,
-      margin: EdgeInsets.symmetric(
-        vertical: 10,
-        horizontal: 10,
-      ),
-      decoration: _cardDecoration(),
-      child: Center(
-        child: Text(
-          "No Posts",
-          style: TextStyle(
-            color: Theme.of(context).primaryColor,
-            fontSize: 26,
-            fontWeight: FontWeight.w700,
-          ),
+  Widget _searching() {
+    return Column(
+      children: [
+        Container(
+            height: MediaQuery.of(context).size.height * 0.20,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                  image: AssetImage("assets/images/svgs/post.png")),
+            )),
+        SizedBox(
+          height: 5,
         ),
-      ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 9.0, horizontal: 60),
+          child: LinearProgressIndicator(
+            color: Theme.of(context).primaryColor,
+            minHeight: 2,
+          ),
+        )
+      ],
     );
   }
 

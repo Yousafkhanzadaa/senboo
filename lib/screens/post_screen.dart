@@ -100,7 +100,7 @@ class _PostScreenState extends State<PostScreen> {
             ),
             SizedBox(
               width: MediaQuery.of(context).size.width * 0.80,
-              child: _postEditButton(),
+              child: _postButton(),
             ),
           ],
         ),
@@ -139,7 +139,7 @@ class _PostScreenState extends State<PostScreen> {
               controller: _mainTitleController,
               hint: "Title",
               label: "Main Title",
-              maxLines: 4,
+              maxLines: 5,
               validator: (value) {
                 // if (value!.length > 140) {
                 //   return "Title is too long";
@@ -233,13 +233,30 @@ class _PostScreenState extends State<PostScreen> {
         return Dialog(
           backgroundColor: Colors.transparent,
           child: Container(
+            width: MediaQuery.of(context).size.width * 70,
+            height: 200,
             decoration: _cardDecoration(),
-            height: MediaQuery.of(context).size.height * 0.35,
-            width: MediaQuery.of(context).size.width * 0.9,
-            child: Center(
-              child: CircularProgressIndicator(
-                color: Theme.of(context).primaryColor,
-              ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                    height: 100,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                          image: AssetImage("assets/images/svgs/loading.png")),
+                    )),
+                SizedBox(
+                  height: 5,
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 9.0, horizontal: 60),
+                  child: LinearProgressIndicator(
+                    color: Theme.of(context).primaryColor,
+                    minHeight: 2,
+                  ),
+                )
+              ],
             ),
           ),
         );
@@ -264,7 +281,7 @@ class _PostScreenState extends State<PostScreen> {
   }
 
   // save buttan goes here -0------------------------------------
-  Widget _postEditButton() {
+  Widget _postButton() {
     dateTime = DateTime.now();
 
     return ElevatedButton(

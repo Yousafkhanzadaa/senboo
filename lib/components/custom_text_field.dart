@@ -39,6 +39,11 @@ class _CustomTextFieldState extends State<CustomTextField> {
           borderSide:
               BorderSide(color: Theme.of(context).primaryColor, width: 1),
         ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(widget.maxLines! > 1 ? 25 : 35),
+          borderSide:
+              BorderSide(color: Theme.of(context).primaryColor, width: 1),
+        ),
         prefix: SizedBox(
           width: 10,
         ),

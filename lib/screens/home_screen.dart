@@ -70,12 +70,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future<void> _refresh() async {
-    setState(() {
-      limit += 1;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     if (gotList) {
@@ -98,56 +92,52 @@ class _HomeScreenState extends State<HomeScreen> {
                   var postsList = snapshot.data!.docs;
                   return postsList.isEmpty
                       ? _noPosts()
-                      : RefreshIndicator(
-                          onRefresh: _refresh,
-                          color: Theme.of(context).primaryColor,
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            // scrollDirection: Axis.vertical,
-                            physics: ScrollPhysics(),
-                            addRepaintBoundaries: false,
-                            itemCount: snapshot.data!.docs.length,
-                            itemBuilder: (context, index) {
-                              var data = snapshot.data!.docs;
-                              postData = PostData.setData(data[index]);
+                      : ListView.builder(
+                          shrinkWrap: true,
+                          // scrollDirection: Axis.vertical,
+                          physics: ScrollPhysics(),
+                          addRepaintBoundaries: false,
+                          itemCount: snapshot.data!.docs.length,
+                          itemBuilder: (context, index) {
+                            var data = snapshot.data!.docs;
+                            postData = PostData.setData(data[index]);
 
-                              return Column(
-                                children: [
-                                  PostCard(
-                                    userName: postData!.userName!,
-                                    profession: postData!.profession!,
-                                    title: postData!.title!,
-                                    body: postData!.body!,
-                                    date: postData!.date!.toDate(),
-                                    category: postData!.category!,
-                                    likes: postData!.likes!,
-                                    postId: postData!.postId!,
-                                    ownerId: postData!.ownerId!,
-                                    photoUrl: postData!.photoUrl!,
-                                  ),
-                                  showAd(index % 3 == 0),
-                                ],
-                              );
-                              // : PostCard(
-                              //     userName: postData!.userName!,
-                              //     profession: postData!.profession!,
-                              //     title: postData!.title!,
-                              //     body: postData!.body!,
-                              //     date: postData!.date!.toDate(),
-                              //     category: postData!.category!,
-                              //     likes: postData!.likes!,
-                              //     postId: postData!.postId!,
-                              //     ownerId: postData!.ownerId!,
-                              //   );
-                            },
-                          ),
+                            return Column(
+                              children: [
+                                PostCard(
+                                  userName: postData!.userName!,
+                                  profession: postData!.profession!,
+                                  title: postData!.title!,
+                                  body: postData!.body!,
+                                  date: postData!.date!.toDate(),
+                                  category: postData!.category!,
+                                  likes: postData!.likes!,
+                                  postId: postData!.postId!,
+                                  ownerId: postData!.ownerId!,
+                                  photoUrl: postData!.photoUrl!,
+                                ),
+                                showAd(index % 3 == 0),
+                              ],
+                            );
+                            // : PostCard(
+                            //     userName: postData!.userName!,
+                            //     profession: postData!.profession!,
+                            //     title: postData!.title!,
+                            //     body: postData!.body!,
+                            //     date: postData!.date!.toDate(),
+                            //     category: postData!.category!,
+                            //     likes: postData!.likes!,
+                            //     postId: postData!.postId!,
+                            //     ownerId: postData!.ownerId!,
+                            //   );
+                          },
                         );
                 }
-                return _loadingScreen();
+                return _searching();
               },
             );
     }
-    return _loadingScreen();
+    return _searching();
   }
 
   // Error Screen ----------------------------------------------------
@@ -163,118 +153,144 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Load Screen ---------------------------------------------
-  Widget _loadingScreen() {
+  // Widget _loadingScreen() {
+  //   return Container(
+  //     height: MediaQuery.of(context).size.height * 0.4,
+  //     margin: EdgeInsets.symmetric(
+  //       vertical: 10,
+  //       horizontal: 10,
+  //     ),
+  //     decoration: _cardDecoration(),
+  //     child: Center(
+  //       child: CircularProgressIndicator(
+  //         color: Theme.of(context).primaryColor,
+  //       ),
+  //     ),
+  //   );
+  // }
+  // Load Screen ---------------------------------------------
+  Widget _searching() {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.4,
       margin: EdgeInsets.symmetric(
         vertical: 10,
         horizontal: 10,
       ),
-      decoration: _cardDecoration(),
-      child: Center(
-        child: CircularProgressIndicator(
-          color: Theme.of(context).primaryColor,
-        ),
+      // decoration: _cardDecoration(),
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+              height: MediaQuery.of(context).size.height * 0.20,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage("assets/images/svgs/post.png")),
+              )),
+          SizedBox(
+            height: 5,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 9.0, horizontal: 60),
+            child: LinearProgressIndicator(
+              color: Theme.of(context).primaryColor,
+              minHeight: 2,
+            ),
+          )
+        ],
       ),
     );
   }
 
   // Load Screen ---------------------------------------------
   Widget _editPro() {
-    return Column(
-      children: [
-        Container(
-          // height: MediaQuery.of(context).size.height * 0.4,
+    return Container(
+      // height: MediaQuery.of(context).size.height * 0.4,
 
-          margin: EdgeInsets.symmetric(
-            vertical: 10,
-            horizontal: 10,
-          ),
-          padding: EdgeInsets.symmetric(
-            vertical: 20,
-            horizontal: 10,
-          ),
-          decoration: _cardDecoration(),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "Welcome",
-                  style: TextStyle(
-                    color: Theme.of(context).primaryColor,
-                    fontSize: 32,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Text(
-                  "We're glad you decide to join the Senboo family!",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Theme.of(context).primaryColor,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                SizedBox(
-                  height: 15,
-                ),
-                Text(
-                  "Please first select your fields of interests and then save.",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Theme.of(context).primaryColor,
-                    fontSize: 18,
-                  ),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                _intrestButtonsField(),
-                SizedBox(
-                  height: 10,
-                ),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.70,
-                  child: _saveInterestsButton(),
-                ),
-              ],
+      margin: EdgeInsets.symmetric(
+        vertical: 10,
+        horizontal: 10,
+      ),
+      padding: EdgeInsets.symmetric(
+        vertical: 20,
+        horizontal: 10,
+      ),
+      decoration: _cardDecoration(),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+                height: MediaQuery.of(context).size.height * 0.25,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                      image: AssetImage("assets/images/svgs/welcome.png")),
+                )),
+            SizedBox(
+              height: 10,
             ),
-          ),
+            Text(
+              "Please first select your fields of interests and then save.",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Theme.of(context).primaryColor,
+                fontSize: 16,
+              ),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            _intrestButtonsField(),
+            SizedBox(
+              height: 10,
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.70,
+              child: _saveInterestsButton(),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 
 // mo posts found
   Widget _noPosts() {
-    return Column(
-      children: [
-        Container(
-            height: MediaQuery.of(context).size.height * 0.3,
-            margin: EdgeInsets.symmetric(
-              vertical: 10,
-              horizontal: 10,
-            ),
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage("assets/images/svgs/inbox.png")),
-            )),
-        Center(
-          child: Text(
-            "No posts available for your fields of interests yet!",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Theme.of(context).primaryColor,
-              fontSize: 26,
-              fontWeight: FontWeight.w700,
+    return Container(
+      margin: EdgeInsets.symmetric(
+        vertical: 10,
+        horizontal: 10,
+      ),
+      padding: EdgeInsets.symmetric(
+        vertical: 20,
+        horizontal: 10,
+      ),
+      decoration: _cardDecoration(),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+              height: MediaQuery.of(context).size.height * 0.25,
+              margin: EdgeInsets.symmetric(
+                vertical: 10,
+                horizontal: 10,
+              ),
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage("assets/images/svgs/inbox.png")),
+              )),
+          Center(
+            child: Text(
+              "No posts available for your fields of interests yet!",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Theme.of(context).primaryColor,
+                fontSize: 26,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

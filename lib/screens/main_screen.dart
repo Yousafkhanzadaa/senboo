@@ -96,8 +96,27 @@ class _MainScreenState extends State<MainScreen> {
   Widget _loadingScreen() {
     return Scaffold(
       body: Center(
-        child: CircularProgressIndicator(
-          color: Theme.of(context).primaryColor,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+                height: 100,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                      image: AssetImage("assets/images/svgs/loading.png")),
+                )),
+            SizedBox(
+              height: 5,
+            ),
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 9.0, horizontal: 60),
+              child: LinearProgressIndicator(
+                color: Theme.of(context).primaryColor,
+                minHeight: 2,
+              ),
+            )
+          ],
         ),
       ),
     );

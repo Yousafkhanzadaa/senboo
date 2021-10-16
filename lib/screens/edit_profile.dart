@@ -352,29 +352,6 @@ class _EditProfileState extends State<EditProfile> {
     );
   }
 
-  // show loading
-  _showLoading() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          child: Container(
-            decoration: _cardDecoration(),
-            height: MediaQuery.of(context).size.height * 0.35,
-            width: MediaQuery.of(context).size.width * 0.9,
-            child: Center(
-              child: CircularProgressIndicator(
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   // CardDecoration --------------------------------------
   BoxDecoration _cardDecoration() {
     return BoxDecoration(
@@ -499,6 +476,45 @@ class _EditProfileState extends State<EditProfile> {
           child: _buttonsIcon(
             Icons.done,
           )),
+    );
+  }
+
+  _showLoading() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            width: MediaQuery.of(context).size.width * 70,
+            height: 200,
+            decoration: _cardDecoration(),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                    height: 100,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                          image: AssetImage("assets/images/svgs/loading.png")),
+                    )),
+                SizedBox(
+                  height: 5,
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 9.0, horizontal: 60),
+                  child: LinearProgressIndicator(
+                    color: Theme.of(context).primaryColor,
+                    minHeight: 2,
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

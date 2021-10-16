@@ -56,6 +56,10 @@ flutter:
     - assets/images/svgs/inbox.png
     - assets/images/svgs/search.png
     - assets/images/svgs/comments.png
+    - assets/images/svgs/post.png
+    - assets/images/svgs/profile.png
+    - assets/images/svgs/loading.png
+    - assets/images/svgs/welcome.png
 
   # fonts ----------------------------------------
   fonts:

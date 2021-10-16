@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
@@ -259,18 +260,27 @@ class _PostViewScreenState extends State<PostViewScreen> {
 
   // TextTitle is here ---------------------------------------------------
   Widget _textTitle() {
-    return Text(
-      widget.title,
-      maxLines: 7,
-      style: Theme.of(context).textTheme.headline3,
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      child: Text(
+        widget.title,
+        textAlign:
+            widget.category.contains("Urdu") ? TextAlign.end : TextAlign.start,
+        style: Theme.of(context).textTheme.headline3,
+      ),
     );
   }
 
   // bodyText is Here -----------------------------------------------------
   Widget _bodyText() {
-    return Text(
-      widget.body,
-      style: Theme.of(context).textTheme.bodyText1,
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      child: Text(
+        widget.body,
+        textAlign:
+            widget.category.contains("Urdu") ? TextAlign.end : TextAlign.start,
+        style: Theme.of(context).textTheme.bodyText1,
+      ),
     );
   }
 
@@ -367,11 +377,23 @@ class _PostViewScreenState extends State<PostViewScreen> {
             ),
           );
         }
-        return Container(
-          padding: EdgeInsets.all(5),
-          decoration: _buttonDecorations(),
-          child: _buttonsIcon(
-            Icons.chat_bubble_outline,
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CommentScreen(
+                  postId: widget.postId,
+                ),
+              ),
+            );
+          },
+          child: Container(
+            padding: EdgeInsets.all(5),
+            decoration: _buttonDecorations(),
+            child: _buttonsIcon(
+              Icons.chat_bubble_outline,
+            ),
           ),
         );
       },

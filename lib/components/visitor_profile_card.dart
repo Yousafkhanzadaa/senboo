@@ -121,16 +121,32 @@ class _VisitorProfileCardState extends State<VisitorProfileCard> {
   // Load Screen ---------------------------------------------
   Widget _loadingScreen() {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.4,
+      // height: MediaQuery.of(context).size.height * 0.4,
+      padding: EdgeInsets.symmetric(vertical: 80),
       margin: EdgeInsets.symmetric(
         vertical: 10,
         horizontal: 10,
       ),
       decoration: _cardDecoration(),
-      child: Center(
-        child: CircularProgressIndicator(
-          color: Theme.of(context).primaryColor,
-        ),
+      child: Column(
+        children: [
+          Container(
+              height: MediaQuery.of(context).size.height * 0.20,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage("assets/images/svgs/profile.png")),
+              )),
+          SizedBox(
+            height: 5,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 9.0, horizontal: 60),
+            child: LinearProgressIndicator(
+              color: Theme.of(context).primaryColor,
+              minHeight: 2,
+            ),
+          )
+        ],
       ),
     );
   }

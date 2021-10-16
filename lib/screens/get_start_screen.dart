@@ -52,10 +52,6 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                 child: Column(
               children: [
                 _quote(),
-                SizedBox(
-                  height: 25,
-                ),
-                _write(),
               ],
             )),
             // _termsContitions(),
@@ -92,8 +88,12 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
               .copyWith(fontWeight: FontWeight.w700),
         ),
         Text(
-          "Share you imagination",
-          style: Theme.of(context).textTheme.bodyText1,
+          "Share your Imagination",
+          style: Theme.of(context).textTheme.bodyText1!.copyWith(
+                fontSize: 16,
+                color: Theme.of(context).primaryColor,
+                // fontWeight: FontWeight.w700,
+              ),
         )
       ],
     );
@@ -102,47 +102,15 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
   // Quote --------------------------------------------
   Widget _quote() {
     return Text(
-      '"The world is a canvas for your imagination. You are the painter.\nThere are NO RULES!"',
-      textAlign: TextAlign.center,
-      style: Theme.of(context).textTheme.bodyText1!.copyWith(fontSize: 19),
-    );
-  }
-
-  // Quote --------------------------------------------
-  Widget _write() {
-    return Text(
-      "Write and share with world!",
+      '“You can’t fail if you don’t quit. You can’t succeed if you don’t start.” — Michael Hyatt',
       textAlign: TextAlign.center,
       style: Theme.of(context).textTheme.bodyText1!.copyWith(
-            fontSize: 19,
+            fontSize: 22,
             color: Theme.of(context).primaryColor,
-            fontWeight: FontWeight.w700,
+            // fontWeight: FontWeight.w700,
           ),
     );
   }
-
-  // // Terms and conditions --------------------------------------------
-  // Widget _termsContitions() {
-  //   return Row(
-  //     mainAxisAlignment: MainAxisAlignment.center,
-  //     children: [
-  //       Checkbox(
-  //         value: agreed,
-  //         activeColor: Theme.of(context).primaryColor,
-  //         onChanged: (value) {
-  //           setState(() {
-  //             agreed = value!;
-  //           });
-  //         },
-  //       ),
-  //       Text(
-  //         "Agreed to all terms and conditinos",
-  //         textAlign: TextAlign.center,
-  //         style: Theme.of(context).textTheme.bodyText1,
-  //       ),
-  //     ],
-  //   );
-  // }
 
   // GetStarted Button ----------------------------------------------------
   Widget _getStartedButton() {
@@ -173,23 +141,38 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
     });
   }
 
-  // show loading
   _showLoading() {
     showDialog(
       context: context,
       barrierDismissible: false,
-      useSafeArea: true,
       builder: (context) {
         return Dialog(
           backgroundColor: Colors.transparent,
           child: Container(
+            width: MediaQuery.of(context).size.width * 70,
+            height: 200,
             decoration: _cardDecoration(),
-            height: MediaQuery.of(context).size.height * 0.35,
-            width: MediaQuery.of(context).size.width * 0.9,
-            child: Center(
-              child: CircularProgressIndicator(
-                color: Theme.of(context).primaryColor,
-              ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                    height: 100,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                          image: AssetImage("assets/images/svgs/loading.png")),
+                    )),
+                SizedBox(
+                  height: 5,
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 9.0, horizontal: 60),
+                  child: LinearProgressIndicator(
+                    color: Theme.of(context).primaryColor,
+                    minHeight: 2,
+                  ),
+                )
+              ],
             ),
           ),
         );

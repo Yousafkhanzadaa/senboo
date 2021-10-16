@@ -83,7 +83,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                     },
                                   );
                           }
-                          return _loadingScreen();
+                          return _searching();
                         },
                       ),
               ),
@@ -116,7 +116,7 @@ class _SearchScreenState extends State<SearchScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
-            height: MediaQuery.of(context).size.height * 0.2,
+            height: MediaQuery.of(context).size.height * 0.3,
             margin: EdgeInsets.symmetric(
               vertical: 10,
               horizontal: 10,
@@ -170,35 +170,28 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  // Load Screen ---------------------------------------------
-  Widget _loadingScreen() {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.4,
-      margin: EdgeInsets.symmetric(
-        vertical: 10,
-        horizontal: 10,
-      ),
-      decoration: _cardDecoration(),
-      child: Center(
-        child: CircularProgressIndicator(
-          color: Theme.of(context).primaryColor,
-        ),
-      ),
-    );
-  }
-
-  // CardDecoration --------------------------------------
-  BoxDecoration _cardDecoration() {
-    return BoxDecoration(
-      color: Theme.of(context).cardColor,
-      borderRadius: BorderRadius.circular(25),
-      boxShadow: [
-        BoxShadow(
-          color: Theme.of(context).primaryColor.withOpacity(0.40),
-          blurRadius: 5,
-          offset: Offset(0, 0),
-          spreadRadius: 1,
-        ),
+  // field is empty
+  Widget _searching() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+            height: MediaQuery.of(context).size.height * 0.2,
+            margin: EdgeInsets.symmetric(
+              vertical: 10,
+              horizontal: 10,
+            ),
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                  image: AssetImage("assets/images/svgs/search.png")),
+            )),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 9.0, horizontal: 60),
+          child: LinearProgressIndicator(
+            color: Theme.of(context).primaryColor,
+            minHeight: 2,
+          ),
+        )
       ],
     );
   }
