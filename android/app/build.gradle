@@ -45,8 +45,8 @@ android {
         applicationId "com.ydevs.senboo"
         minSdkVersion 21
         targetSdkVersion 31
-        versionCode 7
-        versionName "1.1.1"
+        versionCode 8
+        versionName "1.1.2"
     }
 
     signingConfigs {

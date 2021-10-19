@@ -48,7 +48,7 @@ class _CommentCardState extends State<CommentCard> {
       boxShadow: [
         BoxShadow(
           color: Theme.of(context).primaryColor.withOpacity(0.30),
-          blurRadius: 4,
+          blurRadius: 3,
           offset: Offset(0, 0),
           // spreadRadius: 1,
         ),

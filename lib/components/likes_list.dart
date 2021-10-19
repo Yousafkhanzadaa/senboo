@@ -39,7 +39,7 @@ class _LikeListState extends State<LikeList> {
     return FutureBuilder(
       future: users.doc(ownerId).get(),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
+        if (snapshot.hasData) {
           userData = UserData.setData(snapshot);
           return _likeCard(
             imgUrl: userData!.photoUrl!,
@@ -121,9 +121,8 @@ class _LikeListState extends State<LikeList> {
       boxShadow: [
         BoxShadow(
           color: Theme.of(context).primaryColor.withOpacity(0.40),
-          blurRadius: 5,
+          blurRadius: 3,
           offset: Offset(0, 0),
-          spreadRadius: 1,
         ),
       ],
     );

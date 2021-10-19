@@ -63,6 +63,8 @@ class _PostCardState extends State<PostCard> {
   int likesCounter = 0;
   List likeList = [];
 
+  List commentList = [];
+
   bool? _saved;
   List? _savedList;
   final DateFormat formatter = DateFormat('yyyy-MM-dd');
@@ -394,7 +396,7 @@ class _PostCardState extends State<PostCard> {
           comments.doc(widget.postId).collection("postComments").snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          List commentList = snapshot.data!.docs.toList();
+          commentList = snapshot.data!.docs.toList();
           return GestureDetector(
             onTap: () {
               Navigator.push(

@@ -24,7 +24,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
       body: Container(
         height: MediaQuery.of(context).size.height,
         width: double.infinity,
-        padding: EdgeInsets.all(10),
+        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.only(
@@ -188,9 +188,8 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
       boxShadow: [
         BoxShadow(
           color: Theme.of(context).primaryColor.withOpacity(0.40),
-          blurRadius: 5,
+          blurRadius: 3,
           offset: Offset(0, 0),
-          spreadRadius: 1,
         ),
       ],
     );

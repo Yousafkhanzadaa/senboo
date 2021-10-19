@@ -61,6 +61,7 @@ class _PostViewScreenState extends State<PostViewScreen> {
   int likesCounter = 0;
   List likeList = [];
   List saveList = [];
+  List commentList = [];
   final DateFormat formatter = DateFormat('yyyy-MM-dd');
 
   @override
@@ -346,7 +347,7 @@ class _PostViewScreenState extends State<PostViewScreen> {
           comments.doc(widget.postId).collection("postComments").snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          List commentList = snapshot.data!.docs.toList();
+          commentList = snapshot.data!.docs.toList();
           return GestureDetector(
             onTap: () {
               Navigator.push(

@@ -24,9 +24,9 @@ class _AdsState extends State<Ads> {
       listener: BannerAdListener(
           onAdLoaded: (ad) {
             // print('Ad loaded: ${ad.adUnitId}');
-            // setState(() {
-            isLoaded = true;
-            // });
+            setState(() {
+              isLoaded = true;
+            });
           },
           onAdFailedToLoad: (ad, error) {
             // print('Ad Failed to loaded: ${ad.adUnitId}, $error');
@@ -55,9 +55,12 @@ class _AdsState extends State<Ads> {
       );
     } else {
       return Container();
-      // return LinearProgressIndicator(
-      //   color: Theme.of(context).primaryColor,
-      //   minHeight: 2,
+      // return Padding(
+      //   padding: const EdgeInsets.symmetric(horizontal: 60),
+      //   child: LinearProgressIndicator(
+      //     color: Theme.of(context).primaryColor,
+      //     minHeight: 1,
+      //   ),
       // );
     }
   }
