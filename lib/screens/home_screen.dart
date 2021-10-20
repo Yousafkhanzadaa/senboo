@@ -16,6 +16,9 @@ class _HomeScreenState extends State<HomeScreen> {
   User? currentUser = FirebaseAuth.instance.currentUser;
   // Post collection
   CollectionReference posts = FirebaseFirestore.instance.collection("posts");
+  // Post collection
+  CollectionReference usersPosts =
+      FirebaseFirestore.instance.collection("usersPosts");
   // User collection
   CollectionReference users = FirebaseFirestore.instance.collection("users");
   PostData? postData;
@@ -62,6 +65,46 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  // Adding Posts...............................................
+  Future<void> addPost(
+      {required String userName,
+      required String profession,
+      required List category,
+      required String title,
+      required String body,
+      required String photoUrl,
+      required List searchKeywords,
+      required DateTime date,
+      required String ownerId,
+      required String postId,
+      required List likes}) async {
+    try {
+      var newCollection = await usersPosts
+          .doc(ownerId)
+          .collection("userPost")
+          .doc(postId)
+          .get();
+
+      if (!newCollection.exists) {
+        await usersPosts.doc(ownerId).collection("userPost").doc(postId).set({
+          "ownerId": ownerId,
+          "userName": userName,
+          "profession": profession,
+          "date": date,
+          "category": category,
+          "title": title,
+          "body": body,
+          "searchKeywords": searchKeywords,
+          "postId": postId,
+          "photoUrl": photoUrl,
+          "likes": likes,
+        });
+      }
+    } catch (e) {
+      throw e;
+    }
+  }
+
   Widget showAd(bool show) {
     if (show) {
       return Ads();
@@ -101,6 +144,20 @@ class _HomeScreenState extends State<HomeScreen> {
                           itemBuilder: (context, index) {
                             var data = snapshot.data!.docs;
                             postData = PostData.setData(data[index]);
+
+                            addPost(
+                              userName: postData!.userName!,
+                              profession: postData!.profession!,
+                              title: postData!.title!,
+                              body: postData!.body!,
+                              date: postData!.date!.toDate(),
+                              category: postData!.category!,
+                              likes: postData!.likes!,
+                              postId: postData!.postId!,
+                              ownerId: postData!.ownerId!,
+                              photoUrl: postData!.photoUrl!,
+                              searchKeywords: postData!.searchKeywords!,
+                            );
 
                             return Column(
                               children: [

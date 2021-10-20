@@ -25,6 +25,9 @@ class _PostScreenState extends State<PostScreen> {
   User? currentUser = FirebaseAuth.instance.currentUser;
   // Post collection
   CollectionReference posts = FirebaseFirestore.instance.collection("posts");
+  // Post collection
+  CollectionReference usersPosts =
+      FirebaseFirestore.instance.collection("usersPosts");
   UserDataUpdate? userData;
   List<String> _categories = [];
 
@@ -361,6 +364,23 @@ class _PostScreenState extends State<PostScreen> {
     var uidV4 = uid.v4();
     try {
       await posts.doc(uidV4).set({
+        "ownerId": currentUser!.uid,
+        "userName": userName,
+        "profession": profession,
+        "date": date,
+        "category": category,
+        "title": title,
+        "body": body,
+        "searchKeywords": searchKeywords,
+        "postId": uidV4,
+        "photoUrl": photoUrl,
+        "likes": [],
+      });
+      await usersPosts
+          .doc(currentUser!.uid)
+          .collection("userPost")
+          .doc(uidV4)
+          .set({
         "ownerId": currentUser!.uid,
         "userName": userName,
         "profession": profession,

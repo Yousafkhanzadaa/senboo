@@ -35,6 +35,9 @@ class _UpdatePostScreenState extends State<UpdatePostScreen> {
   User? currentUser = FirebaseAuth.instance.currentUser;
   // Post collection
   CollectionReference posts = FirebaseFirestore.instance.collection("posts");
+  // Post collection
+  CollectionReference usersPosts =
+      FirebaseFirestore.instance.collection("usersPosts");
   List _categories = [];
   DateTime? dateTime;
 
@@ -80,6 +83,16 @@ class _UpdatePostScreenState extends State<UpdatePostScreen> {
   }) async {
     try {
       await posts.doc(postId).update({
+        "category": category,
+        "title": title,
+        "body": body,
+        "searchKeywords": searchKeywords,
+      });
+      await usersPosts
+          .doc(currentUser!.uid)
+          .collection("userPost")
+          .doc(postId)
+          .update({
         "category": category,
         "title": title,
         "body": body,
