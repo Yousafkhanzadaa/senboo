@@ -6,7 +6,6 @@ import 'package:senboo/components/profile_card.dart';
 import 'package:senboo/components/profile_post_card.dart';
 import 'package:senboo/model/get_user_data.dart';
 import 'package:senboo/screens/edit_card.dart';
-// import 'package:senboo/screens/post_view_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   ProfileScreen({Key? key}) : super(key: key);
@@ -23,6 +22,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   CollectionReference users = FirebaseFirestore.instance.collection("users");
   CollectionReference comments =
       FirebaseFirestore.instance.collection('comments');
+  // Post collection
+  CollectionReference usersPosts =
+      FirebaseFirestore.instance.collection("usersPosts");
 
   // saved posts
   CollectionReference savedPosts =
@@ -45,6 +47,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _showLoading();
     await comments.doc(postId).delete();
     await posts.doc(postId).delete();
+    await usersPosts
+        .doc(currentUser!.uid)
+        .collection("userPost")
+        .doc(postId)
+        .delete();
     // dataProvider.getTotalLikes(ownerId: currentUser!.uid);
     Navigator.pop(context);
   }
@@ -139,6 +146,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     itemBuilder: (context, index) {
                       var data = snapshot.data!.docs;
                       postData = PostData.setData(dataList[index]);
+
+                      // remove next update /////////////////////////////////////////////////
+                      // remove next update /////////////////////////////////////////////////
+
+                      addPost(
+                        userName: postData!.userName!,
+                        profession: postData!.profession!,
+                        title: postData!.title!,
+                        body: postData!.body!,
+                        date: postData!.date!.toDate(),
+                        category: postData!.category!,
+                        likes: postData!.likes!,
+                        postId: postData!.postId!,
+                        ownerId: postData!.ownerId!,
+                        photoUrl: postData!.photoUrl!,
+                        searchKeywords: postData!.searchKeywords!,
+                      );
                       return _cardView(
                           postData: postData!,
                           data: data,
@@ -451,5 +475,60 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ],
     );
+  }
+
+  // Adding Posts...............................................
+  Future<void> addPost(
+      {required String userName,
+      required String profession,
+      required List category,
+      required String title,
+      required String body,
+      required String photoUrl,
+      required List searchKeywords,
+      required DateTime date,
+      required String ownerId,
+      required String postId,
+      required List likes}) async {
+    try {
+      var newCollection = await usersPosts
+          .doc(ownerId)
+          .collection("userPost")
+          .doc(postId)
+          .get();
+
+      if (!newCollection.exists) {
+        await usersPosts.doc(ownerId).collection("userPost").doc(postId).set({
+          "ownerId": ownerId,
+          "userName": userName,
+          "profession": profession,
+          "date": date,
+          "category": category,
+          "title": title,
+          "body": body,
+          "searchKeywords": searchKeywords,
+          "postId": postId,
+          "photoUrl": photoUrl,
+          "likes": likes,
+        });
+
+        if (newCollection.exists) {
+          await usersPosts
+              .doc(ownerId)
+              .collection("userPost")
+              .doc(postId)
+              .update({
+            "userName": userName,
+            "profession": profession,
+            "category": category,
+            "title": title,
+            "body": body,
+            "likes": likes,
+          });
+        }
+      }
+    } catch (e) {
+      throw e;
+    }
   }
 }

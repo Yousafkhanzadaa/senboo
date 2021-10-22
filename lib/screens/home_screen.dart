@@ -22,8 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // User collection
   CollectionReference users = FirebaseFirestore.instance.collection("users");
   PostData? postData;
-  bool gotList = false;
-  int limit = 100;
+  bool loaded = false;
 
   final List<String> _fieldButtonNames = [
     "Quote",
@@ -44,65 +43,68 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
   List<dynamic> _interestedList = [];
   List<dynamic> _newInterestedList = [];
+  var postsList;
   // List interestList = [];
 
   @override
   void initState() {
     super.initState();
 
-    getInterested();
+    getTimeLine();
   }
 
-  getInterested() {
+  Future<dynamic> getTimeLine() async {
+    // List iList = [];
     users.doc(currentUser!.uid).get().then((snapshot) {
       // EditListController editListController =
       //     Provider.of<EditListController>(context, listen: false);
 
-      setState(() {
-        _interestedList = snapshot['interested'];
-        gotList = true;
-      });
-    });
-  }
+      _interestedList = snapshot.get('interested');
 
-  // Adding Posts...............................................
-  Future<void> addPost(
-      {required String userName,
-      required String profession,
-      required List category,
-      required String title,
-      required String body,
-      required String photoUrl,
-      required List searchKeywords,
-      required DateTime date,
-      required String ownerId,
-      required String postId,
-      required List likes}) async {
-    try {
-      var newCollection = await usersPosts
-          .doc(ownerId)
-          .collection("userPost")
-          .doc(postId)
-          .get();
-
-      if (!newCollection.exists) {
-        await usersPosts.doc(ownerId).collection("userPost").doc(postId).set({
-          "ownerId": ownerId,
-          "userName": userName,
-          "profession": profession,
-          "date": date,
-          "category": category,
-          "title": title,
-          "body": body,
-          "searchKeywords": searchKeywords,
-          "postId": postId,
-          "photoUrl": photoUrl,
-          "likes": likes,
+      if (_interestedList.isNotEmpty) {
+        posts
+            .where(
+              "category",
+              arrayContainsAny: _interestedList,
+            )
+            .orderBy('date', descending: true)
+            .limit(35)
+            .get()
+            .then((snapshot) {
+          setState(() {
+            postsList = snapshot.docs;
+            loaded = true;
+          });
+        });
+      } else {
+        setState(() {
+          _interestedList = snapshot.get('interested');
+          loaded = true;
         });
       }
-    } catch (e) {
-      throw e;
-    }
+    });
+
+    // if (iList.isEmpty) {
+    //   setState(() {
+    //     loaded = true;
+    //     _interestedList = iList;
+    //   });
+    // } else {
+    //   Stream postStream = posts
+    //       .where(
+    //         "category",
+    //         arrayContainsAny: _interestedList,
+    //       )
+    //       .orderBy('date', descending: true)
+    //       .limit(35)
+    //       .snapshots();
+    //   postStream.listen((snapshot) {
+    //     setState(() {
+    //       postsList = snapshot.docs;
+    //       loaded = true;
+    //     });
+    //   });
+    // }
   }
 
   Widget showAd(bool show) {
@@ -115,84 +117,40 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (gotList) {
-      return _interestedList.isEmpty
-          ? _editPro()
-          : StreamBuilder<QuerySnapshot>(
-              stream: posts
-                  .where(
-                    "category",
-                    arrayContainsAny: _interestedList,
-                  )
-                  .orderBy('date', descending: true)
-                  .limit(limit)
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return _errorScreen();
-                }
-                if (snapshot.hasData) {
-                  var postsList = snapshot.data!.docs;
-                  return postsList.isEmpty
-                      ? _noPosts()
-                      : ListView.builder(
-                          shrinkWrap: true,
-                          // scrollDirection: Axis.vertical,
-                          physics: ScrollPhysics(),
-                          addRepaintBoundaries: false,
-                          itemCount: snapshot.data!.docs.length,
-                          itemBuilder: (context, index) {
-                            var data = snapshot.data!.docs;
-                            postData = PostData.setData(data[index]);
+    if (loaded) {
+      if (_interestedList.isNotEmpty) {
+        return postsList.isEmpty
+            ? _noPosts()
+            : ListView.builder(
+                shrinkWrap: true,
+                // scrollDirection: Axis.vertical,
 
-                            addPost(
-                              userName: postData!.userName!,
-                              profession: postData!.profession!,
-                              title: postData!.title!,
-                              body: postData!.body!,
-                              date: postData!.date!.toDate(),
-                              category: postData!.category!,
-                              likes: postData!.likes!,
-                              postId: postData!.postId!,
-                              ownerId: postData!.ownerId!,
-                              photoUrl: postData!.photoUrl!,
-                              searchKeywords: postData!.searchKeywords!,
-                            );
+                itemCount: postsList.length,
+                itemBuilder: (context, index) {
+                  // var data = snapshot.data!.docs;
+                  postData = PostData.setData(postsList[index]);
 
-                            return Column(
-                              children: [
-                                PostCard(
-                                  userName: postData!.userName!,
-                                  profession: postData!.profession!,
-                                  title: postData!.title!,
-                                  body: postData!.body!,
-                                  date: postData!.date!.toDate(),
-                                  category: postData!.category!,
-                                  likes: postData!.likes!,
-                                  postId: postData!.postId!,
-                                  ownerId: postData!.ownerId!,
-                                  photoUrl: postData!.photoUrl!,
-                                ),
-                                showAd(index % 3 == 0),
-                              ],
-                            );
-                            // : PostCard(
-                            //     userName: postData!.userName!,
-                            //     profession: postData!.profession!,
-                            //     title: postData!.title!,
-                            //     body: postData!.body!,
-                            //     date: postData!.date!.toDate(),
-                            //     category: postData!.category!,
-                            //     likes: postData!.likes!,
-                            //     postId: postData!.postId!,
-                            //     ownerId: postData!.ownerId!,
-                            //   );
-                          },
-                        );
-                }
-                return _searching();
-              },
-            );
+                  return Column(
+                    children: [
+                      PostCard(
+                        userName: postData!.userName!,
+                        profession: postData!.profession!,
+                        title: postData!.title!,
+                        body: postData!.body!,
+                        date: postData!.date!.toDate(),
+                        category: postData!.category!,
+                        likes: postData!.likes!,
+                        postId: postData!.postId!,
+                        ownerId: postData!.ownerId!,
+                        photoUrl: postData!.photoUrl!,
+                      ),
+                      showAd(index % 3 == 0),
+                    ],
+                  );
+                },
+              );
+      }
+      return _editPro();
     }
     return _searching();
   }
@@ -263,15 +221,16 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       // height: MediaQuery.of(context).size.height * 0.4,
 
-      margin: EdgeInsets.symmetric(
-        vertical: 10,
-        horizontal: 10,
-      ),
+      // margin: EdgeInsets.symmetric(
+      //   vertical: 10,
+      //   horizontal: 10,
+      // ),
       padding: EdgeInsets.symmetric(
         vertical: 20,
         horizontal: 10,
       ),
-      decoration: _cardDecoration(),
+      color: Colors.white,
+      // decoration: _cardDecoration(),
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -358,9 +317,10 @@ class _HomeScreenState extends State<HomeScreen> {
           await users.doc(currentUser!.uid).update({
             "interested": _newInterestedList,
           }).then((value) {
-            setState(() {
-              _interestedList = _newInterestedList;
-            });
+            getTimeLine();
+            // setState(() {
+            //   _interestedList = _newInterestedList;
+            // });
           });
         } else {
           var snackBar = SnackBar(

@@ -55,6 +55,9 @@ class _PostCardState extends State<PostCard> {
   // saved posts
   CollectionReference savedPosts =
       FirebaseFirestore.instance.collection("savedPosts");
+  // Post collection
+  CollectionReference usersPosts =
+      FirebaseFirestore.instance.collection("usersPosts");
 
   ScreenshotController screenshotController = ScreenshotController();
   bool? liked;
@@ -62,37 +65,60 @@ class _PostCardState extends State<PostCard> {
   // bool? saved;
   int likesCounter = 0;
   List likeList = [];
+  int? commentsNum;
 
   List commentList = [];
 
   bool? _saved;
   List? _savedList;
+  bool loaded = false;
   final DateFormat formatter = DateFormat('yyyy-MM-dd');
 
   @override
   void initState() {
     super.initState();
+    // getLikeCommentData();
+
+    // setState(() {
+    //   likeList = widget.likes;
+    //   liked = widget.likes.contains(currentUser!.uid);
+    // });
+  }
+
+  void getLikeCommentData() async {
+    Stream<DocumentSnapshot> likeListen = posts.doc(widget.postId).snapshots();
+    likeListen.listen((snapshot) {});
   }
 
   // gettting like
-  void _handlePostLike() {
+  _handlePostLike() async {
     bool _liked = likeList.contains(currentUser!.uid);
     if (_liked) {
       likeList.remove(currentUser!.uid);
+      // posts.doc(widget.postId).update({"likes": likeList});
       setState(() {
         likesCounter -= 1;
         liked = false;
       });
-      posts.doc(widget.postId).update({"likes": likeList});
+      await usersPosts
+          .doc(widget.ownerId)
+          .collection("userPost")
+          .doc(widget.postId)
+          .update({"likes": likeList});
     }
-    if (!_liked) {
+    if (_liked) {
       likeList.add(currentUser!.uid);
 
       setState(() {
         likesCounter += 1;
         liked = true;
       });
-      posts.doc(widget.postId).update({"likes": likeList});
+      // posts.doc(widget.postId).update({"likes": likeList});
+      usersPosts
+          .doc(widget.ownerId)
+          .collection("userPost")
+          .doc(widget.postId)
+          .update({"likes": likeList});
     }
   }
 
@@ -103,6 +129,7 @@ class _PostCardState extends State<PostCard> {
         vertical: 10,
         horizontal: 10,
       ),
+      decoration: _cardDecoration(),
       child: GestureDetector(
         onTap: () {
           Navigator.push(
@@ -141,19 +168,36 @@ class _PostCardState extends State<PostCard> {
     );
   }
 
-  // // Load Screen ---------------------------------------------
-  // Widget _loadingScreen() {
+  // Load Screen ---------------------------------------------
+  // Load Screen ---------------------------------------------
+  // Widget _searching() {
   //   return Container(
-  //     height: MediaQuery.of(context).size.height * 0.4,
   //     margin: EdgeInsets.symmetric(
   //       vertical: 10,
   //       horizontal: 10,
   //     ),
-  //     decoration: _cardDecoration(),
-  //     child: Center(
-  //       child: CircularProgressIndicator(
-  //         color: Theme.of(context).primaryColor,
-  //       ),
+  //     // decoration: _cardDecoration(),
+  //     padding: const EdgeInsets.symmetric(vertical: 20),
+  //     child: Column(
+  //       mainAxisAlignment: MainAxisAlignment.center,
+  //       children: [
+  //         Container(
+  //             height: MediaQuery.of(context).size.height * 0.10,
+  //             decoration: BoxDecoration(
+  //               image: DecorationImage(
+  //                   image: AssetImage("assets/images/svgs/post.png")),
+  //             )),
+  //         SizedBox(
+  //           height: 5,
+  //         ),
+  //         Container(
+  //           width: MediaQuery.of(context).size.width * 0.20,
+  //           child: LinearProgressIndicator(
+  //             color: Theme.of(context).primaryColor,
+  //             minHeight: 2,
+  //           ),
+  //         )
+  //       ],
   //     ),
   //   );
   // }
@@ -322,17 +366,6 @@ class _PostCardState extends State<PostCard> {
     );
   }
 
-  // bodyText is Here -----------------------------------------------------
-  // Widget _bodyText() {
-  //   return Text(
-  //     widget.body,
-  //     maxLines: 6,
-  //     textAlign: TextAlign.start,
-  //     overflow: TextOverflow.ellipsis,
-  //     style: Theme.of(context).textTheme.bodyText1,
-  //   );
-  // }
-
   // Third Part
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   // ActionBar goes here -------------------------------------------
@@ -360,93 +393,63 @@ class _PostCardState extends State<PostCard> {
   // LikeButton goes here -------------------------------------------
   Widget _likeButton() {
     return StreamBuilder<DocumentSnapshot>(
-      stream: posts.doc(widget.postId).snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          likeList = snapshot.data!['likes'];
-          liked = likeList.contains(currentUser!.uid);
+        stream: posts.doc(widget.postId).snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            likeList = snapshot.data!['likes'];
+            liked = likeList.contains(currentUser!.uid);
 
-          likesCounter = likeList.length;
-          return GestureDetector(
-            onTap: _handlePostLike,
-            child: Container(
-              padding: EdgeInsets.all(5),
-              decoration: _buttonDecorations(),
-              child: Column(
-                children: [
-                  _buttonsIcon(
-                      liked! ? Icons.favorite : Icons.favorite_outline),
-                  Text(
-                    NumberFormat.compact().format(likesCounter).toString(),
-                    style: Theme.of(context).textTheme.bodyText2,
-                  )
-                ],
-              ),
-            ),
-          );
-        }
-        return Container();
-      },
-    );
-  }
-
-  Widget _commentButton() {
-    return StreamBuilder<QuerySnapshot>(
-      stream:
-          comments.doc(widget.postId).collection("postComments").snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          commentList = snapshot.data!.docs.toList();
-          return GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CommentScreen(
-                    postId: widget.postId,
-                  ),
-                ),
-              );
-            },
-            child: Container(
-              padding: EdgeInsets.all(5),
-              decoration: _buttonDecorations(),
-              child: Column(
-                children: [
-                  _buttonsIcon(
-                    Icons.chat_bubble_outline,
-                  ),
-                  Text(
-                    NumberFormat.compact()
-                        .format(commentList.length)
-                        .toString(),
-                    style: Theme.of(context).textTheme.bodyText2,
-                  )
-                ],
-              ),
-            ),
-          );
-        }
-        return GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => CommentScreen(
-                  postId: widget.postId,
+            likesCounter = likeList.length;
+            return GestureDetector(
+              onTap: _handlePostLike,
+              child: Container(
+                padding: EdgeInsets.all(5),
+                decoration: _buttonDecorations(),
+                child: Column(
+                  children: [
+                    _buttonsIcon(
+                        liked! ? Icons.favorite : Icons.favorite_outline),
+                    Text(
+                      NumberFormat.compact().format(likesCounter).toString(),
+                      style: Theme.of(context).textTheme.bodyText2,
+                    )
+                  ],
                 ),
               ),
             );
-          },
-          child: Container(
-            padding: EdgeInsets.all(5),
-            decoration: _buttonDecorations(),
-            child: _buttonsIcon(
-              Icons.chat_bubble_outline,
+          }
+
+          return Container();
+        });
+  }
+
+  Widget _commentButton() {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CommentScreen(
+              postId: widget.postId,
             ),
           ),
         );
       },
+      child: Container(
+        padding: EdgeInsets.all(5),
+        decoration: _buttonDecorations(),
+        child: Column(
+          children: [
+            _buttonsIcon(
+              Icons.chat_bubble_outline,
+            ),
+            // Text(
+            //   NumberFormat.compact().format(commentsNum).toString(),
+            //   style: Theme.of(context).textTheme.bodyText2,
+            // )
+          ],
+        ),
+      ),
     );
   }
 
@@ -477,21 +480,8 @@ class _PostCardState extends State<PostCard> {
     await Share.shareFiles([image.path], text: text);
   }
 
-  // _saveScreenshot(Uint8List bytes) async {
-  //   await [Permission.storage].request();
-
-  //   var imageName = uid.v4();
-  //   final result = await ImageGallerySaver.saveImage(bytes, name: imageName);
-
-  //   return result['filePath'];
-  // }
-
   // CommentButton goes here -------------------------------------------
   Widget _saveButton() {
-    // if (saved == null) {
-    //   return Container();
-    // }
-
     return StreamBuilder<DocumentSnapshot>(
         stream: users.doc(currentUser!.uid).snapshots(),
         builder: (context, snapshot) {
