@@ -145,10 +145,6 @@ class _UpdatePostScreenState extends State<UpdatePostScreen> {
   BoxDecoration _formBackDecoration() {
     return BoxDecoration(
       color: Theme.of(context).cardColor,
-      borderRadius: BorderRadius.only(
-        topLeft: Radius.circular(25),
-        topRight: Radius.circular(25),
-      ),
       boxShadow: [
         BoxShadow(
           color: Theme.of(context).primaryColor.withOpacity(0.40),
@@ -208,7 +204,7 @@ class _UpdatePostScreenState extends State<UpdatePostScreen> {
         ),
         RichText(
           text: TextSpan(
-            text: "Select category",
+            text: "Select Post category",
             style: Theme.of(context).textTheme.bodyText1,
             children: <TextSpan>[],
           ),
@@ -300,7 +296,7 @@ class _UpdatePostScreenState extends State<UpdatePostScreen> {
   BoxDecoration _cardDecoration() {
     return BoxDecoration(
       color: Theme.of(context).cardColor,
-      borderRadius: BorderRadius.circular(25),
+      borderRadius: BorderRadius.circular(15),
       boxShadow: [
         BoxShadow(
           color: Theme.of(context).primaryColor.withOpacity(0.40),

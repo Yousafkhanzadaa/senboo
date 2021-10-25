@@ -1,3 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -14,6 +17,12 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
   bool agreed = false;
 
   @override
+  void initState() {
+    super.initState();
+    // setupInteractedMessage();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
@@ -27,10 +36,6 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
         padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(25),
-            topRight: Radius.circular(25),
-          ),
           boxShadow: [
             BoxShadow(
               color: Theme.of(context).primaryColor.withOpacity(0.40),
@@ -184,7 +189,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
   BoxDecoration _cardDecoration() {
     return BoxDecoration(
       color: Theme.of(context).cardColor,
-      borderRadius: BorderRadius.circular(25),
+      borderRadius: BorderRadius.circular(15),
       boxShadow: [
         BoxShadow(
           color: Theme.of(context).primaryColor.withOpacity(0.40),

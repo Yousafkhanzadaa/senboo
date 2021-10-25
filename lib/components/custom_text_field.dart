@@ -30,17 +30,17 @@ class _CustomTextFieldState extends State<CustomTextField> {
       // autovalidateMode: AutovalidateMode.always,
       decoration: InputDecoration(
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(widget.maxLines! > 1 ? 25 : 35),
+          borderRadius: BorderRadius.circular(widget.maxLines! > 1 ? 15 : 35),
           borderSide:
               BorderSide(color: Theme.of(context).primaryColor, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(widget.maxLines! > 1 ? 25 : 35),
+          borderRadius: BorderRadius.circular(widget.maxLines! > 1 ? 15 : 35),
           borderSide:
               BorderSide(color: Theme.of(context).primaryColor, width: 1),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(widget.maxLines! > 1 ? 25 : 35),
+          borderRadius: BorderRadius.circular(widget.maxLines! > 1 ? 15 : 35),
           borderSide:
               BorderSide(color: Theme.of(context).primaryColor, width: 1),
         ),

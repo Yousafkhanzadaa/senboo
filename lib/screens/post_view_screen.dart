@@ -5,8 +5,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
+import 'package:senboo/model/get_user_data.dart';
 import 'package:senboo/screens/comment_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:senboo/screens/visitor_screen.dart';
@@ -14,27 +16,10 @@ import 'package:share_plus/share_plus.dart';
 
 class PostViewScreen extends StatefulWidget {
   PostViewScreen(
-      {Key? key,
-      required this.userName,
-      required this.profession,
-      required this.title,
-      required this.body,
-      required this.date,
-      required this.category,
-      required this.postId,
-      required this.ownerId,
-      required this.photoUrl,
-      this.reverse})
+      {Key? key, required this.postId, required this.ownerId, this.reverse})
       : super(key: key);
-  final String userName;
-  final String profession;
-  final String title;
-  final String body;
-  final DateTime date;
-  final List category;
   final String postId;
   final String ownerId;
-  final String photoUrl;
   final int? reverse;
 
   @override
@@ -50,8 +35,10 @@ class _PostViewScreenState extends State<PostViewScreen> {
       FirebaseFirestore.instance.collection("users"); // saved posts
   CollectionReference savedPosts =
       FirebaseFirestore.instance.collection("savedPosts");
-  //comments
+  // Feeds
+  CollectionReference feeds = FirebaseFirestore.instance.collection("feeds");
 
+  //comments
   CollectionReference comments =
       FirebaseFirestore.instance.collection('comments');
   ScreenshotController screenshotController = ScreenshotController();
@@ -59,14 +46,42 @@ class _PostViewScreenState extends State<PostViewScreen> {
   bool? _saved;
   List? _savedList;
   int likesCounter = 0;
+  bool loaded = false;
   List likeList = [];
   List saveList = [];
   List commentList = [];
+  PostData? postData;
   final DateFormat formatter = DateFormat('yyyy-MM-dd');
+
+  Map currentUserInfo = {
+    'currentUserName': "Someone",
+    'currentUserPhotoUrl': "null",
+  };
 
   @override
   void initState() {
     super.initState();
+    _getPostDetails();
+  }
+
+  // Getting postDetails
+  _getPostDetails() {
+    posts.doc(widget.postId).get().then((snapshot) async {
+      var getUserInfo = await users.doc(currentUser!.uid).get();
+      var getCommentsList =
+          await comments.doc(widget.postId).collection("postComments").get();
+      setState(() {
+        _savedList = getUserInfo.get("savedPosts");
+        commentList = getCommentsList.docs;
+        currentUserInfo['currentUserName'] = getUserInfo.get('userName');
+        currentUserInfo['currentUserPhotoUrl'] = getUserInfo.get('photoUrl');
+
+        _saved = _savedList!.contains(widget.postId);
+        postData = PostData.setData(snapshot);
+        likeList = postData!.likes!;
+        loaded = true;
+      });
+    });
   }
 
   // gettting like
@@ -78,7 +93,9 @@ class _PostViewScreenState extends State<PostViewScreen> {
         likesCounter -= 1;
         liked = false;
       });
-      posts.doc(widget.postId).update({"likes": likeList});
+      posts.doc(widget.postId).update({"likes": likeList}).then((value) {
+        _removeFeedItem();
+      });
     }
     if (!_liked) {
       likeList.add(currentUser!.uid);
@@ -87,8 +104,37 @@ class _PostViewScreenState extends State<PostViewScreen> {
         likesCounter += 1;
         liked = true;
       });
-      posts.doc(widget.postId).update({"likes": likeList});
+      posts.doc(widget.postId).update({"likes": likeList}).then((value) {
+        _addFeedItem();
+      });
     }
+  }
+
+  _addFeedItem() {
+    if (currentUser!.uid != widget.ownerId) {
+      feeds.doc(widget.ownerId).collection("feedItems").doc(widget.postId).set({
+        "type": "like",
+        "userName": currentUserInfo['currentUserName'],
+        "userId": currentUser!.uid,
+        "ownerId": widget.ownerId,
+        "postId": widget.postId,
+        "timeStamp": DateTime.now(),
+        "photoUrl": currentUserInfo['currentUserPhotoUrl'],
+      });
+    }
+  }
+
+  _removeFeedItem() {
+    feeds
+        .doc(widget.ownerId)
+        .collection("feedItems")
+        .doc(widget.postId)
+        .get()
+        .then((snapshot) {
+      if (snapshot.exists) {
+        snapshot.reference.delete();
+      }
+    });
   }
 
   @override
@@ -101,18 +147,53 @@ class _PostViewScreenState extends State<PostViewScreen> {
           elevation: 0,
           backgroundColor: Theme.of(context).primaryColor,
         ),
-        body: Container(
-          // decoration: _cardDecoration(),
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          child: Column(
-            children: [
-              _headingBox(),
-              _bodyBox(),
-              _actionBar(),
-            ],
+        body: !loaded
+            ? _searching()
+            : Container(
+                // decoration: _cardDecoration(),
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                child: Column(
+                  children: [
+                    _headingBox(),
+                    _bodyBox(),
+                    _actionBar(),
+                  ],
+                ),
+              ),
+      ),
+    );
+  }
+
+  // Load Screen ---------------------------------------------
+  Widget _searching() {
+    return Container(
+      margin: EdgeInsets.symmetric(
+        vertical: 10,
+        horizontal: 10,
+      ),
+      // decoration: _cardDecoration(),
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+              height: MediaQuery.of(context).size.height * 0.20,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage("assets/images/svgs/post.png")),
+              )),
+          SizedBox(
+            height: 5,
           ),
-        ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 9.0, horizontal: 60),
+            child: LinearProgressIndicator(
+              color: Theme.of(context).primaryColor,
+              minHeight: 2,
+            ),
+          )
+        ],
       ),
     );
   }
@@ -133,7 +214,7 @@ class _PostViewScreenState extends State<PostViewScreen> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _profilePic(widget.photoUrl),
+              _profilePic(postData!.photoUrl!),
               SizedBox(
                 width: 5,
               ),
@@ -189,13 +270,13 @@ class _PostViewScreenState extends State<PostViewScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          widget.userName,
+          postData!.userName!,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: Theme.of(context).textTheme.headline1,
         ),
         Text(
-          widget.profession,
+          postData!.profession!,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: Theme.of(context).textTheme.subtitle2,
@@ -218,7 +299,7 @@ class _PostViewScreenState extends State<PostViewScreen> {
         //   width: 5,
         // ),
         Text(
-          formatter.format(widget.date),
+          formatter.format(postData!.date!.toDate()),
           style: Theme.of(context).textTheme.subtitle2,
         ),
       ],
@@ -228,7 +309,7 @@ class _PostViewScreenState extends State<PostViewScreen> {
   // Category Text under TimerText here ----------------------------------
   Widget _categoryText() {
     return Text(
-      "${widget.category.join(", ").toUpperCase()}",
+      "${postData!.category!.join(", ").toUpperCase()}",
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
       style: Theme.of(context).textTheme.subtitle2,
@@ -264,9 +345,10 @@ class _PostViewScreenState extends State<PostViewScreen> {
     return Container(
       width: MediaQuery.of(context).size.width,
       child: Text(
-        widget.title,
-        textAlign:
-            widget.category.contains("Urdu") ? TextAlign.end : TextAlign.start,
+        postData!.title!,
+        textAlign: postData!.category!.contains("Urdu")
+            ? TextAlign.end
+            : TextAlign.start,
         style: Theme.of(context).textTheme.headline3,
       ),
     );
@@ -277,9 +359,10 @@ class _PostViewScreenState extends State<PostViewScreen> {
     return Container(
       width: MediaQuery.of(context).size.width,
       child: Text(
-        widget.body,
-        textAlign:
-            widget.category.contains("Urdu") ? TextAlign.end : TextAlign.start,
+        postData!.body!,
+        textAlign: postData!.category!.contains("Urdu")
+            ? TextAlign.end
+            : TextAlign.start,
         style: Theme.of(context).textTheme.bodyText1,
       ),
     );
@@ -310,137 +393,91 @@ class _PostViewScreenState extends State<PostViewScreen> {
 
   // LikeButton goes here -------------------------------------------
   Widget _likeButton() {
-    return StreamBuilder<DocumentSnapshot>(
-      stream: posts.doc(widget.postId).snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          likeList = snapshot.data!['likes'];
-          liked = likeList.contains(currentUser!.uid);
-          likesCounter = likeList.length;
-          return GestureDetector(
-            onTap: _handlePostLike,
-            child: Container(
-              padding: EdgeInsets.all(5),
-              decoration: _buttonDecorations(),
-              child: Column(
-                children: [
-                  _buttonsIcon(
-                      liked! ? Icons.favorite : Icons.favorite_outline),
-                  Text(
-                    NumberFormat.compact().format(likesCounter).toString(),
-                    style: Theme.of(context).textTheme.bodyText2,
-                  )
-                ],
-              ),
-            ),
-          );
-        }
-        return Container();
-      },
+    liked = likeList.contains(currentUser!.uid);
+    likesCounter = likeList.length;
+    return GestureDetector(
+      onTap: _handlePostLike,
+      child: Container(
+        padding: EdgeInsets.all(5),
+        decoration: _buttonDecorations(),
+        child: Column(
+          children: [
+            _buttonsIcon(liked! ? Icons.favorite : Icons.favorite_outline),
+            Text(
+              NumberFormat.compact().format(likesCounter).toString(),
+              style: Theme.of(context).textTheme.bodyText2,
+            )
+          ],
+        ),
+      ),
     );
   }
 
   // CommentButton goes here -------------------------------------------
   Widget _commentButton() {
-    return StreamBuilder<QuerySnapshot>(
-      stream:
-          comments.doc(widget.postId).collection("postComments").snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          commentList = snapshot.data!.docs.toList();
-          return GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CommentScreen(
-                    postId: widget.postId,
-                  ),
-                ),
-              );
-            },
-            child: Container(
-              padding: EdgeInsets.all(5),
-              decoration: _buttonDecorations(),
-              child: Column(
-                children: [
-                  _buttonsIcon(
-                    Icons.chat_bubble_outline,
-                  ),
-                  Text(
-                    NumberFormat.compact()
-                        .format(commentList.length)
-                        .toString(),
-                    style: Theme.of(context).textTheme.bodyText2,
-                  )
-                ],
-              ),
-            ),
-          );
-        }
-        return GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => CommentScreen(
-                  postId: widget.postId,
-                ),
-              ),
-            );
-          },
-          child: Container(
-            padding: EdgeInsets.all(5),
-            decoration: _buttonDecorations(),
-            child: _buttonsIcon(
-              Icons.chat_bubble_outline,
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CommentScreen(
+              postId: widget.postId,
+              ownerId: widget.ownerId,
             ),
           ),
         );
       },
+      child: Container(
+        padding: EdgeInsets.all(5),
+        decoration: _buttonDecorations(),
+        child: Column(
+          children: [
+            _buttonsIcon(
+              FontAwesomeIcons.comment,
+            ),
+            Text(
+              NumberFormat.compact().format(commentList.length).toString(),
+              style: Theme.of(context).textTheme.bodyText2,
+            )
+          ],
+        ),
+      ),
     );
+  }
+
+  _handleSavePost() async {
+    if (_saved!) {
+      _savedList!.remove(widget.postId);
+      await users
+          .doc(currentUser!.uid)
+          .update({"savedPosts": _savedList}).then((value) {
+        setState(() {
+          _saved = !_saved!;
+        });
+      });
+    } else if (!_saved!) {
+      _savedList!.add(widget.postId);
+      await users
+          .doc(currentUser!.uid)
+          .update({"savedPosts": _savedList}).then((value) {
+        setState(() {
+          _saved = !_saved!;
+        });
+      });
+    }
   }
 
   // CommentButton goes here -------------------------------------------
   Widget _saveButton() {
-    return StreamBuilder<DocumentSnapshot>(
-        stream: users.doc(currentUser!.uid).snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            _savedList = snapshot.data!['savedPosts'];
-            _saved = _savedList!.contains(widget.postId);
-            return GestureDetector(
-              onTap: () async {
-                // _handlePostSave(saved!);
-
-                if (_saved!) {
-                  _savedList!.remove(widget.postId);
-                  await users
-                      .doc(currentUser!.uid)
-                      .update({"savedPosts": _savedList});
-                } else if (!_saved!) {
-                  _savedList!.add(widget.postId);
-                  await users
-                      .doc(currentUser!.uid)
-                      .update({"savedPosts": _savedList});
-                }
-              },
-              child: Container(
-                padding: EdgeInsets.all(5),
-                decoration: _buttonDecorations(),
-                child: _buttonsIcon(_saved!
-                    ? Icons.bookmark_added
-                    : Icons.bookmark_add_outlined),
-              ),
-            );
-          }
-          return Container(
-              padding: EdgeInsets.all(5),
-              decoration: _buttonDecorations(),
-              child: _buttonsIcon(
-                Icons.bookmark_outline,
-              ));
-        });
+    return GestureDetector(
+      onTap: _handleSavePost,
+      child: Container(
+        padding: EdgeInsets.all(5),
+        decoration: _buttonDecorations(),
+        child: _buttonsIcon(
+            _saved! ? Icons.bookmark_added : Icons.bookmark_add_outlined),
+      ),
+    );
   }
 
   // CommentButton goes here -------------------------------------------
@@ -491,10 +528,10 @@ class _PostViewScreenState extends State<PostViewScreen> {
       // border: Border.all(color: Theme.of(context).primaryColor, width: 1),
       boxShadow: [
         BoxShadow(
-          color: Theme.of(context).primaryColor.withOpacity(0.20),
+          color: Theme.of(context).shadowColor,
           blurRadius: 3,
           offset: Offset(0, 0),
-          spreadRadius: 1,
+          // spreadRadius: 1,
         ),
       ],
     );

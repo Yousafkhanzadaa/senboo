@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:senboo/screens/visitor_screen.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -22,7 +24,8 @@ class CommentCard extends StatefulWidget {
 }
 
 class _CommentCardState extends State<CommentCard> {
-  bool liked = false;
+  // bool liked = false;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -44,10 +47,10 @@ class _CommentCardState extends State<CommentCard> {
   BoxDecoration _cardDecoration() {
     return BoxDecoration(
       color: Theme.of(context).cardColor,
-      borderRadius: BorderRadius.circular(25),
+      borderRadius: BorderRadius.circular(15),
       boxShadow: [
         BoxShadow(
-          color: Theme.of(context).primaryColor.withOpacity(0.30),
+          color: Theme.of(context).shadowColor,
           blurRadius: 3,
           offset: Offset(0, 0),
           // spreadRadius: 1,
@@ -65,18 +68,18 @@ class _CommentCardState extends State<CommentCard> {
       decoration: BoxDecoration(
         color: Theme.of(context).primaryColor,
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(25),
-          topRight: Radius.circular(25),
+          topLeft: Radius.circular(15),
+          topRight: Radius.circular(15),
         ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _timeAgo(),
+          _userNameHeading(),
           SizedBox(
             height: 5,
           ),
-          _userNameHeading(),
+          _timeAgo(),
         ],
       ),
     );

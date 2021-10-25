@@ -51,14 +51,7 @@ class _SearchCardState extends State<SearchCard> {
           context,
           MaterialPageRoute(
             builder: (context) => PostViewScreen(
-              userName: widget.userName,
-              profession: widget.profession,
-              title: widget.title,
-              body: widget.body,
-              date: widget.date,
-              category: widget.category,
               postId: widget.postId,
-              photoUrl: widget.photoUrl,
               ownerId: widget.ownerId,
               reverse: 1,
             ),
@@ -87,10 +80,10 @@ class _SearchCardState extends State<SearchCard> {
   BoxDecoration _cardDecoration() {
     return BoxDecoration(
       color: Theme.of(context).cardColor,
-      borderRadius: BorderRadius.circular(25),
+      borderRadius: BorderRadius.circular(15),
       boxShadow: [
         BoxShadow(
-          color: Theme.of(context).primaryColor.withOpacity(0.40),
+          color: Theme.of(context).shadowColor,
           blurRadius: 3,
           offset: Offset(0, 0),
         ),
@@ -110,8 +103,8 @@ class _SearchCardState extends State<SearchCard> {
       decoration: BoxDecoration(
         color: Theme.of(context).primaryColor,
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(25),
-          topRight: Radius.circular(25),
+          topLeft: Radius.circular(15),
+          topRight: Radius.circular(15),
         ),
       ),
       child: Column(

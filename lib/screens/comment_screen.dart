@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:senboo/components/comment_card.dart';
 import 'package:senboo/components/custom_text_field.dart';
 import 'package:intl/intl.dart';
@@ -10,9 +11,11 @@ class CommentScreen extends StatefulWidget {
   CommentScreen({
     Key? key,
     required this.postId,
+    required this.ownerId,
   }) : super(key: key);
 
   final String postId;
+  final String ownerId;
 
   @override
   _CommentScreenState createState() => _CommentScreenState();
@@ -36,10 +39,50 @@ class _CommentScreenState extends State<CommentScreen> {
 
   Map commentMap = {
     "userName": "userName",
+    'currentUserPhotoUrl': "null",
     "profession": "profession",
     "title": "title",
     "date": null,
   };
+  bool loaded = false;
+  // Feeds
+  CollectionReference feeds = FirebaseFirestore.instance.collection("feeds");
+
+  @override
+  void initState() {
+    super.initState();
+    _getPostDetails();
+  }
+
+  // Getting postDetails
+  _getPostDetails() {
+    users.doc(currentUser!.uid).get().then((snapshot) async {
+      var currentPost = await posts.doc(widget.postId).get();
+      setState(() {
+        commentMap['userName'] = snapshot.get('userName');
+        commentMap['profession'] = snapshot.get('profession');
+        commentMap['currentUserPhotoUrl'] = snapshot.get('photoUrl');
+
+        commentMap['title'] = currentPost.get('title');
+        commentMap['date'] = currentPost.get('date');
+        loaded = true;
+      });
+    });
+  }
+
+  _addFeedItem() {
+    if (currentUser!.uid != widget.ownerId) {
+      feeds.doc(widget.ownerId).collection("feedItems").doc(widget.postId).set({
+        "type": "comment",
+        "userName": commentMap['userName'],
+        "userId": currentUser!.uid,
+        "postId": widget.postId,
+        "ownerId": widget.ownerId,
+        "timeStamp": DateTime.now(),
+        "photoUrl": commentMap['currentUserPhotoUrl'],
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,13 +92,9 @@ class _CommentScreenState extends State<CommentScreen> {
         iconTheme: IconThemeData(color: Colors.white),
         backgroundColor: Theme.of(context).primaryColor,
       ),
-      body: StreamBuilder<DocumentSnapshot>(
-        stream: posts.doc(widget.postId).snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            commentMap['title'] = snapshot.data!['title'];
-            commentMap['date'] = snapshot.data!['date'].toDate();
-            return Container(
+      body: !loaded
+          ? _loadingComments()
+          : Container(
               height: MediaQuery.of(context).size.height,
               width: MediaQuery.of(context).size.width,
               child: Column(
@@ -65,11 +104,7 @@ class _CommentScreenState extends State<CommentScreen> {
                   _writeComment(),
                 ],
               ),
-            );
-          }
-          return Container();
-        },
-      ),
+            ),
     );
   }
 
@@ -236,45 +271,35 @@ class _CommentScreenState extends State<CommentScreen> {
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   Widget _sendButton() {
     dateTime = DateTime.now();
-    return StreamBuilder<DocumentSnapshot>(
-        stream: users.doc(currentUser!.uid).snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            commentMap['userName'] = snapshot.data!.get("userName");
-            commentMap['profession'] = snapshot.data!.get("profession");
-            return GestureDetector(
-              onTap: () {
-                if (_commentTextContaller.text.isNotEmpty) {
-                  addComment(
-                    postId: widget.postId,
-                    userName: commentMap['userName'],
-                    profession: commentMap['profession'],
-                    comment: _commentTextContaller.text,
-                    date: dateTime!,
-                  );
-                  setState(() {
-                    _commentTextContaller.clear();
-                  });
-                }
-              },
-              child: Container(
-                padding: EdgeInsets.all(10),
-                decoration: _buttonDecorations(),
-                child: _buttonsIcon(
-                  Icons.send_outlined,
-                ),
-              ),
-            );
-          }
-          return Container(
-              padding: EdgeInsets.all(10),
-              decoration: _buttonDecorations(),
-              child: Center(
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                ),
-              ));
-        });
+
+    return GestureDetector(
+      onTap: () {
+        if (_commentTextContaller.text.isNotEmpty) {
+          addComment(
+            postId: widget.postId,
+            userName: commentMap['userName'],
+            profession: commentMap['profession'],
+            comment: _commentTextContaller.text,
+            date: dateTime!,
+          ).then((value) {
+            _addFeedItem();
+            setState(() {
+              _commentTextContaller.clear();
+            });
+          });
+        }
+      },
+      child: Container(
+        padding: EdgeInsets.all(15),
+        decoration: _buttonDecorations(),
+        alignment: Alignment.center,
+        child: Center(
+          child: _buttonsIcon(
+            FontAwesomeIcons.paperPlane,
+          ),
+        ),
+      ),
+    );
   }
 
   // Adding Comments ==================================================
@@ -319,7 +344,7 @@ class _CommentScreenState extends State<CommentScreen> {
   Widget _buttonsIcon(IconData icon) {
     return Icon(
       icon,
-      size: 26,
+      size: 20,
       color: Colors.white,
     );
   }

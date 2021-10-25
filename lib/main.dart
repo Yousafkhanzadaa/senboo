@@ -1,13 +1,22 @@
+// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:senboo/providers/color_provider.dart';
 import 'package:senboo/initial.dart';
+import 'package:senboo/providers/notiry_provider.dart';
 import 'package:senboo/services/firebase_auth_services.dart';
 
-void main() {
+// import 'dart:async';
+// import 'dart:io';
+// import 'package:firebase_messaging/firebase_messaging.dart';
+
+// import 'package:cloud_firestore/cloud_firestore.dart';
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.light));
@@ -20,7 +29,7 @@ class Senboo extends StatefulWidget {
 }
 
 class _SenbooState extends State<Senboo> {
-  final Future<FirebaseApp> _initialization = Firebase.initializeApp();
+  final golbalKey = GlobalKey<ScaffoldMessengerState>();
 
   @override
   Widget build(BuildContext context) {
@@ -28,32 +37,18 @@ class _SenbooState extends State<Senboo> {
   }
 
   // App initializer ------------------------------------------
-  FutureBuilder _buildScreen() {
-    return FutureBuilder(
-      future: _initialization,
-      builder: (context, snapshot) {
-        // _inOut();
-        // error screen -------------------------------------
-        if (snapshot.hasError) {
-          return _errorScreen();
-        }
-
-        //initialization done-----------------------------------
-        if (snapshot.connectionState == ConnectionState.done) {
-          return MultiProvider(providers: [
-            ChangeNotifierProvider<ColorProvider>(
-              create: (_) => ColorProvider(),
-            ),
-            ChangeNotifierProvider<FirebaseAuthServices>(
-              create: (_) => FirebaseAuthServices(),
-            ),
-          ], child: InitialService());
-        }
-
-        // loading -----------------------------------
-        return _loadingScreen();
-      },
-    );
+  _buildScreen() {
+    return MultiProvider(providers: [
+      ChangeNotifierProvider<ColorProvider>(
+        create: (_) => ColorProvider(),
+      ),
+      ChangeNotifierProvider<FirebaseAuthServices>(
+        create: (_) => FirebaseAuthServices(),
+      ),
+      ChangeNotifierProvider<NotifyProvider>(
+        create: (_) => NotifyProvider(),
+      ),
+    ], child: InitialService());
   }
 
   // Error Screen ----------------------------------------------------

@@ -155,17 +155,6 @@ class _SearchScreenState extends State<SearchScreen> {
               image: DecorationImage(
                   image: AssetImage("assets/images/svgs/search.png")),
             )),
-        Center(
-          child: Text(
-            "Search",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Theme.of(context).primaryColor,
-              fontSize: 26,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
       ],
     );
   }

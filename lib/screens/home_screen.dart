@@ -21,6 +21,8 @@ class _HomeScreenState extends State<HomeScreen> {
   PostData? postData;
   bool gotList = false;
   int limit = 100;
+  List postsList = [];
+  bool loaded = false;
 
   final List<String> _fieldButtonNames = [
     "Quote",
@@ -41,25 +43,19 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
   List<dynamic> _interestedList = [];
   List<dynamic> _newInterestedList = [];
+
+  Map currentUserInfo = {
+    'currentUserName': null,
+    'currentUserPhotoUrl': null,
+  };
   // List interestList = [];
 
   @override
   void initState() {
     super.initState();
 
-    getInterested();
-  }
-
-  getInterested() {
-    users.doc(currentUser!.uid).get().then((snapshot) {
-      // EditListController editListController =
-      //     Provider.of<EditListController>(context, listen: false);
-
-      setState(() {
-        _interestedList = snapshot['interested'];
-        gotList = true;
-      });
-    });
+    // getInterested();
+    getTimeLine();
   }
 
   Widget showAd(bool show) {
@@ -70,72 +66,88 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<dynamic> getTimeLine() async {
+    // List iList = [];
+    setState(() {
+      loaded = false;
+    });
+    users.doc(currentUser!.uid).get().then((userSnapshot) {
+      // EditListController editListController =
+      //     Provider.of<EditListController>(context, listen: false);
+
+      _interestedList = userSnapshot.get('interested');
+
+      if (_interestedList.isNotEmpty) {
+        posts
+            .where(
+              "category",
+              arrayContainsAny: _interestedList,
+            )
+            .orderBy('date', descending: true)
+            .limit(35)
+            .get()
+            .then((postSnapshot) {
+          setState(() {
+            postsList = postSnapshot.docs;
+            currentUserInfo['currentUserName'] = userSnapshot.get('userName');
+            currentUserInfo['currentUserPhotoUrl'] =
+                userSnapshot.get('photoUrl');
+            loaded = true;
+          });
+        });
+      } else {
+        setState(() {
+          _interestedList = userSnapshot.get('interested');
+          loaded = true;
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (gotList) {
-      return _interestedList.isEmpty
-          ? _editPro()
-          : StreamBuilder<QuerySnapshot>(
-              stream: posts
-                  .where(
-                    "category",
-                    arrayContainsAny: _interestedList,
-                  )
-                  .orderBy('date', descending: true)
-                  .limit(limit)
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return _errorScreen();
-                }
-                if (snapshot.hasData) {
-                  var postsList = snapshot.data!.docs;
-                  return postsList.isEmpty
-                      ? _noPosts()
-                      : ListView.builder(
-                          shrinkWrap: true,
-                          // scrollDirection: Axis.vertical,
-                          physics: ScrollPhysics(),
-                          addRepaintBoundaries: false,
-                          itemCount: snapshot.data!.docs.length,
-                          itemBuilder: (context, index) {
-                            var data = snapshot.data!.docs;
-                            postData = PostData.setData(data[index]);
+    if (loaded) {
+      if (_interestedList.isNotEmpty) {
+        return postsList.isEmpty
+            ? _noPosts()
+            : RefreshIndicator(
+                onRefresh: getTimeLine,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  // scrollDirection: Axis.vertical,
 
-                            return Column(
-                              children: [
-                                PostCard(
-                                  userName: postData!.userName!,
-                                  profession: postData!.profession!,
-                                  title: postData!.title!,
-                                  body: postData!.body!,
-                                  date: postData!.date!.toDate(),
-                                  category: postData!.category!,
-                                  likes: postData!.likes!,
-                                  postId: postData!.postId!,
-                                  ownerId: postData!.ownerId!,
-                                  photoUrl: postData!.photoUrl!,
-                                ),
-                                showAd(index % 3 == 0),
-                              ],
-                            );
-                            // : PostCard(
-                            //     userName: postData!.userName!,
-                            //     profession: postData!.profession!,
-                            //     title: postData!.title!,
-                            //     body: postData!.body!,
-                            //     date: postData!.date!.toDate(),
-                            //     category: postData!.category!,
-                            //     likes: postData!.likes!,
-                            //     postId: postData!.postId!,
-                            //     ownerId: postData!.ownerId!,
-                            //   );
-                          },
-                        );
-                }
-                return _searching();
-              },
-            );
+                  itemCount: postsList.length,
+                  itemBuilder: (context, index) {
+                    // var data = snapshot.data!.docs;
+                    postData = PostData.setData(postsList[index]);
+
+                    return Column(
+                      children: [
+                        PostCard(
+                          userName: postData!.userName!,
+                          profession: postData!.profession!,
+                          title: postData!.title!,
+                          body: postData!.body!,
+                          date: postData!.date!.toDate(),
+                          category: postData!.category!,
+                          likes: postData!.likes!,
+                          postId: postData!.postId!,
+                          ownerId: postData!.ownerId!,
+                          photoUrl: postData!.photoUrl!,
+                          currentUserName:
+                              currentUserInfo['currentUserName'] ?? "Someone",
+                          currentUserPhotoUrl: currentUserInfo[
+                                  'currentUserPhotoUrl'] ??
+                              "https://i.pinimg.com/originals/0c/3b/3a/0c3b3adb1a7530892e55ef36d3be6cb8.png",
+                        ),
+                        showAd(index % 3 == 0),
+                      ],
+                    );
+                  },
+                ),
+              );
+      }
+      return _editPro();
     }
     return _searching();
   }
@@ -152,22 +164,6 @@ class _HomeScreenState extends State<HomeScreen> {
     ));
   }
 
-  // Load Screen ---------------------------------------------
-  // Widget _loadingScreen() {
-  //   return Container(
-  //     height: MediaQuery.of(context).size.height * 0.4,
-  //     margin: EdgeInsets.symmetric(
-  //       vertical: 10,
-  //       horizontal: 10,
-  //     ),
-  //     decoration: _cardDecoration(),
-  //     child: Center(
-  //       child: CircularProgressIndicator(
-  //         color: Theme.of(context).primaryColor,
-  //       ),
-  //     ),
-  //   );
-  // }
   // Load Screen ---------------------------------------------
   Widget _searching() {
     return Container(
@@ -332,7 +328,7 @@ class _HomeScreenState extends State<HomeScreen> {
   BoxDecoration _cardDecoration() {
     return BoxDecoration(
       color: Theme.of(context).cardColor,
-      borderRadius: BorderRadius.circular(25),
+      borderRadius: BorderRadius.circular(15),
       boxShadow: [
         BoxShadow(
           color: Theme.of(context).primaryColor.withOpacity(0.40),

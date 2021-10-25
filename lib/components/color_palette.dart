@@ -59,8 +59,8 @@ class _ColorPaletteState extends State<ColorPalette> {
     return BoxDecoration(
       color: Theme.of(context).cardColor,
       borderRadius: BorderRadius.only(
-        topLeft: Radius.circular(25),
-        topRight: Radius.circular(25),
+        topLeft: Radius.circular(15),
+        topRight: Radius.circular(15),
       ),
       boxShadow: [
         BoxShadow(

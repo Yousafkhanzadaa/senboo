@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:senboo/screens/comment_screen.dart';
 import 'package:intl/intl.dart';
@@ -26,6 +27,8 @@ class PostCard extends StatefulWidget {
     required this.postId,
     required this.photoUrl,
     required this.ownerId,
+    required this.currentUserName,
+    required this.currentUserPhotoUrl,
   }) : super(key: key);
   final String userName;
   final String profession;
@@ -37,6 +40,8 @@ class PostCard extends StatefulWidget {
   final String postId;
   final String photoUrl;
   final String ownerId;
+  final String currentUserName;
+  final String currentUserPhotoUrl;
 
   @override
   _PostCardState createState() => _PostCardState();
@@ -49,6 +54,8 @@ class _PostCardState extends State<PostCard> {
   CollectionReference posts = FirebaseFirestore.instance.collection("posts");
   // User collection
   CollectionReference users = FirebaseFirestore.instance.collection("users");
+  // Feeds
+  CollectionReference feeds = FirebaseFirestore.instance.collection("feeds");
   //comments
   CollectionReference comments =
       FirebaseFirestore.instance.collection('comments');
@@ -62,16 +69,29 @@ class _PostCardState extends State<PostCard> {
   // bool? saved;
   int likesCounter = 0;
   List likeList = [];
+  bool loaded = false;
 
-  List commentList = [];
+  // List commentList = [];
 
   bool? _saved;
-  List? _savedList;
+  List? _savedList = [];
   final DateFormat formatter = DateFormat('yyyy-MM-dd');
 
   @override
   void initState() {
     super.initState();
+    _getPostDetails();
+  }
+
+  // getting card data
+  _getPostDetails() async {
+    var getSavedList = await users.doc(currentUser!.uid).get();
+    // var getCommentsList =
+    //     await comments.doc(widget.postId).collection("postComments").get();
+    setState(() {
+      _savedList = getSavedList.get("savedPosts");
+      _saved = _savedList!.contains(widget.postId);
+    });
   }
 
   // gettting like
@@ -83,7 +103,9 @@ class _PostCardState extends State<PostCard> {
         likesCounter -= 1;
         liked = false;
       });
-      posts.doc(widget.postId).update({"likes": likeList});
+      posts.doc(widget.postId).update({"likes": likeList}).then((value) {
+        _removeFeedItem();
+      });
     }
     if (!_liked) {
       likeList.add(currentUser!.uid);
@@ -92,8 +114,37 @@ class _PostCardState extends State<PostCard> {
         likesCounter += 1;
         liked = true;
       });
-      posts.doc(widget.postId).update({"likes": likeList});
+      posts.doc(widget.postId).update({"likes": likeList}).then((value) {
+        _addFeedItem();
+      });
     }
+  }
+
+  _addFeedItem() {
+    if (currentUser!.uid != widget.ownerId) {
+      feeds.doc(widget.ownerId).collection("feedItems").doc(widget.postId).set({
+        "type": "like",
+        "userName": widget.currentUserName,
+        "userId": currentUser!.uid,
+        "postId": widget.postId,
+        "ownerId": widget.ownerId,
+        "timeStamp": DateTime.now(),
+        "photoUrl": widget.currentUserPhotoUrl,
+      });
+    }
+  }
+
+  _removeFeedItem() {
+    feeds
+        .doc(widget.ownerId)
+        .collection("feedItems")
+        .doc(widget.postId)
+        .get()
+        .then((snapshot) {
+      if (snapshot.exists) {
+        snapshot.reference.delete();
+      }
+    });
   }
 
   @override
@@ -109,15 +160,8 @@ class _PostCardState extends State<PostCard> {
             context,
             MaterialPageRoute(
               builder: (context) => PostViewScreen(
-                userName: widget.userName,
-                profession: widget.profession,
-                title: widget.title,
-                body: widget.body,
-                date: widget.date,
-                category: widget.category,
                 postId: widget.postId,
                 ownerId: widget.ownerId,
-                photoUrl: widget.photoUrl,
                 reverse: 1,
               ),
             ),
@@ -141,31 +185,15 @@ class _PostCardState extends State<PostCard> {
     );
   }
 
-  // // Load Screen ---------------------------------------------
-  // Widget _loadingScreen() {
-  //   return Container(
-  //     height: MediaQuery.of(context).size.height * 0.4,
-  //     margin: EdgeInsets.symmetric(
-  //       vertical: 10,
-  //       horizontal: 10,
-  //     ),
-  //     decoration: _cardDecoration(),
-  //     child: Center(
-  //       child: CircularProgressIndicator(
-  //         color: Theme.of(context).primaryColor,
-  //       ),
-  //     ),
-  //   );
-  // }
-
   // CardDecoration --------------------------------------
   BoxDecoration _cardDecoration() {
     return BoxDecoration(
       color: Theme.of(context).cardColor,
-      borderRadius: BorderRadius.circular(25),
+      borderRadius: BorderRadius.circular(15),
       boxShadow: [
         BoxShadow(
-          color: Theme.of(context).primaryColor.withOpacity(0.40),
+          // color: Theme.of(context).primaryColor.withOpacity(0.40),
+          color: Theme.of(context).shadowColor,
           blurRadius: 3,
           offset: Offset(0, 0),
           // spreadRadius: 1,
@@ -198,8 +226,8 @@ class _PostCardState extends State<PostCard> {
       decoration: BoxDecoration(
         color: Theme.of(context).primaryColor,
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(25),
-          topRight: Radius.circular(25),
+          topLeft: Radius.circular(15),
+          topRight: Radius.circular(15),
         ),
       ),
       child: Column(
@@ -340,6 +368,7 @@ class _PostCardState extends State<PostCard> {
     return Container(
       padding: EdgeInsets.all(10),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           _likeButton(),
           SizedBox(
@@ -385,68 +414,35 @@ class _PostCardState extends State<PostCard> {
             ),
           );
         }
-        return Container();
+        return Container(
+          padding: EdgeInsets.all(5),
+          decoration: _buttonDecorations(),
+          child: _buttonsIcon(Icons.favorite_outline),
+        );
       },
     );
   }
 
   Widget _commentButton() {
-    return StreamBuilder<QuerySnapshot>(
-      stream:
-          comments.doc(widget.postId).collection("postComments").snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          commentList = snapshot.data!.docs.toList();
-          return GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CommentScreen(
-                    postId: widget.postId,
-                  ),
-                ),
-              );
-            },
-            child: Container(
-              padding: EdgeInsets.all(5),
-              decoration: _buttonDecorations(),
-              child: Column(
-                children: [
-                  _buttonsIcon(
-                    Icons.chat_bubble_outline,
-                  ),
-                  Text(
-                    NumberFormat.compact()
-                        .format(commentList.length)
-                        .toString(),
-                    style: Theme.of(context).textTheme.bodyText2,
-                  )
-                ],
-              ),
-            ),
-          );
-        }
-        return GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => CommentScreen(
-                  postId: widget.postId,
-                ),
-              ),
-            );
-          },
-          child: Container(
-            padding: EdgeInsets.all(5),
-            decoration: _buttonDecorations(),
-            child: _buttonsIcon(
-              Icons.chat_bubble_outline,
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CommentScreen(
+              postId: widget.postId,
+              ownerId: widget.ownerId,
             ),
           ),
         );
       },
+      child: Container(
+        padding: EdgeInsets.all(5),
+        decoration: _buttonDecorations(),
+        child: _buttonsIcon(
+          FontAwesomeIcons.comment,
+        ),
+      ),
     );
   }
 
@@ -477,60 +473,52 @@ class _PostCardState extends State<PostCard> {
     await Share.shareFiles([image.path], text: text);
   }
 
-  // _saveScreenshot(Uint8List bytes) async {
-  //   await [Permission.storage].request();
+// Save button and its functions
 
-  //   var imageName = uid.v4();
-  //   final result = await ImageGallerySaver.saveImage(bytes, name: imageName);
-
-  //   return result['filePath'];
-  // }
+  _handleSavePost() async {
+    if (_saved!) {
+      _savedList!.remove(widget.postId);
+      await users
+          .doc(currentUser!.uid)
+          .update({"savedPosts": _savedList}).then((value) {
+        setState(() {
+          _saved = !_saved!;
+        });
+      });
+    } else if (!_saved!) {
+      _savedList!.add(widget.postId);
+      await users
+          .doc(currentUser!.uid)
+          .update({"savedPosts": _savedList}).then((value) {
+        setState(() {
+          _saved = !_saved!;
+        });
+      });
+    }
+  }
 
   // CommentButton goes here -------------------------------------------
   Widget _saveButton() {
-    // if (saved == null) {
-    //   return Container();
-    // }
-
-    return StreamBuilder<DocumentSnapshot>(
-        stream: users.doc(currentUser!.uid).snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            // _saved = snapshot.data!.exists;
-            _savedList = snapshot.data!['savedPosts'];
-            _saved = _savedList!.contains(widget.postId);
-            return GestureDetector(
-              onTap: () async {
-                // _handlePostSave(saved!);
-
-                if (_saved!) {
-                  _savedList!.remove(widget.postId);
-                  await users
-                      .doc(currentUser!.uid)
-                      .update({"savedPosts": _savedList});
-                } else if (!_saved!) {
-                  _savedList!.add(widget.postId);
-                  await users
-                      .doc(currentUser!.uid)
-                      .update({"savedPosts": _savedList});
-                }
-              },
-              child: Container(
-                padding: EdgeInsets.all(5),
-                decoration: _buttonDecorations(),
-                child: _buttonsIcon(_saved!
-                    ? Icons.bookmark_added
-                    : Icons.bookmark_add_outlined),
-              ),
-            );
-          }
-          return Container(
-              padding: EdgeInsets.all(5),
-              decoration: _buttonDecorations(),
-              child: _buttonsIcon(
-                Icons.bookmark_outline,
-              ));
-        });
+    if (_saved != null) {
+      return GestureDetector(
+        onTap: _handleSavePost,
+        child: Container(
+          padding: EdgeInsets.all(5),
+          decoration: _buttonDecorations(),
+          child: _buttonsIcon(
+              _saved! ? Icons.bookmark_added : Icons.bookmark_add_outlined),
+        ),
+      );
+    } else {
+      return GestureDetector(
+        onTap: _handleSavePost,
+        child: Container(
+          padding: EdgeInsets.all(5),
+          decoration: _buttonDecorations(),
+          child: _buttonsIcon(Icons.bookmark_outline),
+        ),
+      );
+    }
   }
 
   // All Button Decoration -------------------------------
@@ -542,7 +530,8 @@ class _PostCardState extends State<PostCard> {
       // border: Border.all(color: Theme.of(context).primaryColor, width: 1),
       boxShadow: [
         BoxShadow(
-          color: Theme.of(context).primaryColor.withOpacity(0.40),
+          // color: Theme.of(context).primaryColor.withOpacity(0.40),
+          color: Theme.of(context).shadowColor,
           blurRadius: 3,
           offset: Offset(0, 0),
           // spreadRadius: 1,

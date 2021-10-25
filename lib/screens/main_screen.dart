@@ -1,12 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 // import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:senboo/components/color_palette.dart';
 import 'package:senboo/components/custom_animated_bottom_bar.dart';
+import 'package:senboo/providers/notiry_provider.dart';
 import 'package:senboo/screens/home_screen.dart';
+import 'package:senboo/screens/notivication_screen.dart';
 import 'package:senboo/screens/post_screen.dart';
 import 'package:senboo/screens/profile_screen.dart';
 import 'package:senboo/screens/search_screen.dart';
@@ -37,13 +40,36 @@ class _MainScreenState extends State<MainScreen> {
       FirebaseFirestore.instance.collection("savedPosts");
   bool added = false;
   int _currentIndex = 0;
+  int notifyCount = 0;
   final _inactiveColor = Colors.grey;
 
   @override
   void initState() {
     super.initState();
+
+    getTocken();
     _handleAddData();
     _initGoogleMobileAds();
+    setupInteractedMessage();
+  }
+
+  // Getting notification Tockens
+  Future<void> saveTokenToDatabase(String token) async {
+    // Assume user is logged in for this example
+    String userId = FirebaseAuth.instance.currentUser!.uid;
+
+    await FirebaseFirestore.instance.collection('users').doc(userId).update({
+      'token': token,
+    });
+  }
+
+  getTocken() async {
+    String? token = await FirebaseMessaging.instance.getToken();
+
+    await saveTokenToDatabase(token!);
+
+    // Any time the token refreshes, store this in the database too.
+    FirebaseMessaging.instance.onTokenRefresh.listen(saveTokenToDatabase);
   }
 
   Future<InitializationStatus> _initGoogleMobileAds() {
@@ -82,6 +108,33 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
+  Future<void> setupInteractedMessage() async {
+    // Get any messages which caused the application to open from
+    // a terminated state.
+    RemoteMessage? initialMessage =
+        await FirebaseMessaging.instance.getInitialMessage();
+
+    // navigate to a chat screen
+    if (initialMessage != null) {
+      _handleMessage(initialMessage);
+    }
+
+    // Also handle any interaction when the app is in the background via a
+    // Stream listener
+    FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
+
+    FirebaseMessaging.onMessage.listen(_handleMessage);
+  }
+
+  void _handleMessage(RemoteMessage message) {
+    if (mounted && _currentIndex != 1) {
+      NotifyProvider notifyProvider =
+          Provider.of<NotifyProvider>(context, listen: false);
+
+      notifyProvider.setNotifyCountIncrement = 1;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -90,6 +143,15 @@ class _MainScreenState extends State<MainScreen> {
       body: added ? _getBody() : _loadingScreen(),
       endDrawer: _profileDrawer(),
       bottomNavigationBar: _buildBottomBar(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => PostScreen()));
+        },
+        backgroundColor: Theme.of(context).primaryColor,
+        heroTag: "post@@",
+        child: Icon(Icons.post_add),
+      ),
     );
   }
 
@@ -127,12 +189,13 @@ class _MainScreenState extends State<MainScreen> {
     switch (_currentIndex) {
       case 0:
       case 1:
+      case 2:
         return AppBar(
           toolbarHeight: 0,
           elevation: 0,
           backgroundColor: Theme.of(context).primaryColor,
         );
-      case 2:
+      case 3:
         return AppBar(
           elevation: 0,
           backgroundColor: Theme.of(context).primaryColor,
@@ -152,8 +215,7 @@ class _MainScreenState extends State<MainScreen> {
     switch (_currentIndex) {
       case 0:
       case 1:
-        return null;
-      case 3:
+      case 2:
         return null;
 
       default:
@@ -223,7 +285,13 @@ class _MainScreenState extends State<MainScreen> {
                       child: Text('Cancel'),
                     ),
                     TextButton(
-                      onPressed: () {
+                      onPressed: () async {
+                        await FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(currentUser!.uid)
+                            .update({
+                          'token': "",
+                        });
                         // Navigator.pop(context);
                         _auth.signOut();
                         Navigator.pop(context);
@@ -278,64 +346,6 @@ class _MainScreenState extends State<MainScreen> {
       ),
     );
   }
-
-  // // Delete Usere and his content
-  // delUser() {
-  //   FirebaseAuthServices _auth =
-  //       Provider.of<FirebaseAuthServices>(context, listen: false);
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) {
-  //       return AlertDialog(
-  //         title: Text(
-  //           'Confirm Deleting Your Account \n\nWe will delete you all posts, saved posts and personal information \n',
-  //           style: Theme.of(context).textTheme.bodyText1,
-  //         ),
-  //         actions: [
-  //           TextButton(
-  //             onPressed: () {
-  //               Navigator.pop(context);
-  //             },
-  //             child: Text('Cancel'),
-  //           ),
-  //           TextButton(
-  //             onPressed: () async {
-  //               Navigator.pop(context);
-  //               _showLoading();
-  //               try {
-  //                 posts
-  //                     .where("ownerId", isEqualTo: currentUser!.uid)
-  //                     .get()
-  //                     .then((value) {
-  //                   for (var i in value.docs) {
-  //                     posts.doc(i.id).delete();
-  //                     try {
-  //                       comments.doc(i.id).delete();
-  //                     } catch (e) {
-  //                       continue;
-  //                     }
-  //                   }
-  //                 });
-  //                 savedPosts.doc(currentUser!.uid).delete();
-
-  //                 users.doc(currentUser!.uid).delete();
-  //                 FirebaseAuth.instance.currentUser!.delete();
-  //                 _auth.signOut();
-  //                 Navigator.pop(context);
-  //               } on FirebaseAuthException catch (e) {
-  //                 if (e.code == 'requires-recent-login') {
-  //                   print(
-  //                       'The user must reauthenticate before this operation can be executed.');
-  //                 }
-  //               }
-  //             },
-  //             child: Text('Confirm'),
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
 
   // ActionButtons -----------------------------------
   Widget _chooseColorButton() {
@@ -413,9 +423,9 @@ class _MainScreenState extends State<MainScreen> {
   Widget _getBody() {
     List pages = [
       HomeScreen(),
+      NotificationScreen(),
       SearchScreen(),
       ProfileScreen(),
-      PostScreen(),
     ];
     switch (_currentIndex) {
       case 0:
@@ -433,6 +443,8 @@ class _MainScreenState extends State<MainScreen> {
 
   //bottom navigation bar --------------------------
   Widget _buildBottomBar() {
+    NotifyProvider notifyProvider = Provider.of<NotifyProvider>(context);
+    int notifyCountPro = notifyProvider.getNotifyCount;
     return CustomAnimatedBottomBar(
       containerHeight: 50,
       backgroundColor: Colors.white,
@@ -450,6 +462,16 @@ class _MainScreenState extends State<MainScreen> {
           textAlign: TextAlign.center,
         ),
         BottomNavyBarItem(
+          icon: Icon(Icons.notifications),
+          title: Text('Feeds'),
+          activeColor: Theme.of(context).primaryColor,
+          inactiveColor: (notifyCountPro != 0 && _currentIndex != 1)
+              ? Colors.red
+              : _inactiveColor,
+          count: notifyCountPro,
+          textAlign: TextAlign.center,
+        ),
+        BottomNavyBarItem(
           icon: Icon(Icons.search),
           title: Text('Search'),
           activeColor: Theme.of(context).primaryColor,
@@ -461,13 +483,6 @@ class _MainScreenState extends State<MainScreen> {
           title: Text(
             'Profile ',
           ),
-          activeColor: Theme.of(context).primaryColor,
-          inactiveColor: _inactiveColor,
-          textAlign: TextAlign.center,
-        ),
-        BottomNavyBarItem(
-          icon: Icon(Icons.post_add),
-          title: Text('Post'),
           activeColor: Theme.of(context).primaryColor,
           inactiveColor: _inactiveColor,
           textAlign: TextAlign.center,

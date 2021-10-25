@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
+import 'package:senboo/providers/notiry_provider.dart';
 
 class CustomAnimatedBottomBar extends StatelessWidget {
   CustomAnimatedBottomBar({
@@ -74,7 +76,7 @@ class CustomAnimatedBottomBar extends StatelessWidget {
   }
 }
 
-class _ItemWidget extends StatelessWidget {
+class _ItemWidget extends StatefulWidget {
   final double iconSize;
   final bool isSelected;
   final BottomNavyBarItem item;
@@ -95,25 +97,31 @@ class _ItemWidget extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<_ItemWidget> createState() => _ItemWidgetState();
+}
+
+class _ItemWidgetState extends State<_ItemWidget> {
+  @override
   Widget build(BuildContext context) {
     return Semantics(
       container: true,
-      selected: isSelected,
+      selected: widget.isSelected,
       child: AnimatedContainer(
-        width: isSelected ? 130 : 50,
+        width: widget.isSelected ? 130 : 50,
         height: double.maxFinite,
-        duration: animationDuration,
-        curve: curve,
+        duration: widget.animationDuration,
+        curve: widget.curve,
         decoration: BoxDecoration(
-          color:
-              isSelected ? item.activeColor.withOpacity(0.2) : backgroundColor,
-          borderRadius: BorderRadius.circular(itemCornerRadius),
+          color: widget.isSelected
+              ? widget.item.activeColor.withOpacity(0.2)
+              : widget.backgroundColor,
+          borderRadius: BorderRadius.circular(widget.itemCornerRadius),
         ),
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           physics: NeverScrollableScrollPhysics(),
           child: Container(
-            width: isSelected ? 130 : 50,
+            width: widget.isSelected ? 130 : 55,
             padding: EdgeInsets.symmetric(horizontal: 8),
             child: Row(
               mainAxisSize: MainAxisSize.max,
@@ -122,27 +130,46 @@ class _ItemWidget extends StatelessWidget {
               children: <Widget>[
                 IconTheme(
                   data: IconThemeData(
-                    size: iconSize,
-                    color: isSelected
-                        ? item.activeColor.withOpacity(1)
-                        : item.inactiveColor == null
-                            ? item.activeColor
-                            : item.inactiveColor,
+                    size: widget.iconSize,
+                    color: widget.isSelected
+                        ? widget.item.activeColor.withOpacity(1)
+                        : widget.item.inactiveColor == null
+                            ? widget.item.activeColor
+                            : widget.item.inactiveColor,
                   ),
-                  child: item.icon,
+                  child: widget.item.icon,
                 ),
-                if (isSelected)
+                (widget.item.count != null && widget.item.count != 0)
+                    ? Container(
+                        height: 10,
+                        width: 10,
+                        padding: EdgeInsets.symmetric(horizontal: 1),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                          color: Colors.red,
+                        ),
+                        child: Text(
+                          widget.item.count.toString(),
+                          style: TextStyle(
+                            fontSize: 6,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ))
+                    : SizedBox(),
+                if (widget.isSelected)
                   Expanded(
                     child: Container(
                       padding: EdgeInsets.symmetric(horizontal: 4),
                       child: DefaultTextStyle.merge(
                         style: TextStyle(
-                          color: item.activeColor,
+                          color: widget.item.activeColor,
                           fontWeight: FontWeight.bold,
                         ),
                         maxLines: 1,
-                        textAlign: item.textAlign,
-                        child: item.title,
+                        textAlign: widget.item.textAlign,
+                        child: widget.item.title,
                       ),
                     ),
                   ),
@@ -162,11 +189,13 @@ class BottomNavyBarItem {
     this.activeColor = Colors.blue,
     this.textAlign,
     this.inactiveColor,
+    this.count,
   });
 
   final Widget icon;
   final Widget title;
   final Color activeColor;
   final Color? inactiveColor;
+  final int? count;
   final TextAlign? textAlign;
 }

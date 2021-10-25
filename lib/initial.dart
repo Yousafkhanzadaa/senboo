@@ -82,6 +82,7 @@ class _InitialServiceState extends State<InitialService> {
       primaryColor: Color(int.parse(colorCode ?? "0xff000000")),
       // primaryColor: Color(int.parse(colorCode ?? "0xff939597")),
       backgroundColor: Colors.white,
+      shadowColor: Colors.black12,
       cardColor: Colors.white,
 
       //DefaultFontFamily----------------------

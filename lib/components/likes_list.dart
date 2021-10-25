@@ -26,8 +26,10 @@ class _LikeListState extends State<LikeList> {
       width: MediaQuery.of(context).size.width,
       padding: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
       decoration: _cardDecoration(),
-      child: ListView.builder(
+      child: GridView.builder(
         itemCount: widget.likeList.length,
+        gridDelegate:
+            SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
         itemBuilder: (context, index) {
           return _showLikeCard(index: index, ownerId: widget.likeList[index]);
         },
@@ -76,9 +78,11 @@ class _LikeListState extends State<LikeList> {
       },
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-        margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+        margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
         decoration: _cardDecoration(),
-        child: Row(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
               width: 40,
@@ -89,23 +93,15 @@ class _LikeListState extends State<LikeList> {
               ),
             ),
             SizedBox(
-              width: 10,
+              height: 5,
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  userName,
-                  style: Theme.of(context)
-                      .textTheme
-                      .subtitle1!
-                      .copyWith(fontWeight: FontWeight.w700),
-                ),
-                Text(
-                  profession,
-                  style: Theme.of(context).textTheme.bodyText1,
-                ),
-              ],
+            Text(
+              userName,
+              textAlign: TextAlign.center,
+              style: Theme.of(context)
+                  .textTheme
+                  .subtitle1!
+                  .copyWith(fontWeight: FontWeight.w700, fontSize: 12),
             ),
           ],
         ),
@@ -117,10 +113,10 @@ class _LikeListState extends State<LikeList> {
   BoxDecoration _cardDecoration() {
     return BoxDecoration(
       color: Theme.of(context).cardColor,
-      borderRadius: BorderRadius.circular(22),
+      borderRadius: BorderRadius.circular(15),
       boxShadow: [
         BoxShadow(
-          color: Theme.of(context).primaryColor.withOpacity(0.40),
+          color: Theme.of(context).shadowColor,
           blurRadius: 3,
           offset: Offset(0, 0),
         ),

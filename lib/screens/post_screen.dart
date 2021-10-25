@@ -72,15 +72,77 @@ class _PostScreenState extends State<PostScreen> {
         }
       },
       child: Scaffold(
-        backgroundColor: Theme.of(context).primaryColor,
-        body: SafeArea(
-          child: Container(
-            height: MediaQuery.of(context).size.height,
-            child: _editForm(),
+          appBar: AppBar(
+            title: Text("Post"),
+            elevation: 0,
+            backgroundColor: Theme.of(context).primaryColor,
           ),
-        ),
-      ),
+          body: SafeArea(
+            child: Container(
+              height: MediaQuery.of(context).size.height,
+              child: _editForm(),
+            ),
+          ),
+          floatingActionButton: FloatingActionButton.extended(
+            onPressed: postButton,
+            isExtended: true,
+            backgroundColor: Theme.of(context).primaryColor,
+            extendedPadding: EdgeInsets.symmetric(horizontal: 60),
+            heroTag: "post@@",
+            label: Text(
+              "Post".toUpperCase(),
+              style: Theme.of(context).textTheme.subtitle2,
+            ),
+          )),
     );
+  }
+
+  postButton() async {
+    dateTime = DateTime.now();
+    FocusScopeNode currentFocus = FocusScope.of(context);
+    currentFocus.unfocus();
+    if (_categories.isEmpty) {
+      var snackBar = SnackBar(
+          backgroundColor: Theme.of(context).primaryColor,
+          content: Text('please select post category.\nscroll horizontal.'));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+    if (_categories.isNotEmpty) {
+      if (_formKey.currentState!.validate()) {
+        _showLoading();
+        await users.doc(currentUser!.uid).get().then((snapshot) {
+          userData = UserDataUpdate.setData(snapshot);
+          List searchKeywords =
+              _mainTitleController.text.toLowerCase().split(" ") +
+                  userData!.userName!.toLowerCase().split(" ") +
+                  [userData!.userName!.toLowerCase()];
+
+          while (searchKeywords.contains("")) {
+            searchKeywords.remove("");
+          }
+          while (searchKeywords.contains(" ")) {
+            searchKeywords.remove(" ");
+          }
+          addPost(
+            userName: userData!.userName!,
+            profession: userData!.profession!,
+            photoUrl: userData!.photoUrl!,
+            category: _categories,
+            title: _mainTitleController.text,
+            body: _bodyTextController.text,
+            searchKeywords: searchKeywords,
+            date: dateTime!,
+          );
+        }).whenComplete(() {
+          setState(() {
+            _mainTitleController.text = "";
+            _bodyTextController.text = "";
+            _categories.clear();
+          });
+          Navigator.pop(context);
+        });
+      }
+    }
   }
 
   // form goes here -------------------------------------
@@ -98,10 +160,10 @@ class _PostScreenState extends State<PostScreen> {
             SizedBox(
               height: 20,
             ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.80,
-              child: _postButton(),
-            ),
+            // SizedBox(
+            //   width: MediaQuery.of(context).size.width * 0.80,
+            //   child: _postButton(),
+            // ),
           ],
         ),
       ),
@@ -112,10 +174,10 @@ class _PostScreenState extends State<PostScreen> {
   BoxDecoration _formBackDecoration() {
     return BoxDecoration(
       color: Theme.of(context).cardColor,
-      borderRadius: BorderRadius.only(
-        topLeft: Radius.circular(25),
-        topRight: Radius.circular(25),
-      ),
+      // borderRadius: BorderRadius.only(
+      //   topLeft: Radius.circular(25),
+      //   topRight: Radius.circular(25),
+      // ),
       boxShadow: [
         BoxShadow(
           color: Theme.of(context).primaryColor.withOpacity(0.40),
@@ -139,7 +201,7 @@ class _PostScreenState extends State<PostScreen> {
               controller: _mainTitleController,
               hint: "Title",
               label: "Main Title",
-              maxLines: 5,
+              maxLines: 6,
               validator: (value) {
                 // if (value!.length > 140) {
                 //   return "Title is too long";
@@ -151,7 +213,7 @@ class _PostScreenState extends State<PostScreen> {
               },
             ),
             SizedBox(
-              height: 15,
+              height: 16,
             ),
             CustomTextField(
               controller: _bodyTextController,
@@ -268,7 +330,7 @@ class _PostScreenState extends State<PostScreen> {
   BoxDecoration _cardDecoration() {
     return BoxDecoration(
       color: Theme.of(context).cardColor,
-      borderRadius: BorderRadius.circular(25),
+      borderRadius: BorderRadius.circular(15),
       boxShadow: [
         BoxShadow(
           color: Theme.of(context).primaryColor.withOpacity(0.40),
