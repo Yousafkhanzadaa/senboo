@@ -79,7 +79,7 @@ class _InitialServiceState extends State<InitialService> {
   // Theme data is here --------------------------------------------------
   ThemeData _themeData(String? colorCode) {
     return ThemeData(
-      primaryColor: Color(int.parse(colorCode ?? "0xff000000")),
+      primaryColor: Color(int.parse(colorCode ?? "0xFF939597")),
       // primaryColor: Color(int.parse(colorCode ?? "0xff939597")),
       backgroundColor: Colors.white,
       shadowColor: Colors.black12,

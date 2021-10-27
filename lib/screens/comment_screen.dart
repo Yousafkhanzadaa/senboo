@@ -39,7 +39,7 @@ class _CommentScreenState extends State<CommentScreen> {
 
   Map commentMap = {
     "userName": "userName",
-    'currentUserPhotoUrl': "null",
+    'currentUserPhotoUrl': null,
     "profession": "profession",
     "title": "title",
     "date": null,
@@ -70,6 +70,20 @@ class _CommentScreenState extends State<CommentScreen> {
     });
   }
 
+  removeComment({required String postId, required String commentId}) async {
+    // DataProvider dataProvider =
+    //     Provider.of<DataProvider>(context, listen: false);
+    Navigator.pop(context);
+    _showLoading();
+    await comments
+        .doc(postId)
+        .collection('postComments')
+        .doc(commentId)
+        .delete();
+    // dataProvider.getTotalLikes(ownerId: currentUser!.uid);
+    Navigator.pop(context);
+  }
+
   _addFeedItem() {
     if (currentUser!.uid != widget.ownerId) {
       feeds.doc(widget.ownerId).collection("feedItems").doc(widget.postId).set({
@@ -86,25 +100,34 @@ class _CommentScreenState extends State<CommentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        iconTheme: IconThemeData(color: Colors.white),
-        backgroundColor: Theme.of(context).primaryColor,
-      ),
-      body: !loaded
-          ? _loadingComments()
-          : Container(
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              child: Column(
-                children: [
-                  _headingBox(),
-                  _commentsList(),
-                  _writeComment(),
-                ],
+    return GestureDetector(
+      onTap: () {
+        FocusScopeNode currentFocus = FocusScope.of(context);
+
+        if (!currentFocus.hasPrimaryFocus) {
+          currentFocus.unfocus();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          elevation: 0,
+          iconTheme: IconThemeData(color: Colors.white),
+          backgroundColor: Theme.of(context).primaryColor,
+        ),
+        body: !loaded
+            ? _loadingComments()
+            : Container(
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                child: Column(
+                  children: [
+                    _headingBox(),
+                    _commentsList(),
+                    _writeComment(),
+                  ],
+                ),
               ),
-            ),
+      ),
     );
   }
 
@@ -141,12 +164,12 @@ class _CommentScreenState extends State<CommentScreen> {
   Widget _textTitle() {
     return Text(
       commentMap['title'],
-      maxLines: 5,
+      maxLines: 6,
       overflow: TextOverflow.ellipsis,
       style: Theme.of(context)
           .textTheme
           .bodyText1!
-          .copyWith(color: Colors.white, fontSize: 16),
+          .copyWith(color: Colors.white, fontSize: 14),
     );
   }
 
@@ -177,6 +200,34 @@ class _CommentScreenState extends State<CommentScreen> {
                         userName: commentData!.userName!,
                         ownerId: commentData!.ownerId!,
                         profession: commentData!.profession!,
+                        postOwnerId: widget.ownerId,
+                        photoUrl: commentData!.photoUrl,
+                        removeComment: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: Text('Confirm Removing Comment'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: Text('Cancel'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      removeComment(
+                                          postId: widget.postId,
+                                          commentId: data[index].id);
+                                    },
+                                    child: Text('Confirm'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
                       );
                     },
                   );
@@ -206,7 +257,7 @@ class _CommentScreenState extends State<CommentScreen> {
             )),
         Center(
           child: Text(
-            "No comments",
+            "No comments yet.",
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Theme.of(context).primaryColor,
@@ -280,12 +331,19 @@ class _CommentScreenState extends State<CommentScreen> {
             userName: commentMap['userName'],
             profession: commentMap['profession'],
             comment: _commentTextContaller.text,
+            photoUrl: commentMap['currentUserPhotoUrl'],
             date: dateTime!,
           ).then((value) {
             _addFeedItem();
             setState(() {
               _commentTextContaller.clear();
             });
+
+            FocusScopeNode currentFocus = FocusScope.of(context);
+
+            if (!currentFocus.hasPrimaryFocus) {
+              currentFocus.unfocus();
+            }
           });
         }
       },
@@ -308,6 +366,7 @@ class _CommentScreenState extends State<CommentScreen> {
     required String profession,
     required String comment,
     required String postId,
+    required String photoUrl,
     required DateTime date,
   }) async {
     // var uidV4 = uid.v4();
@@ -316,6 +375,7 @@ class _CommentScreenState extends State<CommentScreen> {
         "ownerId": currentUser!.uid,
         "userName": userName,
         "profession": profession,
+        "photoUrl": photoUrl,
         "date": date,
         "comment": comment,
       });
@@ -346,6 +406,61 @@ class _CommentScreenState extends State<CommentScreen> {
       icon,
       size: 20,
       color: Colors.white,
+    );
+  }
+
+  _showLoading() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            width: MediaQuery.of(context).size.width * 70,
+            height: 200,
+            decoration: _cardDecoration(),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                    height: 100,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                          image: AssetImage("assets/images/svgs/loading.png")),
+                    )),
+                SizedBox(
+                  height: 5,
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 9.0, horizontal: 60),
+                  child: LinearProgressIndicator(
+                    color: Theme.of(context).primaryColor,
+                    minHeight: 2,
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  BoxDecoration _cardDecoration() {
+    return BoxDecoration(
+      color: Theme.of(context).cardColor,
+      borderRadius: BorderRadius.circular(15),
+      boxShadow: [
+        BoxShadow(
+          // color: Theme.of(context).primaryColor.withOpacity(0.40),
+          color: Theme.of(context).shadowColor,
+          blurRadius: 3,
+          offset: Offset(0, 0),
+          // spreadRadius: 1,
+        ),
+      ],
     );
   }
 }

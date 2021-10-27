@@ -62,6 +62,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         // date: feedData!.date!.toDate(),
                         ownerId: feedData!.ownerId!,
                         userName: feedData!.userName!,
+                        photoUrl: feedData!.photoUrl!,
                         postId: feedData!.postId!,
                         type: feedData!.type!,
                         date: feedData!.date!,

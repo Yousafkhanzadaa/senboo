@@ -53,8 +53,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-
-    // getInterested();
     getTimeLine();
   }
 
@@ -111,11 +109,11 @@ class _HomeScreenState extends State<HomeScreen> {
         return postsList.isEmpty
             ? _noPosts()
             : RefreshIndicator(
+                color: Theme.of(context).primaryColor,
+                strokeWidth: 2,
                 onRefresh: getTimeLine,
                 child: ListView.builder(
                   shrinkWrap: true,
-                  // scrollDirection: Axis.vertical,
-
                   itemCount: postsList.length,
                   itemBuilder: (context, index) {
                     // var data = snapshot.data!.docs;
@@ -153,16 +151,16 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Error Screen ----------------------------------------------------
-  Widget _errorScreen() {
-    return Center(
-        child: Text(
-      "Something went wrong\nCheck you internet connection",
-      style: Theme.of(context)
-          .textTheme
-          .headline1!
-          .copyWith(color: Theme.of(context).primaryColor),
-    ));
-  }
+  // Widget _errorScreen() {
+  //   return Center(
+  //       child: Text(
+  //     "Something went wrong\nCheck you internet connection",
+  //     style: Theme.of(context)
+  //         .textTheme
+  //         .headline1!
+  //         .copyWith(color: Theme.of(context).primaryColor),
+  //   ));
+  // }
 
   // Load Screen ---------------------------------------------
   Widget _searching() {
@@ -186,7 +184,7 @@ class _HomeScreenState extends State<HomeScreen> {
             height: 5,
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 9.0, horizontal: 60),
+            padding: const EdgeInsets.symmetric(vertical: 9.0, horizontal: 70),
             child: LinearProgressIndicator(
               color: Theme.of(context).primaryColor,
               minHeight: 2,
@@ -297,9 +295,10 @@ class _HomeScreenState extends State<HomeScreen> {
           await users.doc(currentUser!.uid).update({
             "interested": _newInterestedList,
           }).then((value) {
-            setState(() {
-              _interestedList = _newInterestedList;
-            });
+            // setState(() {
+            //   _interestedList = _newInterestedList;
+            // });
+            getTimeLine();
           });
         } else {
           var snackBar = SnackBar(

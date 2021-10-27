@@ -342,72 +342,72 @@ class _PostScreenState extends State<PostScreen> {
   }
 
   // save buttan goes here -0------------------------------------
-  Widget _postButton() {
-    dateTime = DateTime.now();
+  // Widget _postButton() {
+  //   dateTime = DateTime.now();
 
-    return ElevatedButton(
-      onPressed: () async {
-        FocusScopeNode currentFocus = FocusScope.of(context);
-        currentFocus.unfocus();
-        if (_categories.isEmpty) {
-          var snackBar = SnackBar(
-              backgroundColor: Theme.of(context).primaryColor,
-              content:
-                  Text('please select post category.\nscroll horizontal.'));
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        }
-        if (_categories.isNotEmpty) {
-          if (_formKey.currentState!.validate()) {
-            _showLoading();
-            await users.doc(currentUser!.uid).get().then((snapshot) {
-              userData = UserDataUpdate.setData(snapshot);
-              List searchKeywords =
-                  _mainTitleController.text.toLowerCase().split(" ") +
-                      userData!.userName!.toLowerCase().split(" ") +
-                      [userData!.userName!.toLowerCase()];
+  //   return ElevatedButton(
+  //     onPressed: () async {
+  //       FocusScopeNode currentFocus = FocusScope.of(context);
+  //       currentFocus.unfocus();
+  //       if (_categories.isEmpty) {
+  //         var snackBar = SnackBar(
+  //             backgroundColor: Theme.of(context).primaryColor,
+  //             content:
+  //                 Text('please select post category.\nscroll horizontal.'));
+  //         ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  //       }
+  //       if (_categories.isNotEmpty) {
+  //         if (_formKey.currentState!.validate()) {
+  //           _showLoading();
+  //           await users.doc(currentUser!.uid).get().then((snapshot) {
+  //             userData = UserDataUpdate.setData(snapshot);
+  //             List searchKeywords =
+  //                 _mainTitleController.text.toLowerCase().split(" ") +
+  //                     userData!.userName!.toLowerCase().split(" ") +
+  //                     [userData!.userName!.toLowerCase()];
 
-              while (searchKeywords.contains("")) {
-                searchKeywords.remove("");
-              }
-              while (searchKeywords.contains(" ")) {
-                searchKeywords.remove(" ");
-              }
-              addPost(
-                userName: userData!.userName!,
-                profession: userData!.profession!,
-                photoUrl: userData!.photoUrl!,
-                category: _categories,
-                title: _mainTitleController.text,
-                body: _bodyTextController.text,
-                searchKeywords: searchKeywords,
-                date: dateTime!,
-              );
-            }).whenComplete(() {
-              setState(() {
-                _mainTitleController.text = "";
-                _bodyTextController.text = "";
-                _categories.clear();
-              });
-              Navigator.pop(context);
-            });
-          }
-        }
-      },
-      style: ButtonStyle(
-          backgroundColor:
-              MaterialStateProperty.all(Theme.of(context).primaryColor),
-          shadowColor:
-              MaterialStateProperty.all(Theme.of(context).primaryColor),
-          padding: MaterialStateProperty.all(
-              EdgeInsets.symmetric(vertical: 15, horizontal: 65)),
-          shape: MaterialStateProperty.all(
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(35)))),
-      child: Text(
-        "Post".toUpperCase(),
-        style: Theme.of(context).textTheme.subtitle2,
-      ),
-    );
-  }
+  //             while (searchKeywords.contains("")) {
+  //               searchKeywords.remove("");
+  //             }
+  //             while (searchKeywords.contains(" ")) {
+  //               searchKeywords.remove(" ");
+  //             }
+  //             addPost(
+  //               userName: userData!.userName!,
+  //               profession: userData!.profession!,
+  //               photoUrl: userData!.photoUrl!,
+  //               category: _categories,
+  //               title: _mainTitleController.text,
+  //               body: _bodyTextController.text,
+  //               searchKeywords: searchKeywords,
+  //               date: dateTime!,
+  //             );
+  //           }).whenComplete(() {
+  //             setState(() {
+  //               _mainTitleController.text = "";
+  //               _bodyTextController.text = "";
+  //               _categories.clear();
+  //             });
+  //             Navigator.pop(context);
+  //           });
+  //         }
+  //       }
+  //     },
+  //     style: ButtonStyle(
+  //         backgroundColor:
+  //             MaterialStateProperty.all(Theme.of(context).primaryColor),
+  //         shadowColor:
+  //             MaterialStateProperty.all(Theme.of(context).primaryColor),
+  //         padding: MaterialStateProperty.all(
+  //             EdgeInsets.symmetric(vertical: 15, horizontal: 65)),
+  //         shape: MaterialStateProperty.all(
+  //             RoundedRectangleBorder(borderRadius: BorderRadius.circular(35)))),
+  //     child: Text(
+  //       "Post".toUpperCase(),
+  //       style: Theme.of(context).textTheme.subtitle2,
+  //     ),
+  //   );
+  // }
 
   // Adding Posts...............................................
   Future<void> addPost({

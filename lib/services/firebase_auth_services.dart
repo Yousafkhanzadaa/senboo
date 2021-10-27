@@ -28,7 +28,7 @@ class FirebaseAuthServices extends ChangeNotifier {
   }
 
   // Sign out function -------------------------------------
-  void signOut() async {
+  Future<void> signOut() async {
     try {
       await auth.signOut();
       GoogleSignIn().signOut();

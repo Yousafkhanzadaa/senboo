@@ -210,6 +210,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 options: option,
                 deleteFunction: () {},
                 updateFunction: () {},
+                likeFun: () {},
               );
             } else {
               return Container(
@@ -362,7 +363,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             height: 10,
           ),
           Text(
-            "No Posts",
+            "No posts yet.",
             style: TextStyle(
               color: Theme.of(context).primaryColor,
               fontSize: 26,

@@ -12,6 +12,7 @@ class NotificationCard extends StatefulWidget {
     required this.type,
     required this.postId,
     required this.ownerId,
+    required this.photoUrl,
     // required this.date,
   }) : super(key: key);
   final String userName;
@@ -19,6 +20,7 @@ class NotificationCard extends StatefulWidget {
   final String type;
   final String postId;
   final String ownerId;
+  final String photoUrl;
   // final DateTime date;
 
   @override
@@ -77,7 +79,22 @@ class _NotificationCardState extends State<NotificationCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _userNameHeading(),
+          Row(
+            children: [
+              Container(
+                width: 30,
+                height: 30,
+                decoration: BoxDecoration(
+                  image: DecorationImage(image: NetworkImage(widget.photoUrl)),
+                  borderRadius: BorderRadius.circular(35),
+                ),
+              ),
+              SizedBox(
+                width: 5,
+              ),
+              _userNameHeading(),
+            ],
+          ),
           SizedBox(
             height: 5,
           ),

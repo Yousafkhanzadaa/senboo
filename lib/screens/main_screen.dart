@@ -53,6 +53,15 @@ class _MainScreenState extends State<MainScreen> {
     setupInteractedMessage();
   }
 
+  getTocken() async {
+    String? token = await FirebaseMessaging.instance.getToken();
+
+    await saveTokenToDatabase(token!);
+
+    // Any time the token refreshes, store this in the database too.
+    FirebaseMessaging.instance.onTokenRefresh.listen(saveTokenToDatabase);
+  }
+
   // Getting notification Tockens
   Future<void> saveTokenToDatabase(String token) async {
     // Assume user is logged in for this example
@@ -61,15 +70,6 @@ class _MainScreenState extends State<MainScreen> {
     await FirebaseFirestore.instance.collection('users').doc(userId).update({
       'token': token,
     });
-  }
-
-  getTocken() async {
-    String? token = await FirebaseMessaging.instance.getToken();
-
-    await saveTokenToDatabase(token!);
-
-    // Any time the token refreshes, store this in the database too.
-    FirebaseMessaging.instance.onTokenRefresh.listen(saveTokenToDatabase);
   }
 
   Future<InitializationStatus> _initGoogleMobileAds() {
@@ -286,15 +286,17 @@ class _MainScreenState extends State<MainScreen> {
                     ),
                     TextButton(
                       onPressed: () async {
+                        _showLoading();
                         await FirebaseFirestore.instance
                             .collection('users')
                             .doc(currentUser!.uid)
                             .update({
                           'token': "",
                         });
-                        // Navigator.pop(context);
-                        _auth.signOut();
                         Navigator.pop(context);
+                        _auth.signOut().then((value) {
+                          Navigator.pop(context);
+                        });
                       },
                       child: Text('Confirm'),
                     ),
@@ -486,6 +488,60 @@ class _MainScreenState extends State<MainScreen> {
           activeColor: Theme.of(context).primaryColor,
           inactiveColor: _inactiveColor,
           textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+
+  _showLoading() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            width: MediaQuery.of(context).size.width * 70,
+            height: 200,
+            decoration: _cardDecoration(),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                    height: 100,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                          image: AssetImage("assets/images/svgs/loading.png")),
+                    )),
+                SizedBox(
+                  height: 5,
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 9.0, horizontal: 60),
+                  child: LinearProgressIndicator(
+                    color: Theme.of(context).primaryColor,
+                    minHeight: 2,
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // CardDecoration --------------------------------------
+  BoxDecoration _cardDecoration() {
+    return BoxDecoration(
+      color: Theme.of(context).cardColor,
+      borderRadius: BorderRadius.circular(15),
+      boxShadow: [
+        BoxShadow(
+          color: Theme.of(context).primaryColor.withOpacity(0.40),
+          blurRadius: 3,
+          offset: Offset(0, 0),
         ),
       ],
     );

@@ -11,12 +11,19 @@ class CommentCard extends StatefulWidget {
       required this.profession,
       required this.comment,
       required this.ownerId,
+      required this.postOwnerId,
+      this.photoUrl,
+      this.removeComment,
       required this.date})
       : super(key: key);
   final String userName;
   final String profession;
   final String comment;
+
+  final Function? removeComment;
   final String ownerId;
+  final String? photoUrl;
+  final String postOwnerId;
   final DateTime date;
 
   @override
@@ -25,6 +32,8 @@ class CommentCard extends StatefulWidget {
 
 class _CommentCardState extends State<CommentCard> {
   // bool liked = false;
+  // Current User
+  User? currentUser = FirebaseAuth.instance.currentUser;
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +84,29 @@ class _CommentCardState extends State<CommentCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _userNameHeading(),
+          Row(
+            children: [
+              widget.photoUrl == null
+                  ? SizedBox()
+                  : Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                            image: NetworkImage(widget.photoUrl!)),
+                        borderRadius: BorderRadius.circular(35),
+                      ),
+                    ),
+              SizedBox(
+                width: 5,
+              ),
+              Expanded(child: _userNameHeading()),
+              widget.ownerId == currentUser!.uid ||
+                      widget.postOwnerId == currentUser!.uid
+                  ? popUpButton()
+                  : SizedBox(),
+            ],
+          ),
           SizedBox(
             height: 5,
           ),
@@ -100,11 +131,14 @@ class _CommentCardState extends State<CommentCard> {
         children: [
           Text(
             widget.userName,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style:
                 Theme.of(context).textTheme.headline2!.copyWith(fontSize: 18),
           ),
           Text(
             widget.profession,
+            maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.subtitle2,
           ),
@@ -145,4 +179,26 @@ class _CommentCardState extends State<CommentCard> {
       style: Theme.of(context).textTheme.bodyText1,
     );
   }
+
+  Widget popUpButton() => Container(
+        width: 30,
+        child: PopupMenuButton(
+          color: Colors.white,
+          icon: Icon(Icons.more_vert, color: Colors.white),
+          itemBuilder: (context) => [
+            PopupMenuItem(
+              child: Text(
+                'Remove comment',
+                style: Theme.of(context).textTheme.bodyText1,
+              ),
+              value: 1,
+            ),
+          ],
+          onSelected: (value) {
+            if (value == 1) {
+              widget.removeComment!();
+            }
+          },
+        ),
+      );
 }

@@ -12,21 +12,20 @@ class ColorPalette extends StatefulWidget {
 class _ColorPaletteState extends State<ColorPalette> {
   List<String> colorsList = [
     '0xFF939597',
-    '0xFF72C89E',
+    '0xFF9B2335',
     '0xFFFF6F61',
-    '0xFF604C8D',
-    '0xFF92B558',
-    '0xFFB3CEE5',
-    '0xFF955251',
-    '0xFFB565A7',
-    '0xFF009B77',
-    '0xFFDD4124',
+    '0xFF4885ed',
+    '0xFF35423c',
+    '0xFFEC9787',
+    '0xFF9932CC',
     '0xFFD65076',
     '0xFF45B8AC',
-    '0xFFEFC050',
-    '0xFF5B5EA6',
-    '0xFF9B2335',
-    '0xFF000000',
+    '0xFF2d2f4e',
+    '0xFF2C2C2C', // pink
+    '0xFF000100',
+    '0xFF3e282d',
+    '0xFF4b5862',
+    '0xFF2E5090',
   ];
 
   @override

@@ -54,6 +54,48 @@ class _ProfilePostCardState extends State<ProfilePostCard> {
   CollectionReference users = FirebaseFirestore.instance.collection("users");
   CollectionReference comments =
       FirebaseFirestore.instance.collection('comments');
+  List photoUrlList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    getLikedPhotoUrl();
+  }
+
+  getLikedPhotoUrl() {
+    List tempList = [];
+    // List tempUrlList = [];
+    if (widget.likes.length == 0) {
+      return;
+    }
+    if (widget.likes.length > 2) {
+      tempList.add(widget.likes[0]);
+      tempList.add(widget.likes[1]);
+      tempList.add(widget.likes[2]);
+      tempList.forEach((element) async {
+        await users.doc(element).get().then((snapshot) {
+          setState(() {
+            photoUrlList.add(snapshot.get("photoUrl"));
+            // photoUrlList = tempUrlList;
+          });
+        });
+      });
+    }
+    if (widget.likes.length < 3) {
+      widget.likes.forEach((element) async {
+        await users.doc(element).get().then((snapshot) {
+          setState(() {
+            photoUrlList.add(snapshot.get("photoUrl"));
+            // photoUrlList = tempUrlList;
+          });
+        });
+      });
+    }
+
+    // setState(() {
+    //   photoUrlList = tempUrlList;
+    // });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -220,7 +262,7 @@ class _ProfilePostCardState extends State<ProfilePostCard> {
 
   Widget _categoryText() {
     return Text(
-      "${widget.category.toString()}".toUpperCase(),
+      "${widget.category.join(", ").toUpperCase()}",
       overflow: TextOverflow.ellipsis,
       maxLines: 1,
       style: Theme.of(context).textTheme.subtitle2,
@@ -270,9 +312,7 @@ class _ProfilePostCardState extends State<ProfilePostCard> {
             SizedBox(
               width: 5,
             ),
-            widget.likes.length == 0
-                ? Container()
-                : _showLikedImages(widget.likes.length),
+            photoUrlList.length == 0 ? Container() : _showLikedImages(),
             SizedBox(
               width: 3,
             ),
@@ -287,37 +327,37 @@ class _ProfilePostCardState extends State<ProfilePostCard> {
     );
   }
 
-  _showLikedImages(int count) {
-    if (count >= 3) {
-      return Container(
-        width: 35,
-        child: Stack(
-          children: [
-            Positioned(child: _likedImages("assets/images/dps/02.jpg")),
-            Positioned(
-                left: 5, child: _likedImages("assets/images/dps/01.jpg")),
-            Positioned(
-                left: 10, child: _likedImages("assets/images/dps/03.jpg")),
-          ],
-        ),
-      );
-    } else if (count == 2) {
-      return Container(
-        width: 25,
-        child: Stack(
-          children: [
-            Positioned(child: _likedImages("assets/images/dps/02.jpg")),
-            Positioned(
-                left: 5, child: _likedImages("assets/images/dps/01.jpg")),
-          ],
-        ),
-      );
-    } else {
+  _showLikedImages() {
+    if (photoUrlList.length == 1) {
       return Container(
         width: 20,
         child: Stack(
           children: [
-            Positioned(child: _likedImages("assets/images/dps/02.jpg")),
+            Positioned(child: _likedImages(photoUrlList[0])),
+          ],
+        ),
+      );
+    }
+
+    if (photoUrlList.length == 2) {
+      return Container(
+        width: 25,
+        child: Stack(
+          children: [
+            Positioned(child: _likedImages(photoUrlList[0])),
+            Positioned(left: 5, child: _likedImages(photoUrlList[1])),
+          ],
+        ),
+      );
+    }
+    if (photoUrlList.length == 3) {
+      return Container(
+        width: 35,
+        child: Stack(
+          children: [
+            Positioned(child: _likedImages(photoUrlList[0])),
+            Positioned(left: 5, child: _likedImages(photoUrlList[1])),
+            Positioned(left: 10, child: _likedImages(photoUrlList[2])),
           ],
         ),
       );
@@ -330,8 +370,18 @@ class _ProfilePostCardState extends State<ProfilePostCard> {
       height: 22,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
+        border: Border.all(width: 1, color: Colors.white),
+        boxShadow: [
+          BoxShadow(
+            // color: Theme.of(context).primaryColor.withOpacity(0.40),
+            color: Theme.of(context).shadowColor,
+            blurRadius: 3,
+            offset: Offset(0, 0),
+            // spreadRadius: 1,
+          ),
+        ],
         image: DecorationImage(
-            image: AssetImage(link),
+            image: NetworkImage(link),
             alignment: Alignment.center,
             fit: BoxFit.cover),
       ),

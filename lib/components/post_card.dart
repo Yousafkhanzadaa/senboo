@@ -478,22 +478,16 @@ class _PostCardState extends State<PostCard> {
   _handleSavePost() async {
     if (_saved!) {
       _savedList!.remove(widget.postId);
-      await users
-          .doc(currentUser!.uid)
-          .update({"savedPosts": _savedList}).then((value) {
-        setState(() {
-          _saved = !_saved!;
-        });
+      setState(() {
+        _saved = !_saved!;
       });
+      await users.doc(currentUser!.uid).update({"savedPosts": _savedList});
     } else if (!_saved!) {
       _savedList!.add(widget.postId);
-      await users
-          .doc(currentUser!.uid)
-          .update({"savedPosts": _savedList}).then((value) {
-        setState(() {
-          _saved = !_saved!;
-        });
+      setState(() {
+        _saved = !_saved!;
       });
+      await users.doc(currentUser!.uid).update({"savedPosts": _savedList});
     }
   }
 

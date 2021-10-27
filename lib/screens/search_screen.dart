@@ -127,7 +127,7 @@ class _SearchScreenState extends State<SearchScreen> {
             )),
         Center(
           child: Text(
-            "No posts found",
+            "No posts found.",
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Theme.of(context).primaryColor,
