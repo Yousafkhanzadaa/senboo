@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+// import 'package:provider/provider.dart';
 import 'package:senboo/components/custom_text_field.dart';
 import 'package:senboo/components/interest_button.dart';
 import 'package:senboo/model/user_data_update.dart';
@@ -42,6 +42,9 @@ class _EditProfileState extends State<EditProfile> {
   CollectionReference users = FirebaseFirestore.instance.collection("users");
   // Post collection
   CollectionReference posts = FirebaseFirestore.instance.collection("posts");
+  // userPost collection
+  CollectionReference userPosts =
+      FirebaseFirestore.instance.collection("usersPosts");
   // Current User
   User? currentUser = FirebaseAuth.instance.currentUser;
   // userData modal
@@ -71,6 +74,20 @@ class _EditProfileState extends State<EditProfile> {
     });
   }
 
+  Future updatePostsData({
+    String? userName,
+    String? profession,
+  }) async {
+    userPosts.doc(currentUser!.uid).collection('userPost').get().then((snap) {
+      snap.docs.forEach((DocumentSnapshot doc) async {
+        await doc.reference.update({
+          'userName': userName,
+          'profession': profession,
+        });
+      });
+    });
+  }
+
   Future updateUserDetails({
     String? userName,
     String? profession,
@@ -84,21 +101,6 @@ class _EditProfileState extends State<EditProfile> {
       'bio': bio,
       'socialLinks': socialLinks,
       'interested': interested,
-    });
-  }
-
-  Future updatePostsData({
-    String? userName,
-    String? profession,
-  }) async {
-    posts.where("ownerId", isEqualTo: currentUser!.uid).get().then((value) {
-      value.docs.forEach((DocumentSnapshot element) async {
-        var postId = element.get('postId');
-        await posts.doc(postId).update({
-          'userName': userName,
-          'profession': profession,
-        });
-      });
     });
   }
 
@@ -372,10 +374,6 @@ class _EditProfileState extends State<EditProfile> {
         if (_interestedList.isNotEmpty) {
           if (_formKey.currentState!.validate()) {
             _showLoading();
-            await updatePostsData(
-              userName: _nameController.text,
-              profession: _professionController.text,
-            );
             await updateUserDetails(
               userName: _nameController.text,
               profession: _professionController.text,
@@ -385,10 +383,15 @@ class _EditProfileState extends State<EditProfile> {
                 _twitterController.text,
               ],
               interested: _interestedList,
-            ).whenComplete(() {
-              Navigator.pop(context);
+            ).whenComplete(() async {
+              await updatePostsData(
+                userName: _nameController.text,
+                profession: _professionController.text,
+              ).whenComplete(() {
+                Navigator.pop(context);
 
-              Navigator.pop(context);
+                Navigator.pop(context);
+              });
             });
           }
         }
@@ -439,9 +442,15 @@ class _EditProfileState extends State<EditProfile> {
                 _twitterController.text,
               ],
               interested: _interestedList,
-            ).whenComplete(() {
-              Navigator.pop(context);
-              Navigator.pop(context);
+            ).whenComplete(() async {
+              await updatePostsData(
+                userName: _nameController.text,
+                profession: _professionController.text,
+              ).whenComplete(() {
+                Navigator.pop(context);
+
+                Navigator.pop(context);
+              });
             });
           }
         }

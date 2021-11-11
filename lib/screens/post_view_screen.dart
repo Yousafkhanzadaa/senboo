@@ -363,7 +363,10 @@ class _PostViewScreenState extends State<PostViewScreen> {
         textAlign: postData!.category!.contains("Urdu")
             ? TextAlign.end
             : TextAlign.start,
-        style: Theme.of(context).textTheme.bodyText1,
+        style: Theme.of(context)
+            .textTheme
+            .bodyText1!
+            .copyWith(fontSize: postData!.category!.contains("Urdu") ? 17 : 15),
       ),
     );
   }

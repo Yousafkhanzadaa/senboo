@@ -6,6 +6,65 @@ const admin = require("firebase-admin");
 admin.initializeApp();
 
 
+
+exports.onPostCreated = functions.firestore
+  .document("/usersPosts/{userId}/userPost/{postId}")
+  .onCreate(async (snapshot, context) => {
+    const createdPost = snapshot.data();
+    const postId = context.params.postId;
+
+
+    admin.firestore().collection("posts").doc(postId).set(createdPost);
+  });
+
+
+  // NEW ADDED CODE ===============================================
+  // UPDATING USER POST RELATED DATA ------------------------------
+exports.onPostUpdate = functions.firestore
+  .document("/usersPosts/{userId}/userPost/{postId}")
+  .onUpdate(async (change, context) => {
+    const updatedData = change.after.data();
+    const postId = context.params.postId;
+
+    admin.firestore()
+      .collection("posts")
+      .doc(postId)
+      .get().then((snap) => {
+        snap.ref.update({
+          "userName": updatedData.userName,
+          "profession": updatedData.profession,
+          "category": updatedData.category,
+          "searchKeywords": updatedData.searchKeywords,
+          "title": updatedData.title,
+          "body": updatedData.body,
+        });
+      });
+  });
+
+//  NEW ADDED CODE ================================================================
+// UPDATING USER RELATED DATA ON UPDATE-------------------------------------------
+// exports.onUpdateProfile = functions.firestore
+//   .document("/users/{userId}")
+//   .onUpdate(async (change, context) => {
+//     const updatedData = change.after.data();
+//     const userId = context.params.userId;
+
+//     admin.firestore()
+//       .collection("usersPosts")
+//       .doc(userId)
+//       .collection("userPost")
+//       .get().then((snap) => {
+//         snap.forEach((doc) => {
+//             doc.ref.update({
+//               "userName": updatedData.userName,
+//               "profession": updatedData.profession,
+//             });
+//         });
+//       });
+//   });
+
+
+// FUNCTION FOR FEEDS/NOTIFICATIONS --------------------------------
 exports.onFeedCreated = functions.firestore
     .document("/feeds/{userId}/feedItems/{postId}")
     .onCreate(async (snapshot, context)  => {
@@ -20,8 +79,10 @@ exports.onFeedCreated = functions.firestore
       
 
       // const registrationToken = "YOUR_REGISTRATION_TOKEN";
-      if (postCreated.type == "like") {
+      if (doc.data().token != "") {
 
+        if (postCreated.type == "like") {
+          
         const message = {
           "token": doc.data().token,
           "notification": {
@@ -43,5 +104,9 @@ exports.onFeedCreated = functions.firestore
         };
         admin.messaging().send(message)
       }
+    } else {
+      
+      console.log(`-----NOT SENDED-------- ${doc.data().token}`)
+    }
 
     });

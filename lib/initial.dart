@@ -119,7 +119,7 @@ class _InitialServiceState extends State<InitialService> {
         ),
         // bodyText1 -----------------------------------
         bodyText1: TextStyle(
-          fontSize: 15,
+          fontSize: 16,
           color: Color(0xFF616161),
         ),
 

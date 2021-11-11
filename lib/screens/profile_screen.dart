@@ -5,7 +5,7 @@ import 'package:senboo/components/likes_list.dart';
 import 'package:senboo/components/profile_card.dart';
 import 'package:senboo/components/profile_post_card.dart';
 import 'package:senboo/model/get_user_data.dart';
-import 'package:senboo/screens/edit_card.dart';
+import 'package:senboo/screens/edit_post.dart';
 // import 'package:senboo/screens/post_view_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
