@@ -45,7 +45,7 @@ class ProfilePostCard extends StatefulWidget {
 }
 
 class _ProfilePostCardState extends State<ProfilePostCard> {
-  final DateFormat formatter = DateFormat('yyyy-MM-dd');
+  final DateFormat formatter = DateFormat.yMMMd('en_US');
   User? currentUser = FirebaseAuth.instance.currentUser;
 
   // Post collection
@@ -114,10 +114,10 @@ class _ProfilePostCardState extends State<ProfilePostCard> {
       },
       child: Container(
         width: MediaQuery.of(context).size.width * 0.47,
-        margin: EdgeInsets.symmetric(
-          vertical: 10,
-          horizontal: 10,
-        ),
+        // margin: EdgeInsets.symmetric(
+        //   vertical: 10,
+        //   horizontal: 10,
+        // ),
         decoration: _cardDecoration(),
         child: Column(
           children: [
@@ -197,7 +197,7 @@ class _ProfilePostCardState extends State<ProfilePostCard> {
   Widget _headingBox() {
     return Container(
       width: MediaQuery.of(context).size.width,
-      padding: EdgeInsets.all(10),
+      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
       decoration: BoxDecoration(
         color: Theme.of(context).primaryColor,
         borderRadius: BorderRadius.only(
@@ -207,30 +207,28 @@ class _ProfilePostCardState extends State<ProfilePostCard> {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _timerText(),
-                    SizedBox(
-                      height: 5,
-                    ),
                     _userNameHeading(),
                     SizedBox(
-                      height: 15,
+                      height: 10,
                     ),
+                    _categoryText(),
+                    _timerText(),
                   ],
                 ),
               ),
               widget.options != null ? popUpButton() : SizedBox(),
             ],
           ),
-          _categoryText(),
         ],
       ),
     );
@@ -241,6 +239,7 @@ class _ProfilePostCardState extends State<ProfilePostCard> {
       widget.userName,
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
+      textAlign: TextAlign.start,
       style: Theme.of(context)
           .textTheme
           .bodyText1!
@@ -254,7 +253,7 @@ class _ProfilePostCardState extends State<ProfilePostCard> {
       children: [
         Text(
           formatter.format(widget.date),
-          style: Theme.of(context).textTheme.subtitle2,
+          style: Theme.of(context).textTheme.subtitle2!.copyWith(fontSize: 10),
         ),
       ],
     );

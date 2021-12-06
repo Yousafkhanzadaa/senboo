@@ -75,7 +75,7 @@ class _PostCardState extends State<PostCard> {
 
   bool? _saved;
   List? _savedList = [];
-  final DateFormat formatter = DateFormat('yyyy-MM-dd');
+  final DateFormat formatter = DateFormat.yMMMd('en_US');
 
   @override
   void initState() {
@@ -205,8 +205,8 @@ class _PostCardState extends State<PostCard> {
   // Profile pic.-------------------------------
   Widget _profilePic(String photoUrl) {
     return Container(
-      height: 50,
-      width: 50,
+      height: 40,
+      width: 40,
       decoration: BoxDecoration(
           // border: Border.all(color: Theme.of(context).primaryColor, width: 2),
 
@@ -222,7 +222,12 @@ class _PostCardState extends State<PostCard> {
   Widget _headingBox() {
     return Container(
       width: MediaQuery.of(context).size.width,
-      padding: EdgeInsets.all(10),
+      padding: EdgeInsets.only(
+        top: 10,
+        left: 10,
+        bottom: 5,
+        right: 10,
+      ),
       decoration: BoxDecoration(
         color: Theme.of(context).primaryColor,
         borderRadius: BorderRadius.only(
@@ -235,7 +240,7 @@ class _PostCardState extends State<PostCard> {
         children: [
           _userNameHeading(),
           SizedBox(
-            height: 10,
+            height: 5,
           ),
           _categoryText(),
           _timerText(),
@@ -274,7 +279,7 @@ class _PostCardState extends State<PostCard> {
                   style: Theme.of(context)
                       .textTheme
                       .headline1!
-                      .copyWith(fontSize: 20),
+                      .copyWith(fontSize: 16),
                 ),
                 Text(
                   widget.profession,
@@ -296,7 +301,7 @@ class _PostCardState extends State<PostCard> {
       children: [
         Text(
           formatter.format(widget.date),
-          style: Theme.of(context).textTheme.subtitle2,
+          style: Theme.of(context).textTheme.subtitle2!.copyWith(fontSize: 10),
         ),
       ],
     );
@@ -308,7 +313,7 @@ class _PostCardState extends State<PostCard> {
       "${widget.category.join(", ").toUpperCase()}",
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
-      style: Theme.of(context).textTheme.subtitle2,
+      style: Theme.of(context).textTheme.subtitle2!.copyWith(fontSize: 10),
     );
   }
 
@@ -317,8 +322,8 @@ class _PostCardState extends State<PostCard> {
   // Lower BodyBox --------------------------------------------------
   Widget _bodyBox() {
     return Container(
-      padding: EdgeInsets.all(10),
-      margin: EdgeInsets.only(top: 10, bottom: 15),
+      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      margin: EdgeInsets.only(top: 0, bottom: 5),
       alignment: Alignment.topLeft,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -341,11 +346,12 @@ class _PostCardState extends State<PostCard> {
         widget.title,
         textAlign:
             widget.category.contains("Urdu") ? TextAlign.end : TextAlign.start,
-        maxLines: 7,
+        maxLines: 5,
+        overflow: TextOverflow.fade,
         style: Theme.of(context)
             .textTheme
             .subtitle1!
-            .copyWith(fontWeight: FontWeight.w700),
+            .copyWith(fontWeight: FontWeight.w700, fontSize: 18),
       ),
     );
   }
@@ -366,7 +372,7 @@ class _PostCardState extends State<PostCard> {
   // ActionBar goes here -------------------------------------------
   Widget _actionBar() {
     return Container(
-      padding: EdgeInsets.all(10),
+      padding: EdgeInsets.only(top: 0, bottom: 5, left: 10, right: 10),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
@@ -407,7 +413,10 @@ class _PostCardState extends State<PostCard> {
                       liked! ? Icons.favorite : Icons.favorite_outline),
                   Text(
                     NumberFormat.compact().format(likesCounter).toString(),
-                    style: Theme.of(context).textTheme.bodyText2,
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyText2!
+                        .copyWith(fontSize: 10),
                   )
                 ],
               ),
@@ -440,7 +449,7 @@ class _PostCardState extends State<PostCard> {
         padding: EdgeInsets.all(5),
         decoration: _buttonDecorations(),
         child: _buttonsIcon(
-          FontAwesomeIcons.comment,
+          Icons.chat_bubble_outline_rounded,
         ),
       ),
     );
@@ -526,7 +535,7 @@ class _PostCardState extends State<PostCard> {
         BoxShadow(
           // color: Theme.of(context).primaryColor.withOpacity(0.40),
           color: Theme.of(context).shadowColor,
-          blurRadius: 3,
+          blurRadius: 2,
           offset: Offset(0, 0),
           // spreadRadius: 1,
         ),
@@ -538,7 +547,7 @@ class _PostCardState extends State<PostCard> {
   Widget _buttonsIcon(IconData icon) {
     return Icon(
       icon,
-      size: 24,
+      size: 22,
       color: Theme.of(context).primaryColor,
     );
   }

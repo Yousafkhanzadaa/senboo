@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:senboo/model/get_user_data.dart';
 import 'package:senboo/screens/post_view_screen.dart';
 
 class SearchCard extends StatefulWidget {
@@ -99,7 +98,12 @@ class _SearchCardState extends State<SearchCard> {
   Widget _headingBox() {
     return Container(
       width: MediaQuery.of(context).size.width,
-      padding: EdgeInsets.all(10),
+      padding: EdgeInsets.only(
+        top: 10,
+        left: 10,
+        bottom: 5,
+        right: 10,
+      ),
       decoration: BoxDecoration(
         color: Theme.of(context).primaryColor,
         borderRadius: BorderRadius.only(
@@ -145,7 +149,7 @@ class _SearchCardState extends State<SearchCard> {
       children: [
         Text(
           widget.userName,
-          style: Theme.of(context).textTheme.headline2!.copyWith(fontSize: 18),
+          style: Theme.of(context).textTheme.headline2!.copyWith(fontSize: 16),
         ),
         Text(
           widget.profession,
@@ -176,19 +180,17 @@ class _SearchCardState extends State<SearchCard> {
   Widget _categoryText() {
     return Text(
       "${widget.category.join(", ").toUpperCase()}",
-      style: Theme.of(context).textTheme.subtitle2,
+      style: Theme.of(context).textTheme.subtitle2!.copyWith(fontSize: 10),
     );
   }
 
   //Second Part
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   // Lower BodyBox --------------------------------------------------
   Widget _bodyBox() {
     return Container(
       alignment: Alignment.topLeft,
-      padding: EdgeInsets.all(10),
+      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
       child: _textTitle(),
     );
   }
@@ -203,12 +205,10 @@ class _SearchCardState extends State<SearchCard> {
 
   //Second Part
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   // action bar ----------------------
   Widget _actionBar() {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      padding: EdgeInsets.only(top: 0, bottom: 5, left: 10, right: 10),
       child: _likeIndication(),
     );
   }

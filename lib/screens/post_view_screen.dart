@@ -51,7 +51,7 @@ class _PostViewScreenState extends State<PostViewScreen> {
   List saveList = [];
   List commentList = [];
   PostData? postData;
-  final DateFormat formatter = DateFormat('yyyy-MM-dd');
+  final DateFormat formatter = DateFormat.yMMMd('en_US');
 
   Map currentUserInfo = {
     'currentUserName': "Someone",
@@ -221,6 +221,7 @@ class _PostViewScreenState extends State<PostViewScreen> {
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     GestureDetector(
                       onTap: () {
@@ -237,7 +238,7 @@ class _PostViewScreenState extends State<PostViewScreen> {
                       child: _userNameHeading(),
                     ),
                     SizedBox(
-                      height: 15,
+                      height: 20,
                     ),
                   ],
                 ),
@@ -273,7 +274,7 @@ class _PostViewScreenState extends State<PostViewScreen> {
           postData!.userName!,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: Theme.of(context).textTheme.headline1,
+          style: Theme.of(context).textTheme.headline1!.copyWith(fontSize: 20),
         ),
         Text(
           postData!.profession!,
@@ -290,17 +291,9 @@ class _PostViewScreenState extends State<PostViewScreen> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Icon(
-        //   Icons.watch_later_outlined,
-        //   size: 16,
-        //   color: Colors.white,
-        // ),
-        // SizedBox(
-        //   width: 5,
-        // ),
         Text(
           formatter.format(postData!.date!.toDate()),
-          style: Theme.of(context).textTheme.subtitle2,
+          style: Theme.of(context).textTheme.subtitle2!.copyWith(fontSize: 10),
         ),
       ],
     );
@@ -312,7 +305,7 @@ class _PostViewScreenState extends State<PostViewScreen> {
       "${postData!.category!.join(", ").toUpperCase()}",
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
-      style: Theme.of(context).textTheme.subtitle2,
+      style: Theme.of(context).textTheme.subtitle2!.copyWith(fontSize: 10),
     );
   }
 
@@ -349,7 +342,7 @@ class _PostViewScreenState extends State<PostViewScreen> {
         textAlign: postData!.category!.contains("Urdu")
             ? TextAlign.end
             : TextAlign.start,
-        style: Theme.of(context).textTheme.headline3,
+        style: Theme.of(context).textTheme.headline3!.copyWith(fontSize: 22),
       ),
     );
   }
@@ -408,7 +401,8 @@ class _PostViewScreenState extends State<PostViewScreen> {
             _buttonsIcon(liked! ? Icons.favorite : Icons.favorite_outline),
             Text(
               NumberFormat.compact().format(likesCounter).toString(),
-              style: Theme.of(context).textTheme.bodyText2,
+              style:
+                  Theme.of(context).textTheme.bodyText2!.copyWith(fontSize: 10),
             )
           ],
         ),
@@ -436,11 +430,12 @@ class _PostViewScreenState extends State<PostViewScreen> {
         child: Column(
           children: [
             _buttonsIcon(
-              FontAwesomeIcons.comment,
+              Icons.chat_bubble_outline_rounded,
             ),
             Text(
               NumberFormat.compact().format(commentList.length).toString(),
-              style: Theme.of(context).textTheme.bodyText2,
+              style:
+                  Theme.of(context).textTheme.bodyText2!.copyWith(fontSize: 10),
             )
           ],
         ),
@@ -544,7 +539,7 @@ class _PostViewScreenState extends State<PostViewScreen> {
   Widget _buttonsIcon(IconData icon) {
     return Icon(
       icon,
-      size: 26,
+      size: 22,
       color: Theme.of(context).primaryColor,
     );
   }

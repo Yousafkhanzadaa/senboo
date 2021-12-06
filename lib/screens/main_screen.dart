@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 // import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
@@ -84,12 +86,12 @@ class _MainScreenState extends State<MainScreen> {
         await users.doc(currentUser!.uid).set({
           "userId": currentUser!.uid,
           "userName": currentUser!.displayName,
-          "profession": "profession!",
+          "profession": "",
           "socialLinks": ["", ""],
           "date": dateTime,
           "photoUrl": currentUser!.photoURL,
           "userEmail": currentUser!.email,
-          "bio": "bio is not added yet!",
+          "bio": "Senboo is amazing....",
           "savedPosts": [],
           "interested": []
         }).whenComplete(() {
@@ -457,14 +459,16 @@ class _MainScreenState extends State<MainScreen> {
       onItemSelected: (index) => setState(() => _currentIndex = index),
       items: <BottomNavyBarItem>[
         BottomNavyBarItem(
-          icon: Icon(Icons.home),
+          icon: Icon(
+            Icons.home_outlined,
+          ),
           title: Text('Home'),
           activeColor: Theme.of(context).primaryColor,
           inactiveColor: _inactiveColor,
           textAlign: TextAlign.center,
         ),
         BottomNavyBarItem(
-          icon: Icon(Icons.notifications),
+          icon: Icon(Icons.notifications_outlined),
           title: Text('Feeds'),
           activeColor: Theme.of(context).primaryColor,
           inactiveColor: (notifyCountPro != 0 && _currentIndex != 1)
@@ -481,7 +485,7 @@ class _MainScreenState extends State<MainScreen> {
           textAlign: TextAlign.center,
         ),
         BottomNavyBarItem(
-          icon: Icon(Icons.person),
+          icon: Icon(Icons.person_outline_rounded),
           title: Text(
             'Profile ',
           ),

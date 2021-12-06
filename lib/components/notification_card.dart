@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:senboo/screens/post_view_screen.dart';
-import 'package:senboo/screens/visitor_screen.dart';
+// import 'package:senboo/screens/visitor_screen.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class NotificationCard extends StatefulWidget {
@@ -43,28 +43,13 @@ class _NotificationCardState extends State<NotificationCard> {
           ),
         );
       },
-      child: _headingBox(),
+      child: _notify(),
     );
   }
 
-  // BoxDecoration _cardDecoration() {
-  //   return BoxDecoration(
-  //     color: Theme.of(context).cardColor,
-  //     borderRadius: BorderRadius.circular(15),
-  //     boxShadow: [
-  //       BoxShadow(
-  //         color: Theme.of(context).shadowColor,
-  //         blurRadius: 3,
-  //         offset: Offset(0, 0),
-  //         // spreadRadius: 1,
-  //       ),
-  //     ],
-  //   );
-  // }
-
   // HEader box goes here-----------------------------------------
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  Widget _headingBox() {
+  Widget _notify() {
     return Container(
       width: MediaQuery.of(context).size.width * 0.97,
       margin: EdgeInsets.symmetric(
@@ -120,14 +105,16 @@ class _NotificationCardState extends State<NotificationCard> {
           Text(
             widget.userName,
             style:
-                Theme.of(context).textTheme.headline2!.copyWith(fontSize: 18),
+                Theme.of(context).textTheme.headline2!.copyWith(fontSize: 16),
           ),
           Text(
             widget.type == 'like'
                 ? "Liked you post"
                 : (widget.type == 'comment'
                     ? "Commented on your post."
-                    : "Saved your post."),
+                    : (widget.type == "post"
+                        ? "Posted in your field of interest."
+                        : "Saved your post.")),
             style: Theme.of(context).textTheme.subtitle2,
           ),
         ],
@@ -145,26 +132,9 @@ class _NotificationCardState extends State<NotificationCard> {
         // ),
         Text(
           timeago.format(widget.date.toDate()),
-          style: Theme.of(context).textTheme.subtitle2,
+          style: Theme.of(context).textTheme.subtitle2!.copyWith(fontSize: 10),
         ),
       ],
     );
   }
-
-  // Comment Box goes here-----------------------------------------
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-//   Widget _commentbox() {
-//     return Container(
-//       padding: EdgeInsets.only(top: 10, bottom: 30, left: 10, right: 10),
-//       alignment: Alignment.topLeft,
-//       child: _textTitle(),
-//     );
-//   }
-
-//   Widget _textTitle() {
-//     return Text(
-//       widget.comment,
-//       style: Theme.of(context).textTheme.bodyText1,
-//     );
-//   }
 }

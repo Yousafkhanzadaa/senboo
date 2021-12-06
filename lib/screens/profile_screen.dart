@@ -19,6 +19,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   User? currentUser = FirebaseAuth.instance.currentUser;
   // Post collection
   CollectionReference posts = FirebaseFirestore.instance.collection("posts");
+  // userPosts collection
+  CollectionReference userPosts =
+      FirebaseFirestore.instance.collection("usersPosts");
   // User collection
   CollectionReference users = FirebaseFirestore.instance.collection("users");
   CollectionReference comments =
@@ -29,6 +32,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       FirebaseFirestore.instance.collection("savedPosts");
   PostData? postData;
   List? _savedDataList;
+  // TabController _tabController = TabController(length: 2, vsync: TickerProvider());
 
   // List? savedPostsList;
   bool waiting = true;
@@ -43,10 +47,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
     //     Provider.of<DataProvider>(context, listen: false);
     Navigator.pop(context);
     _showLoading();
-    await comments.doc(postId).delete();
-    await posts.doc(postId).delete();
+    // await comments.doc(postId).delete();
+    // await posts.doc(postId).delete();
+    await userPosts
+        .doc(currentUser!.uid)
+        .collection("userPost")
+        .doc(postId)
+        .delete();
     // dataProvider.getTotalLikes(ownerId: currentUser!.uid);
     Navigator.pop(context);
+    setState(() {});
   }
 
   @override
@@ -71,13 +81,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 margin: EdgeInsets.only(bottom: 10),
                 child: ProfileCard(),
               ),
-              _postHead("Posts", Icons.read_more),
-              _postCards(),
-              SizedBox(
-                height: 20,
-              ),
-              _postHead("Saved Posts", Icons.bookmark_added),
-              _savedCards(),
+              _tabView(),
+              // _postHead("Posts", Icons.read_more),
+              // _postCards(),
+              // SizedBox(
+              //   height: 20,
+              // ),
+              // _postHead("Saved Posts", Icons.bookmark_added),
+              // _savedCards(),
             ],
           ),
         ],
@@ -85,31 +96,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // Post title goes here ---------------------------------------------
-  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  Widget _postHead(String title, IconData icon) {
+  Widget _tabView() {
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-      padding: EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(25),
-        color: Colors.white,
-      ),
-      child: Row(
+      color: Colors.white,
+      padding: EdgeInsets.symmetric(horizontal: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Icon(
-            icon,
-            size: 18,
-            color: Color(0xFF3B3B3B),
+          DefaultTabController(
+            length: 2, // length of tabs
+            initialIndex: 0,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                _tabs(),
+                Container(
+                  height: MediaQuery.of(context).size.height *
+                      0.65, //height of TabBarView
+                  padding: EdgeInsets.only(top: 5),
+                  child: TabBarView(children: [
+                    _postCards(),
+                    _savedCards(),
+                  ]),
+                )
+              ],
+            ),
           ),
-          SizedBox(
-            width: 10,
+        ],
+      ),
+    );
+  }
+
+  Widget _tabs() {
+    return Container(
+      child: TabBar(
+        labelColor: Theme.of(context).primaryColor,
+        indicatorColor: Theme.of(context).primaryColor,
+        unselectedLabelColor: Colors.black54,
+        tabs: [
+          Tab(
+            icon: Icon(Icons.post_add_outlined),
           ),
-          Text(
-            title.toUpperCase(),
-            style: Theme.of(context).textTheme.bodyText1!.copyWith(
-                color: Color(0xFF3B3B3B), fontWeight: FontWeight.w700),
-          )
+          Tab(icon: Icon(Icons.bookmark_added)),
         ],
       ),
     );
@@ -122,9 +150,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       height: MediaQuery.of(context).size.height * 0.40,
       width: MediaQuery.of(context).size.width,
       child: StreamBuilder<QuerySnapshot>(
-        stream: posts
-            .where('ownerId', isEqualTo: currentUser!.uid)
-            .orderBy("date", descending: true)
+        stream: userPosts
+            .doc(currentUser!.uid)
+            .collection("userPost")
+            .orderBy('date', descending: true)
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
@@ -132,10 +161,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             return dataList.isEmpty
                 ? _noPosts()
-                : ListView.builder(
+                : GridView.builder(
                     itemCount: dataList.length,
-                    scrollDirection: Axis.horizontal,
-                    shrinkWrap: true,
+
+                    // scrollDirection: Axis.horizontal,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 5.0,
+                      mainAxisSpacing: 5.0,
+                      childAspectRatio: (0.7),
+                    ),
+                    // shrinkWrap: true,
                     itemBuilder: (context, index) {
                       var data = snapshot.data!.docs;
                       postData = PostData.setData(dataList[index]);
@@ -167,9 +203,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _savedDataList = snapshot.data!.get("savedPosts");
             return _savedDataList!.isEmpty
                 ? _noPosts()
-                : ListView.builder(
+                : GridView.builder(
                     itemCount: _savedDataList!.length,
-                    scrollDirection: Axis.horizontal,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 5.0,
+                      mainAxisSpacing: 5.0,
+                      childAspectRatio: (0.7),
+                    ),
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
                       return _savedcardView(_savedDataList![index], 1, null);

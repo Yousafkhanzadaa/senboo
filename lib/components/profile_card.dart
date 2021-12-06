@@ -17,6 +17,9 @@ class _ProfileCardState extends State<ProfileCard> {
   // User collection
   CollectionReference users = FirebaseFirestore.instance.collection("users");
   CollectionReference posts = FirebaseFirestore.instance.collection("posts");
+  // userPosts collection
+  CollectionReference userPosts =
+      FirebaseFirestore.instance.collection("usersPosts");
   // Current User
   User? currentUser = FirebaseAuth.instance.currentUser;
   // userData modal
@@ -33,8 +36,9 @@ class _ProfileCardState extends State<ProfileCard> {
   }
 
   getTotalLikes({required String ownerId}) async {
-    var a = posts.where('ownerId', isEqualTo: ownerId).snapshots();
-    a.listen((value) {
+    var posts =
+        userPosts.doc(currentUser!.uid).collection("userPost").snapshots();
+    posts.listen((value) {
       int likesCount = 0;
       value.docs.forEach((val) {
         // totalLikes += val.get()

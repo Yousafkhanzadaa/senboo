@@ -26,7 +26,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
   Widget build(BuildContext context) {
     return TextFormField(
       controller: widget.controller,
-      style: Theme.of(context).textTheme.bodyText1,
+      style: Theme.of(context).textTheme.bodyText1!.copyWith(fontSize: 14),
       // autovalidateMode: AutovalidateMode.always,
       decoration: InputDecoration(
         border: OutlineInputBorder(
