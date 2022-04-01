@@ -48,7 +48,8 @@ class _InitialServiceState extends State<InitialService> {
   Widget build(BuildContext context) {
     ColorProvider _colorPref = Provider.of<ColorProvider>(context);
 
-    return MaterialApp(
+    return
+    MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'senboo',
       theme: _themeData(_colorPref.getColorCode),
@@ -80,10 +81,11 @@ class _InitialServiceState extends State<InitialService> {
   ThemeData _themeData(String? colorCode) {
     return ThemeData(
       primaryColor: Color(int.parse(colorCode ?? "0xFF939597")),
+      // canvasColor: Color(int.parse(colorCode ?? "0xFF939597")),
+
       // primaryColor: Color(int.parse(colorCode ?? "0xff939597")),
       backgroundColor: Colors.white,
       shadowColor: Colors.black12,
-      cardColor: Colors.white,
 
       //DefaultFontFamily----------------------
       fontFamily: "Lato",

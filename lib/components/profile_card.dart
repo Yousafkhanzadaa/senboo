@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:senboo/model/user_data.dart';
 import 'package:senboo/screens/edit_profile.dart';
 import 'package:intl/intl.dart';
@@ -131,33 +132,10 @@ class _ProfileCardState extends State<ProfileCard> {
 
   // Load Screen ---------------------------------------------
   Widget _loadingScreen() {
-    return Container(
-      // height: MediaQuery.of(context).size.height * 0.4,
-      padding: EdgeInsets.symmetric(vertical: 80),
-      margin: EdgeInsets.symmetric(
-        vertical: 10,
-        horizontal: 10,
-      ),
-      decoration: _cardDecoration(),
-      child: Column(
-        children: [
-          Container(
-              height: MediaQuery.of(context).size.height * 0.20,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage("assets/images/svgs/profile.png")),
-              )),
-          SizedBox(
-            height: 5,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 9.0, horizontal: 60),
-            child: LinearProgressIndicator(
-              color: Theme.of(context).primaryColor,
-              minHeight: 2,
-            ),
-          )
-        ],
+    return Center(
+      child: LoadingAnimationWidget.staggeredDotWave(
+        size: 50,
+        color: Theme.of(context).primaryColor,
       ),
     );
   }

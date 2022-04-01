@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:senboo/components/Ads.dart';
 import 'package:senboo/components/interest_button.dart';
 import 'package:senboo/components/post_card.dart';
@@ -163,34 +164,11 @@ class _HomeScreenState extends State<HomeScreen> {
   // }
 
   // Load Screen ---------------------------------------------
-  Widget _searching() {
-    return Container(
-      margin: EdgeInsets.symmetric(
-        vertical: 10,
-        horizontal: 10,
-      ),
-      // decoration: _cardDecoration(),
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-              height: MediaQuery.of(context).size.height * 0.20,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage("assets/images/svgs/post.png")),
-              )),
-          SizedBox(
-            height: 5,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 9.0, horizontal: 70),
-            child: LinearProgressIndicator(
-              color: Theme.of(context).primaryColor,
-              minHeight: 2,
-            ),
-          )
-        ],
+  _searching() {
+    return Center(
+      child: LoadingAnimationWidget.staggeredDotWave(
+        size: 50,
+        color: Theme.of(context).primaryColor,
       ),
     );
   }

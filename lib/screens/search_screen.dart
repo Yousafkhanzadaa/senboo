@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:senboo/components/custom_text_field.dart';
 import 'package:senboo/components/search_card.dart';
 import 'package:senboo/model/get_user_data.dart';
@@ -116,7 +117,7 @@ class _SearchScreenState extends State<SearchScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
-            height: MediaQuery.of(context).size.height * 0.3,
+            height: MediaQuery.of(context).size.height * 0.2,
             margin: EdgeInsets.symmetric(
               vertical: 10,
               horizontal: 10,
@@ -131,7 +132,7 @@ class _SearchScreenState extends State<SearchScreen> {
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Theme.of(context).primaryColor,
-              fontSize: 26,
+              fontSize: 20,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -146,7 +147,7 @@ class _SearchScreenState extends State<SearchScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
-            height: MediaQuery.of(context).size.height * 0.2,
+            height: MediaQuery.of(context).size.height * 0.17,
             margin: EdgeInsets.symmetric(
               vertical: 10,
               horizontal: 10,
@@ -161,27 +162,11 @@ class _SearchScreenState extends State<SearchScreen> {
 
   // field is empty
   Widget _searching() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-            height: MediaQuery.of(context).size.height * 0.2,
-            margin: EdgeInsets.symmetric(
-              vertical: 10,
-              horizontal: 10,
-            ),
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage("assets/images/svgs/search.png")),
-            )),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 9.0, horizontal: 60),
-          child: LinearProgressIndicator(
-            color: Theme.of(context).primaryColor,
-            minHeight: 2,
-          ),
-        )
-      ],
+    return Center(
+      child: LoadingAnimationWidget.staggeredDotWave(
+        size: 50,
+        color: Theme.of(context).primaryColor,
+      ),
     );
   }
 }

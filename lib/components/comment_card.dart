@@ -73,7 +73,12 @@ class _CommentCardState extends State<CommentCard> {
   Widget _headingBox() {
     return Container(
       width: MediaQuery.of(context).size.width,
-      padding: EdgeInsets.all(10),
+      padding: EdgeInsets.only(
+        top: 5,
+        left: 10,
+        bottom: 5,
+        right: 10,
+      ),
       decoration: BoxDecoration(
         color: Theme.of(context).primaryColor,
         borderRadius: BorderRadius.only(
@@ -107,9 +112,9 @@ class _CommentCardState extends State<CommentCard> {
                   : SizedBox(),
             ],
           ),
-          SizedBox(
-            height: 5,
-          ),
+          // SizedBox(
+          //   height: 5,
+          // ),
           _timeAgo(),
         ],
       ),
@@ -134,7 +139,7 @@ class _CommentCardState extends State<CommentCard> {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style:
-                Theme.of(context).textTheme.headline2!.copyWith(fontSize: 18),
+                Theme.of(context).textTheme.headline2!.copyWith(fontSize: 16),
           ),
           Text(
             widget.profession,
@@ -167,7 +172,7 @@ class _CommentCardState extends State<CommentCard> {
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   Widget _commentbox() {
     return Container(
-      padding: EdgeInsets.only(top: 10, bottom: 30, left: 10, right: 10),
+      padding: EdgeInsets.only(top: 10, bottom: 10, left: 10, right: 10),
       alignment: Alignment.topLeft,
       child: _textTitle(),
     );

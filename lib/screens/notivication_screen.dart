@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:senboo/components/notification_card.dart';
 import 'package:senboo/model/feed_data.dart';
@@ -91,7 +92,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
           child: Icon(
             Icons.notifications,
             color: Theme.of(context).primaryColor,
-            size: 170,
+            size: 120,
           ),
         ),
         Center(
@@ -100,7 +101,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Theme.of(context).primaryColor,
-              fontSize: 26,
+              fontSize: 20,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -110,28 +111,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
 
   Widget _loadingNotifications() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Container(
-          // height: MediaQuery.of(context).size.height * 0.2,
-          margin: EdgeInsets.symmetric(
-            vertical: 10,
-            horizontal: 10,
-          ),
-          child: Icon(
-            Icons.notifications,
-            color: Theme.of(context).primaryColor,
-            size: 170,
-          ),
-        ),
-        Padding(
-            padding: EdgeInsets.symmetric(vertical: 9, horizontal: 60),
-            child: LinearProgressIndicator(
-              color: Theme.of(context).primaryColor,
-              minHeight: 2,
-            )),
-      ],
+    return Center(
+      child: LoadingAnimationWidget.staggeredDotWave(
+        size: 50,
+        color: Theme.of(context).primaryColor,
+      ),
     );
   }
 }

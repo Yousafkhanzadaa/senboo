@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 // import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:senboo/components/color_palette.dart';
@@ -43,6 +43,8 @@ class _MainScreenState extends State<MainScreen> {
   bool added = false;
   int _currentIndex = 0;
   int notifyCount = 0;
+
+  bool state = false;
   final _inactiveColor = Colors.grey;
 
   @override
@@ -160,27 +162,9 @@ class _MainScreenState extends State<MainScreen> {
   Widget _loadingScreen() {
     return Scaffold(
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-                height: 100,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage("assets/images/svgs/loading.png")),
-                )),
-            SizedBox(
-              height: 5,
-            ),
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 9.0, horizontal: 60),
-              child: LinearProgressIndicator(
-                color: Theme.of(context).primaryColor,
-                minHeight: 2,
-              ),
-            )
-          ],
+        child: LoadingAnimationWidget.staggeredDotWave(
+          size: 50,
+          color: Theme.of(context).primaryColor,
         ),
       ),
     );
@@ -251,6 +235,29 @@ class _MainScreenState extends State<MainScreen> {
                       child: _actionButtons(Icons.support, "Your support", 2),
                     ),
                     Spacer(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Dark mode".toUpperCase(),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyText2!
+                                .copyWith(
+                                    fontWeight: FontWeight.bold, fontSize: 16)),
+                        SizedBox(width: 10),
+                        Switch(
+                            value: state,
+                            activeColor: Colors.white,
+                            activeTrackColor: Colors.black,
+                            inactiveTrackColor: Colors.yellow,
+                            onChanged: (val) {
+                              setState(() {
+                                state = val;
+                              });
+                            }),
+                      ],
+                    ),
+
                     Container(
                       margin: EdgeInsets.only(bottom: 25),
                       child: _chooseColorButton(),
@@ -385,44 +392,6 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  // _showLoading() {
-  //   showDialog(
-  //     context: context,
-  //     barrierDismissible: false,
-  //     builder: (context) {
-  //       return Dialog(
-  //         backgroundColor: Colors.transparent,
-  //         child: Container(
-  //           decoration: _cardDecoration(),
-  //           height: MediaQuery.of(context).size.height * 0.35,
-  //           width: MediaQuery.of(context).size.width * 0.9,
-  //           child: Center(
-  //             child: CircularProgressIndicator(
-  //               color: Theme.of(context).primaryColor,
-  //             ),
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
-
-  // CardDecoration --------------------------------------
-  // BoxDecoration _cardDecoration() {
-  //   return BoxDecoration(
-  //     color: Theme.of(context).cardColor,
-  //     borderRadius: BorderRadius.circular(25),
-  //     boxShadow: [
-  //       BoxShadow(
-  //         color: Theme.of(context).primaryColor.withOpacity(0.40),
-  //         blurRadius: 5,
-  //         offset: Offset(0, 0),
-  //         spreadRadius: 1,
-  //       ),
-  //     ],
-  //   );
-  // }
-
   // showing Pages ----------------------------------
   Widget _getBody() {
     List pages = [
@@ -504,31 +473,10 @@ class _MainScreenState extends State<MainScreen> {
       builder: (context) {
         return Dialog(
           backgroundColor: Colors.transparent,
-          child: Container(
-            width: MediaQuery.of(context).size.width * 70,
-            height: 200,
-            decoration: _cardDecoration(),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                    height: 100,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                          image: AssetImage("assets/images/svgs/loading.png")),
-                    )),
-                SizedBox(
-                  height: 5,
-                ),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 9.0, horizontal: 60),
-                  child: LinearProgressIndicator(
-                    color: Theme.of(context).primaryColor,
-                    minHeight: 2,
-                  ),
-                )
-              ],
+          child: Center(
+            child: LoadingAnimationWidget.staggeredDotWave(
+              size: 50,
+              color: Theme.of(context).primaryColor,
             ),
           ),
         );

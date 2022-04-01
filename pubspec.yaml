@@ -42,6 +42,8 @@ dependencies:
   # permission_handler: ^8.2.5
   share_plus: ^3.0.4
   path_provider: ^2.0.5
+  flutter_svg: ^1.0.0
+  loading_animation_widget: ^0.0.2+2
 
 dev_dependencies:
   flutter_test:
@@ -65,6 +67,7 @@ flutter:
     - assets/images/svgs/profile.png
     - assets/images/svgs/loading.png
     - assets/images/svgs/welcome.png
+    - assets/images/svgs/logo_fade.svg
 
   # fonts ----------------------------------------
   fonts:

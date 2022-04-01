@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:senboo/components/likes_list.dart';
 import 'package:senboo/components/profile_card.dart';
 import 'package:senboo/components/profile_post_card.dart';
@@ -82,13 +83,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: ProfileCard(),
               ),
               _tabView(),
-              // _postHead("Posts", Icons.read_more),
-              // _postCards(),
-              // SizedBox(
-              //   height: 20,
-              // ),
-              // _postHead("Saved Posts", Icons.bookmark_added),
-              // _savedCards(),
             ],
           ),
         ],
@@ -389,7 +383,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // Load Screen ---------------------------------------------
   Widget _noPosts() {
     return Container(
-      decoration: _cardDecoration(),
+      // decoration: _cardDecoration(),
       margin: EdgeInsets.all(10),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -407,7 +401,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             "No posts yet.",
             style: TextStyle(
               color: Theme.of(context).primaryColor,
-              fontSize: 26,
+              fontSize: 20,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -418,25 +412,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   // Load Screen ---------------------------------------------
   Widget _searching() {
-    return Column(
-      children: [
-        Container(
-            height: MediaQuery.of(context).size.height * 0.20,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage("assets/images/svgs/post.png")),
-            )),
-        SizedBox(
-          height: 5,
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 9.0, horizontal: 60),
-          child: LinearProgressIndicator(
-            color: Theme.of(context).primaryColor,
-            minHeight: 2,
-          ),
-        )
-      ],
+    return Center(
+      child: LoadingAnimationWidget.staggeredDotWave(
+        size: 50,
+        color: Theme.of(context).primaryColor,
+      ),
     );
   }
 
