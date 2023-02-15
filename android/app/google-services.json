@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "90608668160",
+    "project_id": "senboo-bf5d4",
+    "storage_bucket": "senboo-bf5d4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:90608668160:android:a0c90a35e59a88cf9a52e5",
+        "android_client_info": {
+          "package_name": "com.ydevs.senboo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "90608668160-vk9q7qoq3qkpahfii4d0csuadnu68oqr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ydevs.senboo",
+            "certificate_hash": "2ee49a1e73d7eeb2a8af8d4a892fa53436f4b225"
+          }
+        },
+        {
+          "client_id": "90608668160-rb4a17bi2d121ss15cts8sk1alg07q7f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAcr8KvcItrw0DZ9zkkeWA7QKn9qScbpNA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "90608668160-rb4a17bi2d121ss15cts8sk1alg07q7f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
