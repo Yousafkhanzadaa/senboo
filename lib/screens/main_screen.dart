@@ -2,10 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-// import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:senboo/components/color_palette.dart';
 import 'package:senboo/components/custom_animated_bottom_bar.dart';
@@ -15,10 +13,7 @@ import 'package:senboo/screens/notivication_screen.dart';
 import 'package:senboo/screens/post_screen.dart';
 import 'package:senboo/screens/profile_screen.dart';
 import 'package:senboo/screens/search_screen.dart';
-// import 'package:senboo/screens/support_screen.dart';
 import 'package:senboo/services/firebase_auth_services.dart';
-// import 'package:senboo/services/firestore_services.dart';
-// import 'package:senboo/services/firestore_services.dart';
 
 class MainScreen extends StatefulWidget {
   MainScreen({Key? key}) : super(key: key);
